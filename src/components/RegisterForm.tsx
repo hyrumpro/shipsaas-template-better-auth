@@ -233,7 +233,7 @@ export function RegisterForm() {
         </form>
         <p className="text-center text-sm pt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-500 hover:underline">
+          <Link href="/auth/login" className="text-blue-500 hover:underline">
             Login
           </Link>
         </p>

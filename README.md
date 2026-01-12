@@ -1,128 +1,294 @@
-# ⚡ ShipFree
+# ⚡ ShipFree - Production-Ready SaaS Boilerplate
 
-Hi there! 👋
+**Launch your SaaS in days, not months.**
 
-ShipFree is a free alternative to ShipFast, designed to simplify and optimize your shipping process. It’s built using modern web technologies like Next.js, Supabase, Stripe, LemonSqueezy, Drizzle ORM and Mailgun.
+A complete Next.js 15 SaaS boilerplate with authentication, payments (Stripe & LemonSqueezy), database, email, SEO, and theme system - all configured and ready to deploy.
 
-## Features
+---
 
-- SEO Optimisation
-- User authentication with Supabase
-- Stripe and LemonSqueezy integration
-- Email notifications via Mailgun
-- Modern UI built with Next.js and TailwindCSS
+## 🚀 Quick Start (5 Minutes)
 
-## Docker Setup
+```bash
+# 1. Clone and install
+git clone https://github.com/yourusername/shipfree.git
+cd shipfree
+pnpm install
 
-ShipFree provides Docker configurations for both **development** and **production** environments. Below, you'll find the structure of the Docker files and the commands to get started.
+# 2. Set up environment
+cp .env.example .env
+# Add your Supabase credentials (see GETTING_STARTED.md)
 
-### Docker File Structure
+# 3. Deploy database
+pnpm db:push
 
-The Docker files are organized as follows:
-
-```
-docker
-├── dev
-│   ├── Dockerfile                  # Dockerfile for development
-│   ├── docker-compose.yml          # Base development setup
-│   ├── docker-compose.mongodb.yml  # Development setup with MongoDB
-│   └── docker-compose.postgres.yml # Development setup with PostgreSQL
-└── prod
-    ├── Dockerfile                  # Dockerfile for production
-    ├── docker-compose.yml          # Base production setup
-    ├── docker-compose.mongodb.yml  # Production setup with MongoDB
-    └── docker-compose.postgres.yml # Production setup with PostgreSQL
+# 4. Start development
+pnpm dev
 ```
 
-### Development Environment
+Visit http://localhost:3000
 
-In development, the project runs in **watch mode**, meaning it automatically detects changes in your code and rebuilds the application. This is ideal for local development but should **never** be used in production.
-
-#### Commands for Development
-
-1. **Base Setup** (without a database):
-
-   ```bash
-   docker-compose -f docker/dev/docker-compose.yml up --build
-   ```
-
-2. **With PostgreSQL**:
-
-   ```bash
-   docker-compose -f docker/dev/docker-compose.yml -f docker/dev/docker-compose.postgres.yml up --build
-   ```
-
-3. **With MongoDB**:
-   ```bash
-   docker-compose -f docker/dev/docker-compose.yml -f docker/dev/docker-compose.mongodb.yml up --build
-   ```
-
-#### Why Watch Mode?
-
-- **Watch mode** ensures that your changes are reflected in real-time without manually restarting the server.
-- It’s perfect for development but **not suitable for production** due to performance and security concerns.
+**📖 [Setup Guide](GETTING_STARTED.md)** - 50 minutes to production  
+**🔧 [Developer Guide](DEVELOPER_GUIDE.md)** - Technical docs & API reference  
+**🚀 [Deployment Guide](DEPLOYMENT.md)** - Deploy to Vercel, Railway, or Docker  
+**🔍 [Technical Review](TECHNICAL_REVIEW.md)** - Architecture & security audit
 
 ---
 
-### Production Environment
+## 🎨 Theme System & Component Library
 
-The production environment is optimized for performance and security. It uses a multi-stage build to reduce the image size and includes only the necessary dependencies.
+**Change your entire app's color scheme in seconds!** 
 
-#### Commands for Production
+✨ **20+ Production-Ready Components** - Hero sections, pricing tables, testimonials, forms, dashboards  
+🎨 **8 Color Themes** - Amber, Blue, Purple, Green, Red, Cyan, Pink, Orange  
+⚡ **Live Preview** - Visit `/playground` to see all components and try themes  
+🔧 **Easy Customization** - Change one CSS variable, update everything
 
-1. **Base Setup** (without a database):
+### Quick Theme Change
 
-   ```bash
-   docker-compose -f docker/prod/docker-compose.yml up --build -d
-   ```
+```css
+/* Edit src/app/globals.css */
+:root {
+  --primary: 220 100% 55%;  /* Change to your brand color */
+}
+```
 
-2. **With PostgreSQL**:
+Or visit `/playground` → Click palette icon → Choose color
 
-   ```bash
-   docker-compose -f docker/prod/docker-compose.yml -f docker/prod/docker-compose.postgres.yml up --build -d
-   ```
-
-3. **With MongoDB**:
-   ```bash
-   docker-compose -f docker/prod/docker-compose.yml -f docker/prod/docker-compose.mongodb.yml up --build -d
-   ```
-
-#### Key Differences in Production
-
-- **No watch mode**: The application is pre-built, and changes require a rebuild.
-- **Optimized images**: Smaller image size and faster startup times.
-- **Environment variables**: Ensure all required variables (e.g., `DATABASE_URL`, `API_KEY`) are set.
+👉 **[Theme Documentation](DEVELOPER_GUIDE.md#theme-system)**
 
 ---
 
-### Portainer Integration
+## 💳 Payment Provider Switching
 
-Portainer is included in both development and production setups to help you manage your Docker containers via a web interface.
+**Switch between Stripe and LemonSqueezy with ONE environment variable:**
 
-- **Access Portainer**: `http://localhost:9000`
-- **Default credentials**: Set up during the first login.
+```bash
+# Use Stripe
+NEXT_PUBLIC_PAYMENT_PROVIDER=stripe
 
----
+# Use LemonSqueezy
+NEXT_PUBLIC_PAYMENT_PROVIDER=lemonsqueezy
 
-### Disclaimer
+# Use both
+NEXT_PUBLIC_PAYMENT_PROVIDER=both
+```
 
-- **Development Mode**: Uses watch mode for real-time updates. Not suitable for production.
-- **Production Mode**: Optimized for performance and security. Requires a rebuild for changes.
+**No code changes needed!** The unified architecture handles everything automatically.
 
----
-
-## Docs
-
-For full documentation, visit: [ShipFree Docs](https://shipfree.idee8.agency/docs)
-
-## Code of Conduct
-
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
-
-## Contributing
-
-For people who want to contribute, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+👉 **[Payment Documentation](DEVELOPER_GUIDE.md#payment-integrations)**
 
 ---
 
-Cooked for you with ❤️ by [Revoks](https://revoks.dev)
+## 🐳 Docker Deployment
+
+```bash
+# With Supabase (Recommended)
+pnpm docker:dev              # Development
+pnpm docker:prod:build       # Production
+
+# With local PostgreSQL (Dev only)
+pnpm docker:dev:postgres
+```
+
+👉 **[Deployment Documentation](DEVELOPER_GUIDE.md#deployment)**
+
+---
+
+## ✨ What's Included
+
+### 🔐 Authentication
+- ✅ Email/password authentication (Supabase)
+- ✅ Email verification flow
+- ✅ Protected routes with middleware
+- ✅ Session management
+- ✅ Auth webhook syncing
+
+### 💳 Payments (Stripe & LemonSqueezy)
+- ✅ **Switch providers with one environment variable**
+- ✅ Complete webhook handlers with signature verification
+- ✅ Subscription and one-time payment support
+- ✅ Automatic database updates
+- ✅ Payment history tracking
+- ✅ Refund handling
+- ✅ Automatic receipt emails
+
+### 🗄️ Production-Ready Database
+- ✅ Complete PostgreSQL schema (users, subscriptions, orders, payments)
+- ✅ Row Level Security (RLS) policies
+- ✅ Type-safe queries with Drizzle ORM
+- ✅ Automatic subscription syncing
+- ✅ Webhook event audit trail
+- ✅ Proper indexes for performance
+
+### 🎨 Theme System & Components
+- ✅ 20+ production-ready components
+- ✅ 8 color theme presets
+- ✅ Live theme switcher at `/playground`
+- ✅ CSS variable-based (change once, update everywhere)
+- ✅ Hero sections, pricing, testimonials, forms, dashboards
+
+### 📧 Email System
+- ✅ 6 pre-built HTML email templates
+- ✅ Mailgun integration
+- ✅ Welcome, verification, payment, cancellation emails
+- ✅ Incoming email forwarding
+- ✅ Graceful degradation in development
+
+### 🔍 SEO & Blog
+- ✅ Complete markdown blog system
+- ✅ Dynamic sitemap generation
+- ✅ Structured data (JSON-LD)
+- ✅ OpenGraph & Twitter cards
+- ✅ 3 example blog posts
+
+### 🐳 DevOps
+- ✅ Docker configuration (dev & production)
+- ✅ Vercel deployment ready
+- ✅ Railway deployment ready
+- ✅ Environment variable templates
+- ✅ Comprehensive error handling & logging
+
+---
+
+## 📊 Tech Stack
+
+- **Framework:** Next.js 15 (App Router, Turbopack)
+- **Database:** PostgreSQL (Supabase)
+- **ORM:** Drizzle ORM
+- **Auth:** Supabase Auth
+- **Payments:** Stripe & LemonSqueezy
+- **Email:** Mailgun
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI + shadcn/ui
+- **Deployment:** Vercel, Railway, or Docker
+
+---
+
+## 🎯 Features
+
+### ✅ Fully Implemented
+- ✅ Email/password authentication
+- ✅ Complete payment system (Stripe & LemonSqueezy)
+- ✅ All webhook handlers with database operations
+- ✅ Production-ready database with RLS
+- ✅ Blog system with 3 example posts
+- ✅ SEO optimization (meta tags, sitemap, structured data)
+- ✅ Email templates (6 ready to use)
+- ✅ Docker configuration
+- ✅ Protected routes
+- ✅ Error handling & logging
+
+### 💰 Payment Features
+- ✅ Switch between Stripe and LemonSqueezy with one variable
+- ✅ Subscription management
+- ✅ One-time payments
+- ✅ Webhook signature verification
+- ✅ Automatic database updates
+- ✅ Payment history tracking
+- ✅ Refund handling
+
+### 🗄️ Database Features
+- ✅ Users with subscription status
+- ✅ Subscriptions (recurring billing)
+- ✅ Orders (one-time payments)
+- ✅ Payments (transaction history)
+- ✅ Webhook events (audit trail)
+- ✅ Row Level Security
+- ✅ Automatic timestamp updates
+
+---
+
+## ⏱️ Time Saved
+
+This boilerplate saves you **100-120 hours** of development:
+- Authentication setup: 10-15 hours
+- Database design & implementation: 20-30 hours
+- Payment integration (both providers): 30-40 hours
+- Webhook handlers: 20-30 hours
+- SEO & blog system: 10-15 hours
+- Email templates: 5-10 hours
+- Docker configuration: 5-10 hours
+
+---
+
+## 🚀 Deployment Options
+
+### Vercel (Easiest - 5 minutes)
+```bash
+vercel deploy
+```
+Add environment variables in Vercel dashboard.
+
+### Railway (10 minutes)
+1. Push to GitHub
+2. Connect to Railway
+3. Add environment variables
+4. Deploy!
+
+### Docker (Full Control)
+```bash
+docker-compose -f docker/prod/docker-compose.yml up -d
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+---
+
+## 📚 Documentation
+
+### For Users
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Complete setup guide (50 minutes to production)
+
+### For Developers
+- **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Technical documentation, API reference, theme system, components
+
+### For Deployment
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deployment guides for Vercel, Railway, Docker, and VPS
+
+### For Technical Review
+- **[TECHNICAL_REVIEW.md](TECHNICAL_REVIEW.md)** - Architecture review, security audit, code quality analysis
+
+---
+
+## ⏱️ Time Saved
+
+This boilerplate saves you **100-120 hours** of development:
+- ✅ Authentication setup: 10-15 hours
+- ✅ Database design & implementation: 20-30 hours
+- ✅ Payment integration (both providers): 30-40 hours
+- ✅ Webhook handlers: 20-30 hours
+- ✅ SEO & blog system: 10-15 hours
+- ✅ Email templates: 5-10 hours
+- ✅ Docker configuration: 5-10 hours
+
+---
+
+## 🔒 Security
+
+- ✅ Row Level Security (RLS) on all tables
+- ✅ Webhook signature verification (Stripe, LemonSqueezy, Supabase, Mailgun)
+- ✅ Environment variables for all secrets
+- ✅ Protected API routes with authentication
+- ✅ Secure session management
+- ✅ SQL injection prevention (parameterized queries)
+- ✅ XSS prevention (React escaping)
+
+---
+
+## 📝 License
+
+MIT License
+
+---
+
+## 🤝 Support
+
+- **Documentation:** [Setup](GETTING_STARTED.md) | [Developer](DEVELOPER_GUIDE.md) | [Deployment](DEPLOYMENT.md) | [Technical Review](TECHNICAL_REVIEW.md)
+- **Issues:** GitHub Issues
+- **Discussions:** GitHub Discussions
+
+---
+
+**Built for SaaS founders who want to ship fast.**
+
+Last Updated: January 12, 2026 | Version: 5.0

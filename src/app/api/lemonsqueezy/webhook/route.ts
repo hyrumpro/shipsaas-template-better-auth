@@ -1,8 +1,7 @@
-// app/api/lemonsqueezy/webhook/route.ts
 import { NextResponse } from "next/server";
-import { handleWebhook } from "@/utils/lemon";
 import { logger } from "@/lib/logger";
 import { handleApiError } from "@/lib/error-handler";
+import { handleLemonSqueezyWebhook } from "@/lib/webhooks/lemonsqueezy-handler";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -42,8 +41,8 @@ export async function POST(request: Request) {
 
     logger.info("LemonSqueezy webhook signature verified");
 
-    // Handle the verified webhook
-    await handleWebhook(payload);
+    // Handle the verified webhook with database operations
+    await handleLemonSqueezyWebhook(payload);
 
     return NextResponse.json({ success: true });
   } catch (error) {

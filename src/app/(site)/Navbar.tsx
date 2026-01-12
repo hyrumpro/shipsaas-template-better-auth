@@ -62,6 +62,18 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
+          <Link
+            href="/auth/login"
+            className="rounded-md px-4 py-2 text-sm text-white/90 transition hover:text-white"
+          >
+            Login
+          </Link>
+          <Link
+            href="/auth/register"
+            className="rounded-md bg-[#FFBE18] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#FFD04D]"
+          >
+            Get Started
+          </Link>
           <a
             href={`https://github.com/${repo}`}
             target="_blank"
@@ -138,12 +150,20 @@ export default function Navbar() {
             >
               Wall of love
             </Link>
+            <div className="border-t border-white/10 my-2"></div>
             <Link
-              href="/docs"
+              href="/auth/login"
               className="block rounded-md px-3 py-2 text-base font-medium text-white/90 hover:bg-[#3C3C3C] hover:text-white"
               onClick={toggleMenu}
             >
-              Docs
+              Login
+            </Link>
+            <Link
+              href="/auth/register"
+              className="block rounded-md px-3 py-2 text-base font-medium bg-[#FFBE18] text-black hover:bg-[#FFD04D]"
+              onClick={toggleMenu}
+            >
+              Get Started
             </Link>
             <a
               href={`https://github.com/${repo}`}

@@ -94,7 +94,7 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
             </button>
             {error.includes("sign in") && (
               <a
-                href="/login"
+                href="/auth/login"
                 className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Sign In
