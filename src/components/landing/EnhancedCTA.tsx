@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Rocket, Github, BookOpen } from "lucide-react";
+import { ArrowRight, Rocket, Sparkles, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 export const EnhancedCTA = () => {
@@ -39,8 +39,8 @@ export const EnhancedCTA = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl lg:text-6xl font-black mb-6"
           >
-            Ready to ship{" "}
-            <span className="text-gradient">faster?</span>
+            Start building{" "}
+            <span className="text-gradient">today</span>
           </motion.h2>
           
           {/* Subheadline */}
@@ -51,8 +51,8 @@ export const EnhancedCTA = () => {
             viewport={{ once: true }}
             className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Stop wasting time on boilerplate. Start building what matters. 
-            Join developers who've accelerated their workflow with ShipFree.
+            Join hundreds of developers who've accelerated their SaaS journey. 
+            One payment, lifetime access, unlimited projects.
           </motion.p>
           
           {/* CTA buttons */}
@@ -63,17 +63,17 @@ export const EnhancedCTA = () => {
             viewport={{ once: true }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link href="https://github.com/yourusername/shipfree" target="_blank">
+            <Link href="/playground">
               <Button variant="hero" size="xl">
-                <Github className="w-5 h-5" />
-                Get Started Free
+                <Sparkles className="w-5 h-5" />
+                Get Started - $29
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/docs">
+            <Link href="/playground">
               <Button variant="glass" size="xl">
                 <BookOpen className="w-5 h-5" />
-                Read Documentation
+                View Live Demo
               </Button>
             </Link>
           </motion.div>
@@ -88,15 +88,15 @@ export const EnhancedCTA = () => {
           >
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              100% Free & Open Source
+              One-Time Payment
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              MIT License
+              Lifetime Updates
             </span>
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              No Vendor Lock-in
+              Unlimited Projects
             </span>
           </motion.div>
         </motion.div>

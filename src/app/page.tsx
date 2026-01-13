@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { StructuredData } from "@/components/StructuredData";
 import { EnhancedNavbar } from "@/components/landing/EnhancedNavbar";
 import { EnhancedHero } from "@/components/landing/EnhancedHero";
-import { WhyShipFree } from "@/components/landing/WhyShipFree";
+import { WhyShipSaaS } from "@/components/landing/WhyShipSaaS";
 import { EnhancedFeatures } from "@/components/landing/EnhancedFeatures";
 import { TechStack } from "@/components/landing/TechStack";
 import { EnhancedFAQ } from "@/components/landing/EnhancedFAQ";
@@ -10,9 +10,9 @@ import { EnhancedCTA } from "@/components/landing/EnhancedCTA";
 import { EnhancedFooter } from "@/components/landing/EnhancedFooter";
 
 export const metadata: Metadata = {
-  title: "ShipFree - Free Open Source SaaS Boilerplate",
+  title: "ShipSaaS - Premium Next.js SaaS Template | Launch in Days",
   description:
-    "Free, open-source SaaS boilerplate with Next.js 16, Supabase, Stripe, and Mailgun. Launch your startup in days, not weeks.",
+    "Premium Next.js 16 SaaS template with authentication, payments, emails, and beautiful UI. Production-ready code that saves you weeks of development.",
 };
 
 export default function Home() {
@@ -22,10 +22,10 @@ export default function Home() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "ShipFree",
+    name: "ShipSaaS",
     url: baseUrl,
     description:
-      "Free, open-source SaaS boilerplate for launching startups quickly",
+      "Premium Next.js SaaS template for launching startups quickly",
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -40,12 +40,12 @@ export default function Home() {
   const softwareSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "ShipFree",
+    name: "ShipSaaS",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Web",
     offers: {
       "@type": "Offer",
-      price: "0",
+      price: "29",
       priceCurrency: "USD",
     },
     aggregateRating: {
@@ -63,7 +63,7 @@ export default function Home() {
       <div className="bg-background min-h-screen">
         <EnhancedNavbar />
         <EnhancedHero />
-        <WhyShipFree />
+        <WhyShipSaaS />
         <EnhancedFeatures />
         <TechStack />
         <EnhancedFAQ />

@@ -1,6 +1,18 @@
 // lib/lemon-squeezy.ts
 import { logger } from "@/lib/logger";
 
+// Type for LemonSqueezy checkout response
+interface LemonSqueezyCheckout {
+  data?: {
+    id?: string;
+    attributes?: {
+      url?: string;
+      [key: string]: any;
+    };
+  };
+  [key: string]: any;
+}
+
 // Use dynamic imports to prevent module-level initialization during build
 let isConfigured = false;
 
@@ -67,7 +79,7 @@ export const createCheckout = async (
     storeId,
     variantId,
     newCheckout
-  );
+  ) as { data?: LemonSqueezyCheckout; error?: any };
 
   if (error) {
     logger.error("Failed to create LemonSqueezy checkout", error, {
@@ -78,7 +90,7 @@ export const createCheckout = async (
   }
 
   logger.payment("checkout_created", {
-    checkoutId: (data as any)?.id,
+    checkoutId: data?.data?.id || 'unknown',
     userId,
   });
 

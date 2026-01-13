@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSwitcher } from "@/components/playground/ui/ThemeSwitcher";
 import {
@@ -14,12 +12,17 @@ import {
   Hero3D,
 } from "@/components/playground/hero";
 import { GlassNavbar, MinimalNavbar } from "@/components/playground/nav";
-import { PricingCards } from "@/components/playground/pricing";
+import { PricingCards, PricingComparison } from "@/components/playground/pricing";
 import { TestimonialCards, TestimonialMarquee } from "@/components/playground/testimonials";
 import { ContactForm, NewsletterForm } from "@/components/playground/forms";
 import { StatsCards, ActivityFeed } from "@/components/playground/dashboard";
 import { AnimatedBorder, GlassCard } from "@/components/playground/premium";
-import { Footer } from "@/components/playground/layout";
+import { FeatureGrid } from "@/components/playground/features";
+import { CTAGradient, CTAMinimal } from "@/components/playground/cta";
+import { FAQAccordion } from "@/components/playground/faq";
+import { LogoCloud } from "@/components/playground/social";
+import { StatCounter } from "@/components/playground/stats";
+import { Timeline } from "@/components/playground/timeline";
 import { Sparkles, Code2, Palette, Zap, Layout, ArrowRight } from "lucide-react";
 
 export default function PlaygroundPage() {
@@ -29,15 +32,23 @@ export default function PlaygroundPage() {
       <header className="border-b border-border/50 sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
         <div className="container flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">Component Playground</h1>
-              <p className="text-xs text-muted-foreground">20+ Production-Ready Components</p>
-            </div>
+            <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="font-bold text-lg">Component Playground</h1>
+                <p className="text-xs text-muted-foreground">27+ Production-Ready Components</p>
+              </div>
+            </a>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/">
+                <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                Back to Home
+              </a>
+            </Button>
             <ThemeSwitcher />
             <Button variant="hero" size="sm">
               <Code2 className="w-4 h-4 mr-2" />
@@ -64,13 +75,13 @@ export default function PlaygroundPage() {
           </h1>
 
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Copy, paste, and customize 20+ premium components. All themeable with a single color change.
+            Copy, paste, and customize 27+ premium components. All themeable with a single color change.
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap mb-12">
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border/50">
               <Layout className="w-5 h-5 text-primary" />
-              <span className="font-medium">20+ Components</span>
+              <span className="font-medium">27+ Components</span>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border/50">
               <Palette className="w-5 h-5 text-primary" />
@@ -92,16 +103,23 @@ export default function PlaygroundPage() {
       <section className="py-20 bg-secondary/20">
         <div className="container px-4">
           <Tabs defaultValue="hero" className="w-full">
-            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 lg:grid-cols-8 mb-12">
-              <TabsTrigger value="hero">Hero</TabsTrigger>
-              <TabsTrigger value="nav">Nav</TabsTrigger>
-              <TabsTrigger value="pricing">Pricing</TabsTrigger>
-              <TabsTrigger value="testimonials">Reviews</TabsTrigger>
-              <TabsTrigger value="forms">Forms</TabsTrigger>
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="premium">Premium</TabsTrigger>
-              <TabsTrigger value="theme">Theme</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto pb-4">
+              <TabsList className="inline-flex w-auto min-w-full justify-start gap-2 mb-12 flex-wrap">
+                <TabsTrigger value="hero">Hero</TabsTrigger>
+                <TabsTrigger value="features">Features</TabsTrigger>
+                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                <TabsTrigger value="cta">CTA</TabsTrigger>
+                <TabsTrigger value="testimonials">Reviews</TabsTrigger>
+                <TabsTrigger value="faq">FAQ</TabsTrigger>
+                <TabsTrigger value="stats">Stats</TabsTrigger>
+                <TabsTrigger value="social">Social</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                <TabsTrigger value="forms">Forms</TabsTrigger>
+                <TabsTrigger value="nav">Nav</TabsTrigger>
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="premium">Premium</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="hero" className="space-y-12">
               <ComponentPreview title="Gradient Hero" description="Animated gradient mesh background">
@@ -139,9 +157,53 @@ export default function PlaygroundPage() {
               </ComponentPreview>
             </TabsContent>
 
+            <TabsContent value="features" className="space-y-12">
+              <ComponentPreview title="Feature Grid" description="Animated feature showcase with icons and hover effects">
+                <FeatureGrid />
+              </ComponentPreview>
+            </TabsContent>
+
             <TabsContent value="pricing" className="space-y-12">
               <ComponentPreview title="Pricing Cards" description="Monthly/yearly toggle with animated prices">
                 <PricingCards />
+              </ComponentPreview>
+
+              <ComponentPreview title="Pricing Comparison" description="Feature comparison table with checkmarks">
+                <PricingComparison />
+              </ComponentPreview>
+            </TabsContent>
+
+            <TabsContent value="cta" className="space-y-12">
+              <ComponentPreview title="Gradient CTA" description="Eye-catching gradient background with animated elements">
+                <CTAGradient />
+              </ComponentPreview>
+
+              <ComponentPreview title="Minimal CTA" description="Clean, conversion-focused call-to-action">
+                <CTAMinimal />
+              </ComponentPreview>
+            </TabsContent>
+
+            <TabsContent value="faq" className="space-y-12">
+              <ComponentPreview title="FAQ Accordion" description="Expandable questions with smooth animations">
+                <FAQAccordion />
+              </ComponentPreview>
+            </TabsContent>
+
+            <TabsContent value="stats" className="space-y-12">
+              <ComponentPreview title="Animated Counters" description="Number counters with smooth animations">
+                <StatCounter />
+              </ComponentPreview>
+            </TabsContent>
+
+            <TabsContent value="social" className="space-y-12">
+              <ComponentPreview title="Logo Cloud" description="Animated customer/partner logos with marquee">
+                <LogoCloud />
+              </ComponentPreview>
+            </TabsContent>
+
+            <TabsContent value="timeline" className="space-y-12">
+              <ComponentPreview title="Vertical Timeline" description="Project milestones and roadmap visualization">
+                <Timeline />
               </ComponentPreview>
             </TabsContent>
 
@@ -187,45 +249,7 @@ export default function PlaygroundPage() {
               </ComponentPreview>
             </TabsContent>
 
-            <TabsContent value="theme" className="space-y-8">
-              <div className="max-w-2xl mx-auto text-center">
-                <h2 className="text-3xl font-bold mb-4">Easy Theme Customization</h2>
-                <p className="text-muted-foreground mb-8">
-                  All components use CSS variables for theming. Change colors globally with a single update.
-                </p>
 
-                <div className="p-8 rounded-2xl bg-card border border-border/50 text-left">
-                  <h3 className="text-xl font-bold mb-4">Three Ways to Customize:</h3>
-
-                  <div className="space-y-6">
-                    <div>
-                      <Badge className="mb-2">Option 1: Use Theme Switcher</Badge>
-                      <p className="text-sm text-muted-foreground">
-                        Click the palette icon in the header and choose from 8 predefined themes.
-                      </p>
-                    </div>
-
-                    <div>
-                      <Badge className="mb-2">Option 2: Modify globals.css</Badge>
-                      <pre className="mt-2 p-4 rounded-lg bg-secondary text-sm overflow-x-auto">
-{`:root {
-  --primary: 35 100% 55%;  /* Change this */
-  --accent: 35 100% 55%;
-}`}
-                      </pre>
-                    </div>
-
-                    <div>
-                      <Badge className="mb-2">Option 3: Use Theme Config</Badge>
-                      <pre className="mt-2 p-4 rounded-lg bg-secondary text-sm overflow-x-auto">
-{`import { applyTheme, THEME_PRESETS } from '@/config/theme';
-applyTheme(THEME_PRESETS.blue);`}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
           </Tabs>
         </div>
       </section>

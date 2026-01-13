@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Github } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export const EnhancedHero = () => {
@@ -37,7 +37,7 @@ export const EnhancedHero = () => {
           >
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-muted-foreground">
-              100% Free & Open Source SaaS Template
+              Premium Next.js SaaS Template • One-Time Payment
             </span>
           </motion.div>
 
@@ -48,8 +48,8 @@ export const EnhancedHero = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6"
           >
-            Ship your SaaS in{" "}
-            <span className="text-gradient">days, not months</span>
+            Launch your SaaS{" "}
+            <span className="text-gradient">10x faster</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -59,8 +59,8 @@ export const EnhancedHero = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Free, open-source Next.js 16 + Supabase starter with authentication, 
-            payments (Stripe & LemonSqueezy), emails, SEO, and beautiful UI components.
+            Production-ready Next.js 16 template with authentication, payments, emails, 
+            and stunning UI. Skip weeks of setup and start building features that matter.
           </motion.p>
 
           {/* CTA buttons */}
@@ -70,16 +70,16 @@ export const EnhancedHero = () => {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link href="https://github.com/yourusername/shipfree" target="_blank">
+            <Link href="/playground">
               <Button variant="hero" size="xl">
-                <Github className="w-5 h-5" />
-                Get Started Free
+                <Sparkles className="w-5 h-5" />
+                Get Started - $29
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/docs">
+            <Link href="/playground">
               <Button variant="glass" size="xl">
-                View Documentation
+                View Live Demo
               </Button>
             </Link>
           </motion.div>
@@ -92,9 +92,9 @@ export const EnhancedHero = () => {
             className="grid grid-cols-3 gap-8 mt-16 pt-16 border-t border-border/50"
           >
             {[
-              { value: "100%", label: "Free Forever" },
-              { value: "Next.js 16", label: "Latest Tech" },
-              { value: "Open Source", label: "MIT License" },
+              { value: "$29", label: "One-Time Payment" },
+              { value: "40+ Hours", label: "Development Saved" },
+              { value: "Lifetime", label: "Updates Included" },
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl md:text-4xl font-black text-gradient">{stat.value}</div>

@@ -18,8 +18,8 @@ const features = [
   {
     icon: Shield,
     title: "Authentication",
-    description: "Supabase Auth with email, Google OAuth, magic links. Protected routes & session management.",
-    time: "3 hrs saved",
+    description: "Supabase Auth with email, Google OAuth, magic links. Protected routes, session management, and user profiles.",
+    time: "8 hrs saved",
     color: "text-rose-400",
     bgColor: "bg-rose-500/10",
     borderColor: "border-rose-500/20",
@@ -27,8 +27,8 @@ const features = [
   {
     icon: CreditCard,
     title: "Dual Payment Providers",
-    description: "Stripe & LemonSqueezy integration. Checkout, webhooks, subscriptions ready to go.",
-    time: "5 hrs saved",
+    description: "Stripe & LemonSqueezy ready to go. Checkout flows, webhooks, subscriptions, and one-time payments configured.",
+    time: "12 hrs saved",
     color: "text-violet-400",
     bgColor: "bg-violet-500/10",
     borderColor: "border-violet-500/20",
@@ -36,8 +36,8 @@ const features = [
   {
     icon: Database,
     title: "Supabase Backend",
-    description: "PostgreSQL database with Drizzle ORM, storage, edge functions, and real-time subscriptions.",
-    time: "4 hrs saved",
+    description: "PostgreSQL with Drizzle ORM, file storage, edge functions, and real-time subscriptions. Fully typed and production-ready.",
+    time: "10 hrs saved",
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/20",
@@ -45,8 +45,8 @@ const features = [
   {
     icon: Mail,
     title: "Email Integration",
-    description: "Mailgun setup with DNS configuration (DKIM, DMARC, SPF). Transactional email templates.",
-    time: "3 hrs saved",
+    description: "Mailgun configured with DNS setup (DKIM, DMARC, SPF). Beautiful transactional email templates included.",
+    time: "6 hrs saved",
     color: "text-blue-400",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/20",
@@ -54,8 +54,8 @@ const features = [
   {
     icon: Search,
     title: "SEO Optimized",
-    description: "Meta tags, OpenGraph, sitemap, structured data, and SEO-optimized components built-in.",
-    time: "2 hrs saved",
+    description: "Meta tags, OpenGraph, Twitter cards, sitemap, robots.txt, and structured data. Rank higher from day one.",
+    time: "4 hrs saved",
     color: "text-orange-400",
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/20",
@@ -63,8 +63,8 @@ const features = [
   {
     icon: Palette,
     title: "Beautiful UI",
-    description: "shadcn/ui components with Tailwind CSS. Dark theme, animations, and responsive design.",
-    time: "6 hrs saved",
+    description: "shadcn/ui components with Tailwind CSS. Dark mode, smooth animations, and fully responsive design out of the box.",
+    time: "15 hrs saved",
     color: "text-cyan-400",
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/20",
@@ -72,8 +72,8 @@ const features = [
   {
     icon: Globe,
     title: "Blog & Content",
-    description: "MDX blog system with syntax highlighting, reading time, and SEO optimization.",
-    time: "3 hrs saved",
+    description: "MDX blog system with syntax highlighting, reading time, SEO optimization, and beautiful typography.",
+    time: "5 hrs saved",
     color: "text-yellow-400",
     bgColor: "bg-yellow-500/10",
     borderColor: "border-yellow-500/20",
@@ -81,8 +81,8 @@ const features = [
   {
     icon: Code,
     title: "TypeScript",
-    description: "Fully typed with TypeScript. Type-safe database queries with Drizzle ORM.",
-    time: "2 hrs saved",
+    description: "100% TypeScript with strict mode. Type-safe database queries, API routes, and components throughout.",
+    time: "∞ hrs saved",
     color: "text-primary",
     bgColor: "bg-primary/10",
     borderColor: "border-primary/20",
@@ -90,8 +90,8 @@ const features = [
   {
     icon: Rocket,
     title: "Docker Ready",
-    description: "Production & development Docker configs. Deploy anywhere with ease.",
-    time: "2 hrs saved",
+    description: "Production and development Docker configs included. Deploy to any platform with confidence.",
+    time: "4 hrs saved",
     color: "text-pink-400",
     bgColor: "bg-pink-500/10",
     borderColor: "border-pink-500/20",
@@ -99,8 +99,8 @@ const features = [
   {
     icon: Zap,
     title: "Next.js 16",
-    description: "Latest Next.js with App Router, Server Components, and optimized performance.",
-    time: "∞ hrs saved",
+    description: "Latest Next.js with App Router, Server Components, Server Actions, and optimized performance.",
+    time: "Built-in",
     color: "text-indigo-400",
     bgColor: "bg-indigo-500/10",
     borderColor: "border-indigo-500/20",
@@ -130,17 +130,17 @@ export const EnhancedFeatures = () => {
             className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-primary/10 border border-primary/20"
           >
             <Zap className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Everything Included</span>
+            <span className="text-sm font-medium text-primary">Premium Features</span>
           </motion.div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-            All the boring stuff,{" "}
-            <span className="text-gradient">already done</span>
+            Everything you need to{" "}
+            <span className="text-gradient">launch fast</span>
           </h2>
           
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Stop reinventing the wheel. Every feature you need to launch fast, 
-            built with best practices and ready to customize.
+            Every essential feature, built with best practices and ready to customize. 
+            No more reinventing the wheel—just ship.
           </p>
         </motion.div>
 

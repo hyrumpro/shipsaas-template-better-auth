@@ -56,7 +56,14 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
         setIsLoading(true);
         const redirectUrl = `${window.location.origin}/success`;
         const checkout = await createCheckout(productVariantId, redirectUrl, userId);
-        setCheckoutUrl(checkout.data.attributes.url);
+        
+        // Safely access nested properties with proper null checks
+        const url = checkout?.data?.attributes?.url;
+        if (url) {
+          setCheckoutUrl(url);
+        } else {
+          throw new Error("Checkout URL not returned from API");
+        }
       } catch (err) {
         logger.error("Failed to initiate checkout", err);
         setError("Failed to load checkout. Please try again later.");
