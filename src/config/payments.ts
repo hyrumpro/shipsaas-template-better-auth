@@ -167,51 +167,22 @@ export interface PricingPlan {
 
 export const pricingPlans: PricingPlan[] = [
   {
-    id: "free",
-    name: "Free",
-    description: "Perfect for trying out",
-    price: 0,
-    currency: "usd",
-    interval: "month",
-    features: [
-      "Basic features",
-      "Limited usage",
-      "Community support",
-    ],
-  },
-  {
-    id: "pro-monthly",
-    name: "Pro",
-    description: "For professionals",
+    id: "premium",
+    name: "Premium",
+    description: "One-time payment, lifetime access",
     price: 2900, // $29.00
     currency: "usd",
     interval: "month",
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
-    lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_MONTHLY_VARIANT_ID,
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID,
+    lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_VARIANT_ID,
     features: [
       "All features",
       "Unlimited usage",
       "Priority support",
       "Advanced analytics",
+      "Lifetime access",
     ],
     popular: true,
-  },
-  {
-    id: "pro-yearly",
-    name: "Pro (Yearly)",
-    description: "Save 20% with annual billing",
-    price: 27900, // $279.00 (save $69)
-    currency: "usd",
-    interval: "year",
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
-    lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_YEARLY_VARIANT_ID,
-    features: [
-      "All features",
-      "Unlimited usage",
-      "Priority support",
-      "Advanced analytics",
-      "Save 20%",
-    ],
   },
 ];
 
@@ -229,8 +200,6 @@ export function getAvailablePlans(): PricingPlan[] {
   const provider = getPrimaryProvider();
   
   return pricingPlans.filter((plan) => {
-    if (plan.price === 0) return true; // Free plan always available
-    
     if (provider === "stripe") {
       return !!plan.stripePriceId;
     }

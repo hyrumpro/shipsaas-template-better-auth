@@ -164,9 +164,9 @@ async function handleOrderPaid(data: any, attributes: any, userId: string) {
     // Update existing order
     await updateOrder(dbOrder.id, {
       status: "paid",
-      receiptUrl: attributes.urls?.receipt,
       metadata: {
-        ...dbOrder.metadata,
+        ...(dbOrder.metadata || {}),
+        receiptUrl: attributes.urls?.receipt,
         paidAt: attributes.created_at,
       },
     });
@@ -212,7 +212,7 @@ async function handleOrderRefunded(data: any, attributes: any, userId: string) {
     refundedAmount: Math.round(parseFloat(attributes.refunded_amount || attributes.total) * 100),
     refundedAt: new Date(),
     metadata: {
-      ...dbOrder.metadata,
+      ...(dbOrder.metadata || {}),
       refundedAt: new Date().toISOString(),
     },
   });

@@ -78,7 +78,7 @@ export const createCheckout = async (
   }
 
   logger.payment("checkout_created", {
-    checkoutId: data?.id,
+    checkoutId: (data as any)?.id,
     userId,
   });
 
