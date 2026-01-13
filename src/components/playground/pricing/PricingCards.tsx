@@ -31,7 +31,7 @@ const plans = [
   },
 ];
 
-export const PricingCards = () => {
+export function PricingCards() {
   const [isYearly, setIsYearly] = useState(true);
 
   return (
@@ -80,4 +80,4 @@ export const PricingCards = () => {
       </div>
     </div>
   );
-};
+}

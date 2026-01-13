@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-export const Hero3D = () => {
+export function Hero3D() {
   return (
     <section className="relative py-20 min-h-[600px]">
       {/* Placeholder for 3D canvas - requires @react-three/fiber installation */}
@@ -38,4 +38,4 @@ export const Hero3D = () => {
       </div>
     </section>
   );
-};
+}

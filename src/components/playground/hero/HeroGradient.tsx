@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Play } from "lucide-react";
 
-export const HeroGradient = () => {
+export function HeroGradient() {
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
       {/* Animated gradient mesh background */}
@@ -51,4 +51,4 @@ export const HeroGradient = () => {
       </div>
     </section>
   );
-};
+}

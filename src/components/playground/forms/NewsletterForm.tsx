@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, CheckCircle2 } from "lucide-react";
 
-export const NewsletterForm = () => {
+export function NewsletterForm() {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -51,4 +51,4 @@ export const NewsletterForm = () => {
       )}
     </div>
   );
-};
+}

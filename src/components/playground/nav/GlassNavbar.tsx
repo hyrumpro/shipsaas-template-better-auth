@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-export const GlassNavbar = () => (
+export function GlassNavbar() {
+  return (
   <motion.nav className="px-6 py-4 rounded-2xl bg-background/30 backdrop-blur-2xl border border-border/30 relative overflow-hidden">
     <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
@@ -28,4 +29,5 @@ export const GlassNavbar = () => (
       </Button>
     </div>
   </motion.nav>
-);
+  );
+}

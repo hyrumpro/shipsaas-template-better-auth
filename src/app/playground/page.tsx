@@ -14,7 +14,7 @@ import {
   Hero3D,
 } from "@/components/playground/hero";
 import { GlassNavbar, MinimalNavbar } from "@/components/playground/nav";
-import { PricingCards, PricingSlider } from "@/components/playground/pricing";
+import { PricingCards } from "@/components/playground/pricing";
 import { TestimonialCards, TestimonialMarquee } from "@/components/playground/testimonials";
 import { ContactForm, NewsletterForm } from "@/components/playground/forms";
 import { StatsCards, ActivityFeed } from "@/components/playground/dashboard";
@@ -142,10 +142,6 @@ export default function PlaygroundPage() {
             <TabsContent value="pricing" className="space-y-12">
               <ComponentPreview title="Pricing Cards" description="Monthly/yearly toggle with animated prices">
                 <PricingCards />
-              </ComponentPreview>
-
-              <ComponentPreview title="Usage-Based Pricing" description="Interactive slider for usage-based pricing">
-                <PricingSlider />
               </ComponentPreview>
             </TabsContent>
 

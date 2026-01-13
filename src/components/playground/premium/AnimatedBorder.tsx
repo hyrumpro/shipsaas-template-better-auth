@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Sparkles, Zap, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const AnimatedBorder = () => (
+export function AnimatedBorder() {
+  return (
   <div className="grid md:grid-cols-3 gap-8">
     {/* Rotating Gradient */}
     <div className="relative p-[2px] rounded-2xl overflow-hidden group">
@@ -42,4 +43,5 @@ export const AnimatedBorder = () => (
       </Button>
     </div>
   </div>
-);
+  );
+}

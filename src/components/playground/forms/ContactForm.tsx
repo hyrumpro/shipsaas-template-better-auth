@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, CheckCircle2 } from "lucide-react";
 
-export const ContactForm = () => {
+export function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -83,4 +83,4 @@ export const ContactForm = () => {
       )}
     </div>
   );
-};
+}

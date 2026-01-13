@@ -11,7 +11,7 @@ const floatingIcons = [
   { icon: Star, x: "90%", y: "65%", color: "text-purple-400" },
 ];
 
-export const HeroFloating = () => {
+export function HeroFloating() {
   return (
     <section className="relative py-24 md:py-40 overflow-hidden">
       {floatingIcons.map((item, i) => (
@@ -44,4 +44,4 @@ export const HeroFloating = () => {
       </div>
     </section>
   );
-};
+}

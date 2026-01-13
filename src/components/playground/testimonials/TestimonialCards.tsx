@@ -28,7 +28,7 @@ const testimonials = [
   },
 ];
 
-export const TestimonialCards = () => {
+export function TestimonialCards() {
   return (
     <div className="grid md:grid-cols-3 gap-6">
       {testimonials.map((testimonial, i) => (
@@ -63,4 +63,4 @@ export const TestimonialCards = () => {
       ))}
     </div>
   );
-};
+}

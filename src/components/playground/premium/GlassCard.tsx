@@ -19,7 +19,8 @@ const cards = [
   },
 ];
 
-export const GlassCard = () => (
+export function GlassCard() {
+  return (
   <div className="grid md:grid-cols-2 gap-8">
     {cards.map((card, i) => (
       <motion.div
@@ -54,4 +55,5 @@ export const GlassCard = () => (
       </motion.div>
     ))}
   </div>
-);
+  );
+}

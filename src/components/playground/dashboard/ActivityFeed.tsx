@@ -50,7 +50,7 @@ const colorMap = {
   info: "text-blue-500",
 };
 
-export const ActivityFeed = () => {
+export function ActivityFeed() {
   return (
     <Card>
       <CardHeader>
@@ -85,4 +85,4 @@ export const ActivityFeed = () => {
       </CardContent>
     </Card>
   );
-};
+}

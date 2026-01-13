@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-export const HeroMinimal = () => {
+export function HeroMinimal() {
   return (
     <section className="py-32 md:py-48">
       <div className="container text-center">
@@ -33,4 +33,4 @@ export const HeroMinimal = () => {
       </div>
     </section>
   );
-};
+}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Check, Play } from "lucide-react";
 
-export const HeroSplit = () => {
+export function HeroSplit() {
   const features = ["Authentication Ready", "Stripe Integrated", "Email Templates", "50+ Components"];
 
   return (
@@ -61,4 +61,4 @@ export const HeroSplit = () => {
       </div>
     </section>
   );
-};
+}
