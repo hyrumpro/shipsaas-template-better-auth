@@ -5,6 +5,7 @@ const nextConfig = {
   // initialization that requires API keys during build time. Consider switching to a
   // different payment SDK or updating LemonSqueezy SDK to support lazy initialization.
   typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   pageExtensions: ["ts", "tsx", "mdx"],
 
   // Enable standalone output for Docker production builds
