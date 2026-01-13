@@ -61,13 +61,13 @@ function emailWrapper(content: string): string {
 <body>
   <div class="container">
     <div class="header">
-      <h1 style="margin: 0;">ShipFree</h1>
+      <h1 style="margin: 0;">ShipSaaS</h1>
     </div>
     <div class="content">
       ${content}
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} ShipFree. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} ShipSaaS. All rights reserved.</p>
       <p>If you have any questions, reply to this email.</p>
     </div>
   </div>
@@ -79,9 +79,9 @@ export const EmailTemplates = {
   // Welcome email after signup
   welcome(name: string): EmailTemplate {
     const html = emailWrapper(`
-      <h2>Welcome to ShipFree! 🎉</h2>
+      <h2>Welcome to ShipSaaS! 🎉</h2>
       <p>Hi ${name},</p>
-      <p>Thanks for joining ShipFree! We're excited to have you on board.</p>
+      <p>Thanks for joining ShipSaaS! We're excited to have you on board.</p>
       <p>Get started by exploring our features:</p>
       <ul>
         <li>Set up your project with our Next.js boilerplate</li>
@@ -90,13 +90,13 @@ export const EmailTemplates = {
       </ul>
       <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard" class="button">Go to Dashboard</a>
       <p>If you have any questions, don't hesitate to reach out!</p>
-      <p>Happy building!<br/>The ShipFree Team</p>
+      <p>Happy building!<br/>The ShipSaaS Team</p>
     `);
 
     return {
-      subject: "Welcome to ShipFree! 🚀",
+      subject: "Welcome to ShipSaaS! 🚀",
       html,
-      text: `Welcome to ShipFree!\n\nHi ${name},\n\nThanks for joining ShipFree! We're excited to have you on board.\n\nGet started by visiting ${process.env.NEXT_PUBLIC_SITE_URL}/dashboard\n\nHappy building!\nThe ShipFree Team`,
+      text: `Welcome to ShipSaaS!\n\nHi ${name},\n\nThanks for joining ShipSaaS! We're excited to have you on board.\n\nGet started by visiting ${process.env.NEXT_PUBLIC_SITE_URL}/dashboard\n\nHappy building!\nThe ShipSaaS Team`,
     };
   },
 
@@ -157,13 +157,13 @@ export const EmailTemplates = {
       </div>
       ${invoiceUrl ? `<a href="${invoiceUrl}" class="button">View Invoice</a>` : ""}
       <p>You now have access to all premium features. Start building amazing things!</p>
-      <p>Thank you for your support!<br/>The ShipFree Team</p>
+      <p>Thank you for your support!<br/>The ShipSaaS Team</p>
     `);
 
     return {
       subject: "Payment Successful - Thank You!",
       html,
-      text: `Payment Successful!\n\nHi ${name},\n\nThank you for your payment! Your subscription to the ${plan} plan is now active.\n\nAmount: ${amount}\nPlan: ${plan}\n\n${invoiceUrl ? `View Invoice: ${invoiceUrl}\n\n` : ""}Thank you for your support!\nThe ShipFree Team`,
+      text: `Payment Successful!\n\nHi ${name},\n\nThank you for your payment! Your subscription to the ${plan} plan is now active.\n\nAmount: ${amount}\nPlan: ${plan}\n\n${invoiceUrl ? `View Invoice: ${invoiceUrl}\n\n` : ""}Thank you for your support!\nThe ShipSaaS Team`,
     };
   },
 
@@ -173,17 +173,17 @@ export const EmailTemplates = {
       <h2>Subscription Cancelled</h2>
       <p>Hi ${name},</p>
       <p>We're sorry to see you go. Your subscription has been cancelled and will remain active until <strong>${endDate}</strong>.</p>
-      <p>After this date, you'll still have access to the free tier features.</p>
+      <p>After this date, your access to premium features will end.</p>
       <p>We'd love to hear your feedback on how we can improve. Simply reply to this email to let us know.</p>
       <p>If you change your mind, you can reactivate your subscription anytime from your dashboard.</p>
       <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard" class="button">Go to Dashboard</a>
-      <p>Thank you for being part of ShipFree!<br/>The ShipFree Team</p>
+      <p>Thank you for being part of ShipSaaS!<br/>The ShipSaaS Team</p>
     `);
 
     return {
       subject: "Your subscription has been cancelled",
       html,
-      text: `Subscription Cancelled\n\nHi ${name},\n\nYour subscription has been cancelled and will remain active until ${endDate}.\n\nWe'd love to hear your feedback. Simply reply to this email.\n\nThank you for being part of ShipFree!\nThe ShipFree Team`,
+      text: `Subscription Cancelled\n\nHi ${name},\n\nYour subscription has been cancelled and will remain active until ${endDate}.\n\nWe'd love to hear your feedback. Simply reply to this email.\n\nThank you for being part of ShipSaaS!\nThe ShipSaaS Team`,
     };
   },
 
@@ -194,13 +194,13 @@ export const EmailTemplates = {
       <p>Hi ${name},</p>
       <p>${message}</p>
       ${actionUrl && actionText ? `<a href="${actionUrl}" class="button">${actionText}</a>` : ""}
-      <p>Best regards,<br/>The ShipFree Team</p>
+      <p>Best regards,<br/>The ShipSaaS Team</p>
     `);
 
     return {
       subject: title,
       html,
-      text: `${title}\n\nHi ${name},\n\n${message}\n\n${actionUrl ? `${actionText}: ${actionUrl}\n\n` : ""}Best regards,\nThe ShipFree Team`,
+      text: `${title}\n\nHi ${name},\n\n${message}\n\n${actionUrl ? `${actionText}: ${actionUrl}\n\n` : ""}Best regards,\nThe ShipSaaS Team`,
     };
   },
 };

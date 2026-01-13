@@ -11,36 +11,36 @@ import { HelpCircle } from "lucide-react";
 
 const faqs = [
   {
-    question: "Is ShipFree really free?",
-    answer: "Yes! ShipFree is 100% free and open-source under the MIT license. You can use it for personal projects, commercial projects, client work - anything. No hidden costs, no subscriptions.",
-  },
-  {
-    question: "What tech stack does this use?",
-    answer: "ShipFree is built with Next.js 16 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Supabase (PostgreSQL + Auth), Drizzle ORM, Stripe & LemonSqueezy for payments, and Mailgun for emails.",
+    question: "What's included in the template?",
+    answer: "Everything you need to launch: Next.js 15, Supabase auth, Stripe & LemonSqueezy payments, 27+ UI components, email system, database with RLS, Docker configs, and comprehensive documentation. It's production-ready code that saves you 100+ hours.",
   },
   {
     question: "Can I use this for client projects?",
-    answer: "Absolutely! The MIT license allows you to use ShipFree for unlimited personal and commercial projects, including client work. You can even white-label it.",
+    answer: "Absolutely! Once purchased, you have unlimited usage rights. Build unlimited projects for yourself or clients. The only restriction is you can't resell the template itself.",
   },
   {
-    question: "How do payments work?",
-    answer: "ShipFree includes both Stripe and LemonSqueezy integrations. You get pre-configured checkout sessions, webhook handling for subscription events, and customer portal integration. Just add your API keys and you're ready to accept payments.",
+    question: "How is this different from other templates?",
+    answer: "Unique unified payment architecture (switch between Stripe/LemonSqueezy with one variable), enterprise-grade security with RLS, 27+ production-ready components, and exceptional documentation. Most templates lock you into one provider - we give you flexibility.",
   },
   {
-    question: "Is Supabase required?",
-    answer: "Yes, Supabase powers the authentication, database, and edge functions. It's free to start and scales with your needs. We chose Supabase for its excellent developer experience and PostgreSQL foundation.",
+    question: "Do I get updates?",
+    answer: "Yes! All purchases include lifetime updates. As we add new features, components, and improvements, you'll get them automatically. No subscription required.",
   },
   {
-    question: "Do I get the source code?",
-    answer: "Yes! You get complete access to all source code. Clone it, modify it, make it yours. No obfuscation, no locked components. It's truly open-source.",
+    question: "What if I need help?",
+    answer: "You get priority email support for 90 days, plus access to our comprehensive documentation, video tutorials, and community Discord. We're here to help you succeed.",
   },
   {
-    question: "What about support?",
-    answer: "ShipFree is community-supported. You can get help via GitHub Issues, Discussions, and our Discord community. The codebase is well-documented to help you get started quickly.",
+    question: "Is the code production-ready?",
+    answer: "100%. This isn't a demo or proof-of-concept. It's battle-tested code with proper error handling, security measures, and performance optimizations. Deploy to production with confidence.",
   },
   {
-    question: "How do I deploy this?",
-    answer: "ShipFree includes Docker configurations for easy deployment. You can deploy to Vercel, Railway, Fly.io, or any platform that supports Next.js. Full deployment guides are included in the documentation.",
+    question: "Can I see the components before buying?",
+    answer: "Yes! Visit the /playground page to see all 27+ components in action. Try the theme switcher, explore different variants, and see the code quality for yourself.",
+  },
+  {
+    question: "What's your refund policy?",
+    answer: "We offer a 30-day money-back guarantee. If you're not satisfied for any reason, just email us and we'll process a full refund, no questions asked.",
   },
 ];
 
@@ -73,7 +73,7 @@ export const EnhancedFAQ = () => {
             </h2>
             
             <p className="text-xl text-muted-foreground">
-              Here are answers to the most common questions about ShipFree.
+              Here are answers to the most common questions about ShipSaaS.
             </p>
           </motion.div>
 

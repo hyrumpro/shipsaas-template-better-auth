@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { marked } from "marked";
 
 export interface BlogPost {
   slug: string;
@@ -83,12 +84,8 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     const wordCount = content.split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / 200);
 
-    // Convert markdown to HTML (basic conversion)
-    // For production, use a proper markdown parser like 'marked' or 'remark'
-    const htmlContent = content
-      .split("\n\n")
-      .map((paragraph) => `<p>${paragraph}</p>`)
-      .join("\n");
+    // Convert markdown to HTML using marked
+    const htmlContent = await marked(content);
 
     return {
       slug,

@@ -34,7 +34,7 @@ export function CTAMinimal() {
           className="flex gap-4 justify-center flex-wrap"
         >
           <Button variant="hero" size="lg">
-            Get Started Free
+            Get Started - $29
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <Button variant="outline" size="lg">
@@ -50,15 +50,15 @@ export function CTAMinimal() {
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span>No credit card</span>
+            <span>One-time payment</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span>14-day trial</span>
+            <span>Lifetime updates</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span>Cancel anytime</span>
+            <span>Unlimited projects</span>
           </div>
         </motion.div>
       </div>

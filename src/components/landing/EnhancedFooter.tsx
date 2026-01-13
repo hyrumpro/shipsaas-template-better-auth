@@ -15,10 +15,10 @@ const footerLinks = {
     { label: "API Reference", href: "/api" },
   ],
   community: [
-    { label: "GitHub", href: "https://github.com/yourusername/shipfree" },
-    { label: "Discord", href: "#" },
-    { label: "Twitter", href: "#" },
-    { label: "Discussions", href: "https://github.com/yourusername/shipfree/discussions" },
+    { label: "Documentation", href: "/docs" },
+    { label: "Component Library", href: "/playground" },
+    { label: "Support", href: "/support" },
+    { label: "Contact", href: "/contact" },
   ],
   legal: [
     { label: "Privacy Policy", href: "/privacy" },
@@ -29,8 +29,7 @@ const footerLinks = {
 
 const socialLinks = [
   { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Github, href: "https://github.com/yourusername/shipfree", label: "GitHub" },
-  { icon: Mail, href: "mailto:hello@shipfree.dev", label: "Email" },
+  { icon: Mail, href: "mailto:hello@shipsaas.dev", label: "Email" },
 ];
 
 export const EnhancedFooter = () => {
@@ -47,7 +46,7 @@ export const EnhancedFooter = () => {
               <span className="text-xl font-bold">ShipFree</span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Free, open-source Next.js 16 + Supabase SaaS starter. Ship your product in days, not months.
+              Premium Next.js 16 SaaS template. Ship your product in days, not months. Production-ready code that saves you 100+ hours.
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social) => (
@@ -139,7 +138,7 @@ export const EnhancedFooter = () => {
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} ShipFree. All rights reserved. MIT License.
+            © {new Date().getFullYear()} ShipSaaS. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built with ❤️ using Next.js 16 & Supabase

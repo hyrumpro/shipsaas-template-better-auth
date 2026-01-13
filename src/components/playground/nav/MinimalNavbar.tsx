@@ -8,7 +8,7 @@ export function MinimalNavbar() {
   return (
   <nav className="flex items-center justify-between py-6">
     <div className="font-black text-xl">
-      ShipFree<span className="text-primary">.</span>
+      ShipSaaS<span className="text-primary">.</span>
     </div>
 
     <div className="hidden md:flex items-center gap-8">

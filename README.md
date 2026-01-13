@@ -1,294 +1,492 @@
-# ⚡ ShipFree - Production-Ready SaaS Boilerplate
+# 🚀 ShipSaaS - Premium Next.js SaaS Template
 
-**Launch your SaaS in days, not months.**
+Ship your SaaS in days, not months. Production-ready Next.js 16 template with authentication, payments, 27+ components, and stunning UI.
 
-A complete Next.js 15 SaaS boilerplate with authentication, payments (Stripe & LemonSqueezy), database, email, SEO, and theme system - all configured and ready to deploy.
-
----
-
-## 🚀 Quick Start (5 Minutes)
-
-```bash
-# 1. Clone and install
-git clone https://github.com/yourusername/shipfree.git
-cd shipfree
-pnpm install
-
-# 2. Set up environment
-cp .env.example .env
-# Add your Supabase credentials (see GETTING_STARTED.md)
-
-# 3. Deploy database
-pnpm db:push
-
-# 4. Start development
-pnpm dev
-```
-
-Visit http://localhost:3000
-
-**📖 [Setup Guide](GETTING_STARTED.md)** - 50 minutes to production  
-**🔧 [Developer Guide](DEVELOPER_GUIDE.md)** - Technical docs & API reference  
-**🚀 [Deployment Guide](DEPLOYMENT.md)** - Deploy to Vercel, Railway, or Docker  
-**🔍 [Technical Review](TECHNICAL_REVIEW.md)** - Architecture & security audit
-
----
-
-## 🎨 Theme System & Component Library
-
-**Change your entire app's color scheme in seconds!** 
-
-✨ **20+ Production-Ready Components** - Hero sections, pricing tables, testimonials, forms, dashboards  
-🎨 **8 Color Themes** - Amber, Blue, Purple, Green, Red, Cyan, Pink, Orange  
-⚡ **Live Preview** - Visit `/playground` to see all components and try themes  
-🔧 **Easy Customization** - Change one CSS variable, update everything
-
-### Quick Theme Change
-
-```css
-/* Edit src/app/globals.css */
-:root {
-  --primary: 220 100% 55%;  /* Change to your brand color */
-}
-```
-
-Or visit `/playground` → Click palette icon → Choose color
-
-👉 **[Theme Documentation](DEVELOPER_GUIDE.md#theme-system)**
-
----
-
-## 💳 Payment Provider Switching
-
-**Switch between Stripe and LemonSqueezy with ONE environment variable:**
-
-```bash
-# Use Stripe
-NEXT_PUBLIC_PAYMENT_PROVIDER=stripe
-
-# Use LemonSqueezy
-NEXT_PUBLIC_PAYMENT_PROVIDER=lemonsqueezy
-
-# Use both
-NEXT_PUBLIC_PAYMENT_PROVIDER=both
-```
-
-**No code changes needed!** The unified architecture handles everything automatically.
-
-👉 **[Payment Documentation](DEVELOPER_GUIDE.md#payment-integrations)**
-
----
-
-## 🐳 Docker Deployment
-
-```bash
-# With Supabase (Recommended)
-pnpm docker:dev              # Development
-pnpm docker:prod:build       # Production
-
-# With local PostgreSQL (Dev only)
-pnpm docker:dev:postgres
-```
-
-👉 **[Deployment Documentation](DEVELOPER_GUIDE.md#deployment)**
+**Version**: 1.0 | **Last Updated**: January 2026
 
 ---
 
 ## ✨ What's Included
 
-### 🔐 Authentication
-- ✅ Email/password authentication (Supabase)
-- ✅ Email verification flow
-- ✅ Protected routes with middleware
-- ✅ Session management
-- ✅ Auth webhook syncing
-
-### 💳 Payments (Stripe & LemonSqueezy)
-- ✅ **Switch providers with one environment variable**
-- ✅ Complete webhook handlers with signature verification
-- ✅ Subscription and one-time payment support
-- ✅ Automatic database updates
-- ✅ Payment history tracking
-- ✅ Refund handling
-- ✅ Automatic receipt emails
-
-### 🗄️ Production-Ready Database
-- ✅ Complete PostgreSQL schema (users, subscriptions, orders, payments)
-- ✅ Row Level Security (RLS) policies
-- ✅ Type-safe queries with Drizzle ORM
-- ✅ Automatic subscription syncing
-- ✅ Webhook event audit trail
-- ✅ Proper indexes for performance
-
-### 🎨 Theme System & Components
-- ✅ 20+ production-ready components
-- ✅ 8 color theme presets
-- ✅ Live theme switcher at `/playground`
-- ✅ CSS variable-based (change once, update everywhere)
-- ✅ Hero sections, pricing, testimonials, forms, dashboards
-
-### 📧 Email System
-- ✅ 6 pre-built HTML email templates
-- ✅ Mailgun integration
-- ✅ Welcome, verification, payment, cancellation emails
-- ✅ Incoming email forwarding
-- ✅ Graceful degradation in development
-
-### 🔍 SEO & Blog
-- ✅ Complete markdown blog system
-- ✅ Dynamic sitemap generation
-- ✅ Structured data (JSON-LD)
-- ✅ OpenGraph & Twitter cards
-- ✅ 3 example blog posts
-
-### 🐳 DevOps
-- ✅ Docker configuration (dev & production)
-- ✅ Vercel deployment ready
-- ✅ Railway deployment ready
-- ✅ Environment variable templates
-- ✅ Comprehensive error handling & logging
+- ⚡ **Next.js 16** with App Router & Turbopack
+- 🔐 **Supabase Auth** - Email, OAuth, magic links
+- 💳 **Dual Payment System** - Stripe & LemonSqueezy (switch with one variable)
+- 🎨 **27+ Premium Components** - All themed and customizable
+- 📧 **Email System** - Mailgun integration with templates
+- 🗄️ **PostgreSQL + Drizzle ORM** - Type-safe database
+- 🔒 **Row Level Security** - Enterprise-grade security
+- 📝 **Blog System** - Markdown-based with SEO
+- 🐳 **Docker Ready** - Production & development configs
+- 📱 **Fully Responsive** - Mobile-first design
+- 🎭 **Theme System** - Dark/light mode with CSS variables
+- 🚀 **SEO Optimized** - Meta tags, sitemaps, structured data
 
 ---
 
-## 📊 Tech Stack
+## 🎯 Quick Start (50 Minutes to Production)
 
-- **Framework:** Next.js 15 (App Router, Turbopack)
-- **Database:** PostgreSQL (Supabase)
-- **ORM:** Drizzle ORM
-- **Auth:** Supabase Auth
-- **Payments:** Stripe & LemonSqueezy
-- **Email:** Mailgun
-- **Styling:** Tailwind CSS
-- **UI Components:** Radix UI + shadcn/ui
-- **Deployment:** Vercel, Railway, or Docker
+### Prerequisites
 
----
+- Node.js 18+ and pnpm
+- Supabase account (free tier: [app.supabase.com](https://app.supabase.com))
+- Payment provider: [Stripe](https://stripe.com) or [LemonSqueezy](https://lemonsqueezy.com)
+- Mailgun account (optional: [mailgun.com](https://mailgun.com))
 
-## 🎯 Features
+### Installation
 
-### ✅ Fully Implemented
-- ✅ Email/password authentication
-- ✅ Complete payment system (Stripe & LemonSqueezy)
-- ✅ All webhook handlers with database operations
-- ✅ Production-ready database with RLS
-- ✅ Blog system with 3 example posts
-- ✅ SEO optimization (meta tags, sitemap, structured data)
-- ✅ Email templates (6 ready to use)
-- ✅ Docker configuration
-- ✅ Protected routes
-- ✅ Error handling & logging
-
-### 💰 Payment Features
-- ✅ Switch between Stripe and LemonSqueezy with one variable
-- ✅ Subscription management
-- ✅ One-time payments
-- ✅ Webhook signature verification
-- ✅ Automatic database updates
-- ✅ Payment history tracking
-- ✅ Refund handling
-
-### 🗄️ Database Features
-- ✅ Users with subscription status
-- ✅ Subscriptions (recurring billing)
-- ✅ Orders (one-time payments)
-- ✅ Payments (transaction history)
-- ✅ Webhook events (audit trail)
-- ✅ Row Level Security
-- ✅ Automatic timestamp updates
-
----
-
-## ⏱️ Time Saved
-
-This boilerplate saves you **100-120 hours** of development:
-- Authentication setup: 10-15 hours
-- Database design & implementation: 20-30 hours
-- Payment integration (both providers): 30-40 hours
-- Webhook handlers: 20-30 hours
-- SEO & blog system: 10-15 hours
-- Email templates: 5-10 hours
-- Docker configuration: 5-10 hours
-
----
-
-## 🚀 Deployment Options
-
-### Vercel (Easiest - 5 minutes)
 ```bash
-vercel deploy
-```
-Add environment variables in Vercel dashboard.
+# 1. Extract template files
+cd your-project-name
 
-### Railway (10 minutes)
-1. Push to GitHub
-2. Connect to Railway
-3. Add environment variables
-4. Deploy!
+# 2. Install dependencies
+pnpm install
 
-### Docker (Full Control)
-```bash
-docker-compose -f docker/prod/docker-compose.yml up -d
+# 3. Copy environment file
+cp .env.example .env
 ```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+### Environment Setup
+
+Edit `.env` with your credentials:
+
+```bash
+# App Configuration
+NEXT_PUBLIC_APP_NAME=YourApp
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Supabase (Required)
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+DATABASE_URL=your-database-url
+
+# Payment Provider (Choose one or both)
+NEXT_PUBLIC_PAYMENT_PROVIDER=stripe  # or "lemonsqueezy"
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# LemonSqueezy
+LEMONSQUEEZY_API_KEY=your-api-key
+LEMONSQUEEZY_STORE_ID=your-store-id
+LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
+
+# Mailgun (Optional)
+MAILGUN_API_KEY=your-api-key
+MAILGUN_DOMAIN=your-domain
+```
+
+### Database Setup
+
+```bash
+# Initialize database with migrations
+pnpm db:push
+
+# Or run migrations manually
+pnpm db:migrate
+```
+
+### Run Development Server
+
+```bash
+pnpm dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000)
 
 ---
 
 ## 📚 Documentation
 
-### For Users
-- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Complete setup guide (50 minutes to production)
+### Core Features
 
-### For Developers
-- **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Technical documentation, API reference, theme system, components
+#### 🔐 Authentication
 
-### For Deployment
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deployment guides for Vercel, Railway, Docker, and VPS
+Supabase handles all authentication:
+- Email/password signup and login
+- OAuth providers (Google, GitHub, etc.)
+- Magic link authentication
+- Password reset flows
+- Email verification
 
-### For Technical Review
-- **[TECHNICAL_REVIEW.md](TECHNICAL_REVIEW.md)** - Architecture review, security audit, code quality analysis
+**Files**: `src/app/auth/*`, `src/lib/supabase/*`
+
+#### 💳 Payment Integration
+
+Unified payment architecture supporting both Stripe and LemonSqueezy:
+
+```typescript
+// Switch providers with one variable
+NEXT_PUBLIC_PAYMENT_PROVIDER=stripe  // or "lemonsqueezy"
+```
+
+**Features**:
+- Checkout sessions
+- Webhook handling
+- Subscription management
+- Customer portal
+- Invoice generation
+
+**Files**: `src/lib/checkout.ts`, `src/app/api/*/webhook/route.ts`
+
+#### 🗄️ Database
+
+PostgreSQL with Drizzle ORM and Row Level Security:
+
+```typescript
+// Type-safe queries
+import { db } from "@/db";
+import { users } from "@/db/schema";
+
+const user = await db.query.users.findFirst({
+  where: eq(users.id, userId)
+});
+```
+
+**Migrations**: `supabase/migrations/`
+**Schema**: `src/db/schema.ts`
+**Queries**: `src/db/queries.ts`
+
+#### 📧 Email System
+
+Mailgun integration with pre-built templates:
+
+```typescript
+import { EmailTemplates } from "@/lib/email-templates";
+
+// Send welcome email
+const email = EmailTemplates.welcome(userName);
+await sendEmail(userEmail, email.subject, email.html);
+```
+
+**Templates**: `src/lib/email-templates.ts`
 
 ---
 
-## ⏱️ Time Saved
+## 🎨 Component Library (27+ Components)
 
-This boilerplate saves you **100-120 hours** of development:
-- ✅ Authentication setup: 10-15 hours
-- ✅ Database design & implementation: 20-30 hours
-- ✅ Payment integration (both providers): 30-40 hours
-- ✅ Webhook handlers: 20-30 hours
-- ✅ SEO & blog system: 10-15 hours
-- ✅ Email templates: 5-10 hours
-- ✅ Docker configuration: 5-10 hours
+### Navigation
+- **GlassNavbar** - Frosted glass effect
+- **MinimalNavbar** - Clean with animations
+
+### Hero Sections
+- **HeroGradient** - Animated gradient mesh
+- **HeroFloating** - 3D floating icons
+- **HeroSplit** - Text + visual split
+- **HeroMinimal** - Typography-focused
+
+### Pricing
+- **PricingCards** - Monthly/yearly toggle
+- **PricingComparison** - Feature comparison table
+
+### Features
+- **FeatureGrid** - 9-feature animated grid
+
+### Call-to-Action
+- **CTAGradient** - Eye-catching gradient
+- **CTAMinimal** - Conversion-focused
+
+### Social Proof
+- **TestimonialCards** - Customer reviews
+- **TestimonialMarquee** - Auto-scrolling
+- **LogoCloud** - Partner logos with marquee
+
+### Interactive
+- **FAQAccordion** - Expandable questions
+- **ContactForm** - Animated with validation
+- **NewsletterForm** - Email subscription
+
+### Data Display
+- **StatCounter** - Animated numbers
+- **Timeline** - Vertical timeline
+- **StatsCards** - Dashboard metrics
+
+### Premium
+- **GlassCard** - Frosted glass effect
+- **Footer** - Comprehensive footer
+
+**View all components**: Visit `/playground` in your app
+
+---
+
+## 📝 Blog System
+
+### Creating Blog Posts
+
+1. Create a new `.md` file in `content/blog/`
+2. Add frontmatter:
+
+```markdown
+---
+title: "Your Post Title"
+excerpt: "Brief description for SEO and previews (150-160 chars)"
+date: "2026-01-15"
+author: "Your Name"
+tags: ["tutorial", "nextjs", "saas"]
+image: "/images/your-image.png"
+---
+
+# Your Post Title
+
+Your content here using Markdown...
+
+## Subheading
+
+- Bullet points
+- **Bold text**
+- *Italic text*
+- [Links](https://example.com)
+
+\`\`\`typescript
+// Code blocks with syntax highlighting
+const example = "Hello World";
+\`\`\`
+```
+
+3. Add featured image to `public/images/`
+4. Deploy - posts appear automatically!
+
+### Blog Features
+
+- ✅ Automatic SEO optimization
+- ✅ OpenGraph tags for social sharing
+- ✅ Structured data (BlogPosting schema)
+- ✅ Reading time calculation
+- ✅ Tag-based categorization
+- ✅ Responsive image handling
+- ✅ Share buttons (Twitter, LinkedIn)
+
+**Blog files**: `content/blog/*.md`
+**Blog logic**: `src/lib/blog.ts`
+**Blog pages**: `src/app/blog/`
+
+---
+
+## 🎭 Theme Customization
+
+### CSS Variables
+
+Edit `src/app/globals.css`:
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+  /* ... more variables */
+}
+
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  /* ... dark mode overrides */
+}
+```
+
+### Component Theming
+
+All components use CSS variables:
+
+```tsx
+<div className="bg-background text-foreground border-border">
+  <h1 className="text-primary">Themed Content</h1>
+</div>
+```
+
+---
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables
+4. Deploy!
+
+**Build command**: `pnpm build`
+**Output directory**: `.next`
+
+### Railway
+
+1. Connect GitHub repo
+2. Add environment variables
+3. Deploy automatically
+
+### Docker
+
+```bash
+# Build
+docker build -t your-saas .
+
+# Run
+docker run -p 3000:3000 your-saas
+```
+
+**Docker files**: `docker/` directory
+
+---
+
+## 🔧 Development
+
+### Project Structure
+
+```
+├── src/
+│   ├── app/              # Next.js app router
+│   ├── components/       # React components
+│   │   ├── landing/      # Landing page components
+│   │   ├── playground/   # Component library
+│   │   ├── blog/         # Blog components
+│   │   └── ui/           # Base UI components
+│   ├── lib/              # Utilities and helpers
+│   ├── db/               # Database schema and queries
+│   └── config/           # Configuration files
+├── content/blog/         # Blog posts (Markdown)
+├── supabase/migrations/  # Database migrations
+├── public/               # Static assets
+└── docker/               # Docker configurations
+```
+
+### Available Scripts
+
+```bash
+pnpm dev          # Start development server
+pnpm build        # Build for production
+pnpm start        # Start production server
+pnpm lint         # Run ESLint
+pnpm db:push      # Push database schema
+pnpm db:migrate   # Run migrations
+pnpm db:studio    # Open Drizzle Studio
+```
+
+### Adding New Components
+
+1. Create component in `src/components/playground/`
+2. Add to playground page: `src/app/playground/page.tsx`
+3. Document in `COMPONENT_LIBRARY.md`
 
 ---
 
 ## 🔒 Security
 
-- ✅ Row Level Security (RLS) on all tables
-- ✅ Webhook signature verification (Stripe, LemonSqueezy, Supabase, Mailgun)
-- ✅ Environment variables for all secrets
-- ✅ Protected API routes with authentication
-- ✅ Secure session management
+### Row Level Security (RLS)
+
+All database tables have RLS policies:
+
+```sql
+-- Users can only read their own data
+CREATE POLICY "Users can read own data"
+ON users FOR SELECT
+USING (auth.uid() = id);
+```
+
+**Policies**: `supabase/migrations/002_row_level_security.sql`
+
+### API Security
+
+- ✅ Webhook signature verification
+- ✅ CORS configuration
+- ✅ Rate limiting ready
+- ✅ Environment variable validation
 - ✅ SQL injection prevention (parameterized queries)
-- ✅ XSS prevention (React escaping)
 
 ---
 
-## 📝 License
+## 📊 SEO Features
 
-MIT License
+- ✅ Dynamic meta tags
+- ✅ OpenGraph tags
+- ✅ Twitter Cards
+- ✅ Structured data (JSON-LD)
+- ✅ Automatic sitemap generation
+- ✅ Robots.txt configuration
+- ✅ Breadcrumbs
+- ✅ Canonical URLs
+
+**SEO components**: `src/components/seo/`
 
 ---
 
-## 🤝 Support
+## 🐛 Troubleshooting
 
-- **Documentation:** [Setup](GETTING_STARTED.md) | [Developer](DEVELOPER_GUIDE.md) | [Deployment](DEPLOYMENT.md) | [Technical Review](TECHNICAL_REVIEW.md)
-- **Issues:** GitHub Issues
-- **Discussions:** GitHub Discussions
+### Build Errors
+
+**Clear Next.js cache**:
+```bash
+rm -rf .next
+pnpm build
+```
+
+### Database Connection Issues
+
+1. Verify `DATABASE_URL` in `.env`
+2. Check Supabase project is active
+3. Ensure IP is whitelisted (if using connection pooling)
+
+### Payment Webhooks Not Working
+
+1. Verify webhook URL is publicly accessible
+2. Check webhook secret matches
+3. Review provider dashboard logs
+4. Test with provider CLI tools
+
+### Email Not Sending
+
+1. Verify Mailgun API key and domain
+2. Check domain is verified in Mailgun
+3. Review Mailgun logs
+4. Test with Mailgun API directly
 
 ---
 
-**Built for SaaS founders who want to ship fast.**
+## 📦 Tech Stack
 
-Last Updated: January 12, 2026 | Version: 5.0
+- **Framework**: Next.js 16 (App Router, Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + CSS Variables
+- **UI Components**: shadcn/ui + Custom
+- **Animations**: Framer Motion
+- **Database**: PostgreSQL (Supabase)
+- **ORM**: Drizzle
+- **Auth**: Supabase Auth
+- **Payments**: Stripe + LemonSqueezy
+- **Email**: Mailgun
+- **Deployment**: Vercel / Railway / Docker
+
+---
+
+## 📄 License
+
+This is a premium template. Once purchased, you have:
+- ✅ Unlimited personal and commercial projects
+- ✅ Lifetime updates
+- ✅ Full source code access
+- ❌ Cannot resell or redistribute the template itself
+
+---
+
+## 🆘 Support
+
+- 📧 **Email**: support@shipsaas.com
+- 📚 **Documentation**: This README + inline code comments
+- 🐛 **Issues**: Check troubleshooting section above
+
+---
+
+## 🎉 You're Ready!
+
+Your ShipSaaS template is production-ready. Focus on building your unique features while we handle the boilerplate.
+
+**Next Steps**:
+1. Customize theme colors
+2. Add your branding
+3. Create your first blog post
+4. Configure payment products
+5. Deploy to production
+6. Start marketing!
+
+Happy building! 🚀

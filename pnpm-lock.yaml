@@ -84,6 +84,9 @@ importers:
       mailgun.js:
         specifier: ^11.1.0
         version: 11.1.0
+      marked:
+        specifier: ^17.0.1
+        version: 17.0.1
       next:
         specifier: 16.1.1
         version: 16.1.1(@babel/core@7.28.6)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2662,6 +2665,11 @@ packages:
   mailgun.js@11.1.0:
     resolution: {integrity: sha512-pXYcQT3nU32gMjUjZpl2FdQN4Vv2iobqYiXqyyevk0vXTKQj8Or0ifLXLNAGqMHnymTjV0OphBpurkchvHsRAg==}
     engines: {node: '>=18.0.0'}
+
+  marked@17.0.1:
+    resolution: {integrity: sha512-boeBdiS0ghpWcSwoNm/jJBwdpFaMnZWRzjA6SkUMYb40SVaN1x7mmfGKp0jvexGcx+7y2La5zRZsYFZI6Qpypg==}
+    engines: {node: '>= 20'}
+    hasBin: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -5881,6 +5889,8 @@ snapshots:
       url-join: 4.0.1
     transitivePeerDependencies:
       - debug
+
+  marked@17.0.1: {}
 
   math-intrinsics@1.1.0: {}
 

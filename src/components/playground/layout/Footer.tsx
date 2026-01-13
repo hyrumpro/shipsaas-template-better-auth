@@ -19,7 +19,7 @@ export function Footer() {
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
               <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">ShipFree</span>
+            <span className="font-bold text-xl">ShipSaaS</span>
           </Link>
           <p className="text-sm text-muted-foreground mb-4">
             Ship your SaaS faster with our production-ready template.
@@ -57,7 +57,7 @@ export function Footer() {
       </div>
 
       <div className="pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-        <p>© 2024 ShipFree. All rights reserved.</p>
+        <p>© 2024 ShipSaaS. All rights reserved.</p>
       </div>
     </div>
   </footer>

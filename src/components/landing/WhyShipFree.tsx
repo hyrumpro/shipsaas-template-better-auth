@@ -6,16 +6,16 @@ import { Clock, DollarSign, Code, Rocket } from "lucide-react";
 const benefits = [
   {
     icon: Clock,
-    title: "Save 40+ Hours",
-    description: "Skip the repetitive setup. Authentication, payments, emails, and database are already configured and ready to use.",
+    title: "Save 100+ Hours",
+    description: "Skip the repetitive setup. Authentication, payments, emails, database, and 27+ UI components are already built and tested.",
     color: "text-blue-400",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/20",
   },
   {
     icon: DollarSign,
-    title: "100% Free",
-    description: "No hidden costs, no subscriptions, no paywalls. MIT licensed - use it for any project, commercial or personal.",
+    title: "Lifetime Updates",
+    description: "Buy once, get updates forever. New components, features, and improvements added regularly. No recurring fees.",
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/20",
@@ -23,7 +23,7 @@ const benefits = [
   {
     icon: Code,
     title: "Production Ready",
-    description: "Battle-tested code with TypeScript, proper error handling, security best practices, and comprehensive documentation.",
+    description: "Battle-tested code with TypeScript, enterprise security, proper error handling, and comprehensive documentation.",
     color: "text-violet-400",
     bgColor: "bg-violet-500/10",
     borderColor: "border-violet-500/20",
@@ -31,14 +31,14 @@ const benefits = [
   {
     icon: Rocket,
     title: "Deploy Anywhere",
-    description: "Docker configs included. Deploy to Vercel, Railway, Fly.io, or any platform. Full control over your infrastructure.",
+    description: "Vercel, Railway, or Docker - your choice. Complete deployment guides included. Go from purchase to production in under an hour.",
     color: "text-primary",
     bgColor: "bg-primary/10",
     borderColor: "border-primary/20",
   },
 ];
 
-export const WhyShipFree = () => {
+export const WhyShipSaaS = () => {
   return (
     <section className="relative py-24 overflow-hidden">
       {/* Background accent */}
@@ -56,11 +56,11 @@ export const WhyShipFree = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Why choose{" "}
-              <span className="text-gradient">ShipFree?</span>
+              <span className="text-gradient">ShipSaaS?</span>
             </h2>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Focus on building your unique features, not reinventing the wheel.
+              The smartest investment for your next SaaS project. Everything you need, nothing you don't.
             </p>
           </div>
 

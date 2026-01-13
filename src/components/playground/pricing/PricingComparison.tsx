@@ -7,9 +7,9 @@ import { Check, X, Sparkles } from "lucide-react";
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    description: "Perfect for trying out",
+    name: "Starter",
+    price: "$19",
+    description: "Perfect for side projects",
     features: [
       { name: "Up to 3 projects", included: true },
       { name: "Basic analytics", included: true },
@@ -37,7 +37,7 @@ const plans = [
       { name: "Team collaboration", included: false },
       { name: "Dedicated account manager", included: false },
     ],
-    cta: "Start Free Trial",
+    cta: "Start Now",
     popular: true,
   },
   {

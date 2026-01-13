@@ -1,19 +1,19 @@
 ---
-title: "Getting Started with ShipFree"
-excerpt: "Learn how to set up and deploy your SaaS application in minutes with ShipFree, the open-source alternative to expensive boilerplates."
+title: "Getting Started with ShipSaaS"
+excerpt: "Learn how to set up and deploy your SaaS application in minutes with ShipSaaS, the premium Next.js template for modern startups."
 date: "2026-01-08"
-author: "ShipFree Team"
+author: "ShipSaaS Team"
 tags: ["tutorial", "getting-started", "saas"]
-image: "/blog/getting-started.jpg"
+image: "/images/shipfree-how-to-use.png"
 ---
 
-# Getting Started with ShipFree
+# Getting Started with ShipSaaS
 
-Welcome to ShipFree! This guide will help you get your SaaS application up and running in minutes.
+Welcome to ShipSaaS! This guide will help you get your SaaS application up and running in minutes.
 
-## What is ShipFree?
+## What is ShipSaaS?
 
-ShipFree is a free, open-source SaaS boilerplate built with modern technologies like Next.js 16, Supabase, Stripe, and Mailgun. It provides everything you need to launch your startup quickly.
+ShipSaaS is a premium Next.js SaaS template built with modern technologies like Next.js 16, Supabase, Stripe, and Mailgun. It provides everything you need to launch your startup quickly.
 
 ## Prerequisites
 
@@ -26,11 +26,12 @@ Before you begin, make sure you have:
 
 ## Quick Start
 
-1. **Clone the repository**
+1. **Extract the template**
+
+After purchasing, extract the template files to your project directory:
 
 ```bash
-git clone https://github.com/yourusername/shipfree.git
-cd shipfree
+cd your-project-name
 ```
 
 2. **Install dependencies**

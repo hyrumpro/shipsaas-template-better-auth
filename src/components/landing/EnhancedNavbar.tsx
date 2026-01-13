@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Zap, Github } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -32,7 +32,7 @@ export const EnhancedNavbar = () => {
                 <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
                   <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">ShipFree</span>
+                <span className="text-xl font-bold">ShipSaaS</span>
               </Link>
 
               {/* Desktop nav */}
@@ -50,13 +50,12 @@ export const EnhancedNavbar = () => {
 
               {/* Desktop CTA */}
               <div className="hidden md:flex items-center gap-3">
-                <Link href="https://github.com/yourusername/shipfree" target="_blank">
+                <Link href="/playground">
                   <Button variant="ghost" size="sm">
-                    <Github className="w-4 h-4" />
-                    Star on GitHub
+                    View Components
                   </Button>
                 </Link>
-                <Link href="https://github.com/yourusername/shipfree" target="_blank">
+                <Link href="/pricing">
                   <Button variant="default" size="sm">
                     Get Started
                   </Button>
@@ -92,13 +91,12 @@ export const EnhancedNavbar = () => {
                     </Link>
                   ))}
                   <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                    <Link href="https://github.com/yourusername/shipfree" target="_blank" onClick={() => setIsOpen(false)}>
+                    <Link href="/playground" onClick={() => setIsOpen(false)}>
                       <Button variant="ghost" className="w-full justify-center">
-                        <Github className="w-4 h-4" />
-                        Star on GitHub
+                        View Components
                       </Button>
                     </Link>
-                    <Link href="https://github.com/yourusername/shipfree" target="_blank" onClick={() => setIsOpen(false)}>
+                    <Link href="/pricing" onClick={() => setIsOpen(false)}>
                       <Button variant="default" className="w-full justify-center">
                         Get Started
                       </Button>

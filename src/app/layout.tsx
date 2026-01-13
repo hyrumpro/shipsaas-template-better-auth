@@ -15,49 +15,49 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "ShipFree - Open Source SaaS Boilerplate",
-    template: "%s | ShipFree",
+    default: "ShipSaaS - Premium Next.js SaaS Template",
+    template: "%s | ShipSaaS",
   },
   description:
-    "Free, open-source SaaS boilerplate built with Next.js 16, Supabase, Stripe, and Mailgun. Launch your startup in days, not weeks.",
+    "Premium Next.js 16 SaaS template with authentication, payments, and stunning UI. Launch your startup in days with production-ready code.",
   keywords: [
     "saas",
     "boilerplate",
-    "open source",
-    "free",
+    "template",
+    "premium",
     "next.js",
     "supabase",
     "stripe",
-    "shipfree",
+    "shipsaas",
     "startup",
     "saas template",
   ],
-  authors: [{ name: "ShipFree Team" }],
-  creator: "ShipFree",
+  authors: [{ name: "ShipSaaS Team" }],
+  creator: "ShipSaaS",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    siteName: "ShipFree",
-    title: "ShipFree - Open Source SaaS Boilerplate",
+    siteName: "ShipSaaS",
+    title: "ShipSaaS - Premium Next.js SaaS Template",
     description:
-      "Free, open-source SaaS boilerplate. Launch your startup in days, not weeks.",
+      "Premium SaaS template. Launch your startup in days, not weeks.",
     images: [
       {
         url: `${baseUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "ShipFree - Open Source SaaS Boilerplate",
+        alt: "ShipSaaS - Premium Next.js SaaS Template",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ShipFree - Open Source SaaS Boilerplate",
+    title: "ShipSaaS - Premium Next.js SaaS Template",
     description:
-      "Free, open-source SaaS boilerplate. Launch your startup in days, not weeks.",
+      "Premium SaaS template. Launch your startup in days, not weeks.",
     images: [`${baseUrl}/og-image.png`],
-    creator: "@shipfree",
+    creator: "@shipsaas",
   },
   robots: {
     index: true,
@@ -76,14 +76,13 @@ export const metadata: Metadata = {
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "ShipFree",
+  name: "ShipSaaS",
   url: baseUrl,
   logo: `${baseUrl}/logo.png`,
   description:
-    "Free, open-source SaaS boilerplate for launching startups quickly",
+    "Premium Next.js SaaS template for launching startups quickly",
   sameAs: [
-    "https://github.com/yourusername/shipfree",
-    "https://twitter.com/shipfree",
+    "https://twitter.com/shipsaas",
   ],
 };
 
@@ -91,15 +90,15 @@ const organizationSchema = {
 const webAppSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "ShipFree",
+  name: "ShipSaaS",
   url: baseUrl,
   description:
-    "Open-source SaaS boilerplate with authentication, payments, and email integration",
+    "Premium SaaS template with authentication, payments, and email integration",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Web",
   offers: {
     "@type": "Offer",
-    price: "0",
+    price: "29",
     priceCurrency: "USD",
   },
   featureList: [

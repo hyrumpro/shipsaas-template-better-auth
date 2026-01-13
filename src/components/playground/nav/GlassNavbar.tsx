@@ -13,7 +13,7 @@ export function GlassNavbar() {
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
           <span className="text-primary-foreground font-black text-lg">S</span>
         </div>
-        <span className="font-bold text-xl">ShipFree</span>
+        <span className="font-bold text-xl">ShipSaaS</span>
       </div>
 
       <div className="hidden md:flex items-center gap-1">

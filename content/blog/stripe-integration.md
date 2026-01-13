@@ -2,14 +2,14 @@
 title: "Complete Guide to Stripe Integration"
 excerpt: "Step-by-step guide to integrating Stripe payments, handling webhooks, and managing subscriptions in your SaaS application."
 date: "2026-01-07"
-author: "ShipFree Team"
+author: "ShipSaaS Team"
 tags: ["stripe", "payments", "tutorial"]
-image: "/blog/stripe-integration.jpg"
+image: "/images/complete-guide-to-Stripe-Integration.png"
 ---
 
 # Complete Guide to Stripe Integration
 
-Learn how to integrate Stripe payments into your ShipFree application and handle subscriptions like a pro.
+Learn how to integrate Stripe payments into your ShipSaaS application and handle subscriptions like a pro.
 
 ## Why Stripe?
 

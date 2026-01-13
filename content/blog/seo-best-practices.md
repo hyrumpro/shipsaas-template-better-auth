@@ -2,9 +2,9 @@
 title: "SEO Best Practices for SaaS Applications"
 excerpt: "Optimize your SaaS application for search engines with these proven SEO strategies and techniques."
 date: "2026-01-06"
-author: "ShipFree Team"
+author: "ShipSaaS Team"
 tags: ["seo", "marketing", "best-practices"]
-image: "/blog/seo-best-practices.jpg"
+image: "/images/best-SEO-practices-for-SaaS.png"
 ---
 
 # SEO Best Practices for SaaS Applications

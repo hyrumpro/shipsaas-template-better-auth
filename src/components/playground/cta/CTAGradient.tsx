@@ -72,7 +72,7 @@ export function CTAGradient() {
           transition={{ delay: 0.4 }}
           className="mt-6 text-sm text-white/70"
         >
-          No credit card required • 14-day free trial • Cancel anytime
+          One-time payment • Lifetime updates • Unlimited projects
         </motion.p>
       </div>
     </div>

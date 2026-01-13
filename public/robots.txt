@@ -1,6 +1,7 @@
-
 User-agent: *
-Disallow: /auth/
 Allow: /
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /api/
 
-Sitemap: https://shipfree.idee8.agency.com/sitemap.xml
+Sitemap: https://yourdomain.com/sitemap.xml
