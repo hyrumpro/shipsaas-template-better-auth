@@ -15,8 +15,7 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   
   // ✅ Use React Query hook for cached user data
-  const { data: authData, isLoading: isAuthLoading, error: authError } = useAuth();
-  const user = authData?.data?.user;
+  const { data: user, isLoading: isAuthLoading, error: authError } = useAuth();
 
   // Get variant ID from environment or props
   const productVariantId = variantId || process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID;
