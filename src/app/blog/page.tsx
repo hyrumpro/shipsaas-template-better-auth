@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { BlogList } from "@/components/blog/BlogList";
 import { BlogNavbar } from "@/components/blog/BlogNavbar";

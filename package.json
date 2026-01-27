@@ -1,7 +1,35 @@
 {
-  "name": "shipsaas",
-  "version": "0.1.0",
+  "name": "shipsaas-template",
+  "version": "1.0.0",
+  "description": "Premium Next.js SaaS Template - Ship your SaaS in days with authentication, payments, 27+ components, and production-ready code",
+  "author": "ShipSaaS",
+  "license": "SEE LICENSE IN LICENSE.md",
   "private": true,
+  "keywords": [
+    "nextjs",
+    "saas",
+    "template",
+    "starter",
+    "boilerplate",
+    "stripe",
+    "lemonsqueezy",
+    "supabase",
+    "authentication",
+    "payments",
+    "typescript",
+    "tailwindcss",
+    "drizzle-orm",
+    "postgresql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/shipsaas-template"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/shipsaas-template/issues",
+    "email": "support@yourdomain.com"
+  },
+  "homepage": "https://yourdomain.com",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -38,6 +66,8 @@
     "@stripe/stripe-js": "^5.6.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
+    "@tanstack/react-query": "^5.90.20",
+    "@tanstack/react-query-devtools": "^5.91.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",

@@ -1,10 +1,9 @@
 // app/checkout/page.tsx
 "use client";
 
-import { createCheckout } from "@/utils/lemon";
 import { useEffect, useState } from "react";
 import { logger } from "@/lib/logger";
-import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CheckoutPageProps {
   variantId?: string;
@@ -13,54 +12,59 @@ interface CheckoutPageProps {
 export default function CheckoutPage({ variantId }: CheckoutPageProps) {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  
+  // ✅ Use React Query hook for cached user data
+  const { data: authData, isLoading: isAuthLoading, error: authError } = useAuth();
+  const user = authData?.data?.user;
 
   // Get variant ID from environment or props
   const productVariantId = variantId || process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID;
 
+  // Check authentication status
   useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        setUserId(user.id);
-      } else {
-        logger.warn("User not authenticated for checkout");
-        setError("Please sign in to continue with checkout.");
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+    if (!isAuthLoading && !user) {
+      logger.warn("User not authenticated for checkout");
+      setError("Please sign in to continue with checkout.");
+    }
+  }, [isAuthLoading, user]);
 
   useEffect(() => {
     const initiateCheckout = async () => {
       if (!productVariantId) {
         setError("Product variant ID is not configured. Please contact support.");
-        setIsLoading(false);
         logger.error("LemonSqueezy variant ID not configured");
         return;
       }
 
-      if (!userId) {
-        // Wait for userId to be set
+      if (isAuthLoading || !user) {
+        // Wait for auth to complete
         return;
       }
 
       try {
-        setIsLoading(true);
-        const redirectUrl = `${window.location.origin}/success`;
-        const checkout = await createCheckout(productVariantId, redirectUrl, userId);
+        setIsCheckoutLoading(true);
         
-        // Safely access nested properties with proper null checks
-        const url = checkout?.data?.attributes?.url;
-        if (url) {
-          setCheckoutUrl(url);
+        // Use the unified checkout API
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            planId: productVariantId,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to create checkout");
+        }
+
+        const data = await response.json();
+        
+        if (data.url) {
+          setCheckoutUrl(data.url);
         } else {
           throw new Error("Checkout URL not returned from API");
         }
@@ -68,14 +72,14 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
         logger.error("Failed to initiate checkout", err);
         setError("Failed to load checkout. Please try again later.");
       } finally {
-        setIsLoading(false);
+        setIsCheckoutLoading(false);
       }
     };
 
     initiateCheckout();
-  }, [productVariantId, userId]);
+  }, [productVariantId, isAuthLoading, user]);
 
-  if (isLoading) {
+  if (isAuthLoading || isCheckoutLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

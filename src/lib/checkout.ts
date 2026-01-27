@@ -4,7 +4,6 @@
  */
 
 import { stripe } from "@/utils/stripe";
-import { createCheckout as createLemonSqueezyCheckout } from "@/utils/lemon";
 import { paymentConfig, getPrimaryProvider } from "@/config/payments";
 import { logger } from "@/lib/logger";
 
@@ -105,29 +104,70 @@ async function createStripeCheckout(
 async function createLemonSqueezyCheckoutSession(
   options: CheckoutOptions
 ): Promise<CheckoutResult> {
-  const { planId, userId, successUrl, cancelUrl } = options;
+  const { planId, userId, successUrl } = options;
 
   const redirectUrl = successUrl || paymentConfig.lemonsqueezy.successUrl;
+  const storeId = process.env.LEMONSQUEEZY_STORE_ID;
+  const apiKey = process.env.LEMONSQUEEZY_API_KEY;
 
-  const checkout = await createLemonSqueezyCheckout(
-    planId, // LemonSqueezy Variant ID
-    redirectUrl,
-    userId
-  );
+  if (!storeId || !apiKey) {
+    throw new Error("LemonSqueezy credentials not configured");
+  }
 
-  if (!checkout?.data?.attributes?.url) {
-    throw new Error("Failed to create LemonSqueezy checkout");
+  // Dynamic import to prevent build-time initialization
+  const lemonSqueezyModule = await import("@lemonsqueezy/lemonsqueezy.js");
+  
+  lemonSqueezyModule.lemonSqueezySetup({
+    apiKey,
+    onError: (error) => {
+      logger.error("LemonSqueezy SDK Error", error);
+      throw error;
+    },
+  });
+
+  const newCheckout = {
+    productOptions: {
+      redirectUrl,
+    },
+    checkoutData: {
+      custom: {
+        user_id: userId,
+      },
+    },
+  };
+
+  logger.payment("creating_lemonsqueezy_checkout", {
+    variantId: planId,
+    userId,
+  });
+
+  const { data, error } = await lemonSqueezyModule.createCheckout(
+    storeId,
+    planId,
+    newCheckout
+  ) as { data?: any; error?: any };
+
+  if (error) {
+    logger.error("Failed to create LemonSqueezy checkout", error, {
+      variantId: planId,
+      userId,
+    });
+    throw new Error(`Failed to create checkout: ${error.message}`);
+  }
+
+  if (!data?.data?.attributes?.url) {
+    throw new Error("Failed to create LemonSqueezy checkout - no URL returned");
   }
 
   logger.payment("lemonsqueezy_checkout_created", {
-    checkoutId: checkout.data.id,
+    checkoutId: data.data.id,
     userId,
   });
 
   return {
     provider: "lemonsqueezy",
-    checkoutUrl: checkout.data.attributes.url,
-    sessionId: checkout.data.id,
+    checkoutUrl: data.data.attributes.url,
+    sessionId: data.data.id,
   };
 }
 

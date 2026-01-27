@@ -11,7 +11,7 @@ import {
   payments,
   webhookEvents,
 } from "./schema";
-import { eq, and, desc, gte } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 // ============================================================================
 // USER OPERATIONS

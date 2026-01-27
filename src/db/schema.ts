@@ -6,7 +6,6 @@ import {
   timestamp,
   boolean,
   integer,
-  decimal,
   pgEnum,
   jsonb,
   index,

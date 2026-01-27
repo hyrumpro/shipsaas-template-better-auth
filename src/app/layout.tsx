@@ -4,6 +4,7 @@ import "./globals.css";
 import type React from "react";
 import { cn } from "@/lib/utils";
 import { StructuredData } from "@/components/StructuredData";
+import { QueryProvider } from "@/providers/QueryProvider";
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -122,7 +123,9 @@ export default function RootLayout({
         <StructuredData data={webAppSchema} />
       </head>
       <body className={cn(bricolageGrotesque.className, "antialiased")}>
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

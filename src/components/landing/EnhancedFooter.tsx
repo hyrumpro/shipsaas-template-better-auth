@@ -1,4 +1,4 @@
-import { Zap, Twitter, Github, Mail } from "lucide-react";
+import { Zap, Twitter, Mail } from "lucide-react";
 import Link from "next/link";
 
 const footerLinks = {
