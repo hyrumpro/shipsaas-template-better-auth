@@ -5,3 +5,5 @@ Dockerfile
 .env
 dist
 .next
+.claude
+.kiro

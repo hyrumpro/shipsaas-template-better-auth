@@ -1,3 +1,26 @@
+/**
+ * @deprecated CRITICAL WARNING: This file contains incomplete implementations with 30+ TODO comments.
+ * 
+ * DO NOT USE THIS FILE IN PRODUCTION!
+ * 
+ * Use the complete implementation instead:
+ * - For webhooks: src/lib/webhooks/lemonsqueezy-handler.ts
+ * - For checkout: src/lib/checkout.ts
+ * 
+ * This file will be removed in a future version.
+ * 
+ * Issues with this file:
+ * - Order creation/payment/refund handling incomplete
+ * - Subscription lifecycle events not fully implemented
+ * - No database persistence for LemonSqueezy events
+ * - Missing email notifications for payment events
+ * 
+ * Migration guide:
+ * 1. Ensure webhook URL points to: /api/lemonsqueezy/webhook
+ * 2. Use createLemonSqueezyCheckout() from src/lib/checkout.ts for checkouts
+ * 3. All webhook events are handled by src/lib/webhooks/lemonsqueezy-handler.ts
+ */
+
 // lib/lemon-squeezy.ts
 import { logger } from "@/lib/logger";
 

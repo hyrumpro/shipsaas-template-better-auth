@@ -21,7 +21,7 @@ export function MinimalNavbar() {
     </div>
 
     <Button variant="ghost" className="gap-2 group">
-      Let's Talk
+      Let&apos;s Talk
       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
     </Button>
   </nav>

@@ -14,12 +14,7 @@ import {
 import { applyTheme, THEME_PRESETS, getSavedTheme, type ThemeConfig } from "@/config/theme";
 
 export function ThemeSwitcher() {
-  const [currentTheme, setCurrentTheme] = useState<ThemeConfig | null>(null);
-
-  useEffect(() => {
-    const saved = getSavedTheme();
-    setCurrentTheme(saved);
-  }, []);
+  const [currentTheme, setCurrentTheme] = useState<ThemeConfig | null>(() => getSavedTheme());
 
   const handleThemeChange = (theme: ThemeConfig) => {
     applyTheme(theme);

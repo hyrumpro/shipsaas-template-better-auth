@@ -10,6 +10,7 @@ import {
   getSubscriptionByProviderId,
   createOrder,
   updateOrder,
+  getOrderByProviderId,
   createPayment,
   updateUser,
   createWebhookEvent,
@@ -402,15 +403,39 @@ async function handlePaymentFailed(event: Stripe.Event) {
 
 async function handleChargeRefunded(event: Stripe.Event) {
   const charge = event.data.object as Stripe.Charge;
-
-  // Try to find the order by payment intent
-  // Note: This is a simplified version. You might need to query by provider_order_id
+  const paymentIntentId = charge.payment_intent as string;
+  
+  if (!paymentIntentId) {
+    logger.warn("Charge refunded without payment intent", {
+      chargeId: charge.id,
+    });
+    return;
+  }
+  
+  // Find order by payment intent ID
+  const dbOrder = await getOrderByProviderId("stripe", paymentIntentId);
+  
+  if (!dbOrder) {
+    logger.warn("Order not found for refund", { 
+      paymentIntentId,
+      chargeId: charge.id 
+    });
+    return;
+  }
+  
+  // Update order status to refunded
+  await updateOrder(dbOrder.id, {
+    status: "refunded",
+    refundedAmount: charge.amount_refunded,
+    refundedAt: new Date(),
+    refundReason: (charge as any).refund_reason || undefined,
+  });
+  
   logger.payment("charge_refunded", {
+    userId: dbOrder.userId,
+    orderId: dbOrder.id,
     chargeId: charge.id,
     amount: charge.amount_refunded,
     currency: charge.currency,
   });
-
-  // TODO: Update order status to refunded
-  // This requires querying orders by payment intent ID
 }

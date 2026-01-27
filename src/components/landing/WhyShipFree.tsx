@@ -60,7 +60,7 @@ export const WhyShipSaaS = () => {
             </h2>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              The smartest investment for your next SaaS project. Everything you need, nothing you don't.
+              The smartest investment for your next SaaS project. Everything you need, nothing you don&apos;t.
             </p>
           </div>
 

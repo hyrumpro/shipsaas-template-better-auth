@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSwitcher } from "@/components/playground/ui/ThemeSwitcher";
+import Link from "next/link";
 import {
   HeroGradient,
   HeroFloating,
@@ -32,7 +33,7 @@ export default function PlaygroundPage() {
       <header className="border-b border-border/50 sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
         <div className="container flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-primary-foreground" />
               </div>
@@ -40,14 +41,14 @@ export default function PlaygroundPage() {
                 <h1 className="font-bold text-lg">Component Playground</h1>
                 <p className="text-xs text-muted-foreground">27+ Production-Ready Components</p>
               </div>
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" asChild>
-              <a href="/">
+              <Link href="/">
                 <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
                 Back to Home
-              </a>
+              </Link>
             </Button>
             <ThemeSwitcher />
             <Button variant="hero" size="sm">

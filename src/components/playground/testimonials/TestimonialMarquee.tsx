@@ -30,7 +30,7 @@ export function TestimonialMarquee() {
               <Star key={idx} className="w-4 h-4 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <p className="mb-4">"{t.content}"</p>
+          <p className="mb-4">&ldquo;{t.content}&rdquo;</p>
           <p className="font-semibold">{t.name}</p>
           <p className="text-sm text-muted-foreground">{t.role}</p>
         </div>

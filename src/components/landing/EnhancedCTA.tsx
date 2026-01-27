@@ -51,7 +51,7 @@ export const EnhancedCTA = () => {
             viewport={{ once: true }}
             className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Join hundreds of developers who've accelerated their SaaS journey. 
+            Join hundreds of developers who&apos;ve accelerated their SaaS journey. 
             One payment, lifetime access, unlimited projects.
           </motion.p>
           

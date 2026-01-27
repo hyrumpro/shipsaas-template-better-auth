@@ -46,7 +46,7 @@ export function TestimonialCards() {
               <Star key={j} className="w-4 h-4 fill-primary text-primary" />
             ))}
           </div>
-          <p className="mb-6 text-muted-foreground">"{testimonial.quote}"</p>
+          <p className="mb-6 text-muted-foreground">&ldquo;{testimonial.quote}&rdquo;</p>
           <div className="flex items-center gap-3">
             <Avatar>
               <AvatarImage src={testimonial.avatar} />
