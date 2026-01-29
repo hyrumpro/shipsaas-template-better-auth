@@ -1,9 +1,10 @@
 node_modules
 .git
+.claude
+.vscode
 .dockerignore
 Dockerfile
 .env
 dist
 .next
-.claude
 .kiro
