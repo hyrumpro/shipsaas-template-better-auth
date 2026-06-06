@@ -1,94 +1,119 @@
 import { Metadata } from "next";
 import Link from "next/link";
-
-// CHATGPT PROMPT TO GENERATE YOUR PRIVACY POLICY — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple privacy policy for my website. Here is some context:
-// - Website: https://gopump.co
-// - Name: Pump
-// - Description: An application responsible for help Personal Trainers and People that like to go to the gym improve their performance.
-// - User data collected: name, email, phone, and payment information
-// - Non-personal data collection: web cookies
-// - Purpose of Data Collection: To know better our clients
-// - Data sharing: we do not share the data with any other parties
-// - Children's Privacy: we do not collect any data from children
-// - Updates to the Privacy Policy: users will be updated by email
-// - Contact information: official@gopump.co
-
-// Please write a simple privacy policy for my site. Add the current date.  Do not add or explain your reasoning. Answer:
+import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
+  description:
+    "Privacy policy for ShipSaaS, the premium Next.js SaaS template. Replace this boilerplate with your own policy before going to production.",
 };
 
 const PrivacyPolicy = () => {
   return (
-    <main className="max-w-xl mx-auto">
-      <div className="p-5">
-        <Link href="/" className="btn btn-ghost">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="w-5 h-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
-              clipRule="evenodd"
-            />
-          </svg>{" "}
-          Voltar
-        </Link>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Política de Privacidade do
-        </h1>
+    <div className="min-h-screen">
+      <header className="border-border border-b">
+        <div className="mx-auto flex h-14 w-full max-w-3xl items-center px-6">
+          <Link href="/" aria-label="ShipSaaS home">
+            <Logo />
+          </Link>
+        </div>
+      </header>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {`Última atualização: 12/12/2023
+      <main className="mx-auto w-full max-w-3xl px-6 py-16 md:py-20">
+        <p className="eyebrow">Legal</p>
+        <h1 className="text-display mt-2">Privacy Policy</h1>
+        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+          Placeholder boilerplate. Replace with your own privacy policy
+          reviewed by counsel before launch.
+        </p>
 
-Bem-vindo ao Pump (https://gopump.co), um aplicativo dedicado a ajudar treinadores pessoais e entusiastas da fitness a melhorarem seu desempenho. Sua privacidade é de extrema importância para nós. Esta Política de Privacidade delineia os tipos de informações que coletamos, como as utilizamos e as medidas que tomamos para protegê-las.
+        <article className="prose mt-10">
+          <p className="text-muted-foreground">
+            Last updated: {new Date().toISOString().slice(0, 10)}
+          </p>
 
-1. Coleta e Uso de Informações
+          <p>
+            This Privacy Policy describes how the operators of this
+            website (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or
+            &ldquo;our&rdquo;) collect, use, and protect information when
+            you visit or use our services.
+          </p>
 
-Coletamos os seguintes tipos de informações:
+          <h2>1. Information We Collect</h2>
+          <p>
+            When you create an account, sign up for a paid plan, or
+            contact us, we collect information you provide directly, such
+            as your name, email address, billing address, and payment
+            information processed by our payment providers (Stripe, Lemon
+            Squeezy). We also collect standard server logs (IP address,
+            user agent, pages viewed) and use cookies and similar
+            technologies for authentication and analytics.
+          </p>
 
-Dados Pessoais: Isso inclui seu nome, endereço de e-mail, número de telefone e informações de pagamento. Coletamos esses dados para entender melhor e atender nossos clientes.
+          <h2>2. How We Use Your Information</h2>
+          <p>
+            We use the information we collect to: provide, maintain, and
+            improve our services; process payments and prevent fraud; send
+            transactional emails (receipts, account notifications,
+            security alerts); and respond to support requests.
+          </p>
 
-Dados Não Pessoais: Utilizamos cookies da web para melhorar sua experiência em nosso site. Esses cookies nos ajudam a entender o comportamento do usuário em nosso site, mas não coletam informações pessoais.
+          <h2>3. Sharing of Information</h2>
+          <p>
+            We do not sell your personal information. We share data only
+            with vetted sub-processors who help us operate the service,
+            including: payment processors (Stripe, Lemon Squeezy),
+            database hosting (Supabase / Postgres), email delivery
+            (Mailgun), and error monitoring. Each sub-processor is
+            contractually obligated to protect your data.
+          </p>
 
-2. Finalidade da Coleta de Dados
+          <h2>4. Data Retention</h2>
+          <p>
+            We retain account data for as long as your account is active.
+            We delete personal data on request, except where retention is
+            required for legal, tax, or accounting purposes.
+          </p>
 
-O objetivo principal da coleta de dados é aprimorar nossos serviços e proporcionar uma experiência personalizada para nossos usuários. Entender nossos clientes nos ajuda a melhorar nosso aplicativo e oferecer orientação e suporte mais personalizados.
+          <h2>5. Your Rights</h2>
+          <p>
+            Depending on your jurisdiction (GDPR, CCPA, LGPD, etc.) you
+            may have the right to access, correct, port, or delete the
+            personal data we hold about you. Contact us at the address
+            below to exercise these rights.
+          </p>
 
-3. Compartilhamento e Divulgação de Dados
+          <h2>6. Security</h2>
+          <p>
+            We use industry-standard measures (TLS in transit, encryption
+            at rest, row-level security in the database, webhook
+            signature verification) to protect your data. No method of
+            transmission over the Internet, however, is 100% secure.
+          </p>
 
-O Pump respeita sua privacidade. Não compartilhamos seus dados pessoais com terceiros. Qualquer dado coletado é exclusivamente para o propósito de aprimorar nosso serviço e não é compartilhado externamente.
+          <h2>7. Children</h2>
+          <p>
+            Our services are not directed to children under 13 (or under
+            16 in the EEA / UK), and we do not knowingly collect personal
+            data from them.
+          </p>
 
-4. Privacidade Infantil
+          <h2>8. Changes to This Policy</h2>
+          <p>
+            We may update this Privacy Policy from time to time. We will
+            notify you of material changes by email or by posting a
+            notice on our site before the change takes effect.
+          </p>
 
-Nossos serviços não são direcionados a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças. Se tomarmos conhecimento de que recebemos inadvertidamente informações pessoais de uma criança menor de 13 anos, excluiremos tais informações de nossos registros.
-
-5. Alterações na Nossa Política de Privacidade
-
-Podemos atualizar nossa Política de Privacidade de tempos em tempos. Notificaremos você sobre quaisquer alterações, publicando a nova Política de Privacidade nesta página e atualizando a data de "Última atualização". Você também será informado sobre quaisquer mudanças significativas por meio do endereço de e-mail que nos forneceu.
-
-6. Fale Conosco
-
-Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco em official@gopump.co.`}
-        </pre>
-      </div>
-    </main>
+          <h2>9. Contact</h2>
+          <p>
+            If you have questions about this Privacy Policy or our
+            practices, please contact us at the email address listed on
+            our home page.
+          </p>
+        </article>
+      </main>
+    </div>
   );
 };
 

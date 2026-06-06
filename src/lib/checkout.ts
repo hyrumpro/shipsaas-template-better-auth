@@ -6,6 +6,7 @@
 import { stripe } from "@/utils/stripe";
 import { paymentConfig, getPrimaryProvider } from "@/config/payments";
 import { logger } from "@/lib/logger";
+import { getUserById, updateUser } from "@/db/queries";
 
 export interface CheckoutOptions {
   planId: string;
@@ -20,6 +21,38 @@ export interface CheckoutResult {
   provider: "stripe" | "lemonsqueezy";
   checkoutUrl: string;
   sessionId?: string;
+}
+
+/**
+ * Resolve the Stripe customer id for a user, creating one in Stripe on
+ * first checkout so subsequent checkouts reuse the same customer record
+ * (and the same `default_payment_method`, tax ids, invoices, etc.).
+ */
+async function resolveStripeCustomer(
+  userId: string,
+  userEmail: string
+): Promise<string> {
+  const user = await getUserById(userId);
+
+  if (user?.stripeCustomerId) {
+    return user.stripeCustomerId;
+  }
+
+  // Reuse if Stripe already has a customer for this email — prevents
+  // duplicate customers on retry / double-click.
+  const existing = await stripe.customers.list({ email: userEmail, limit: 1 });
+  if (existing.data.length > 0) {
+    const customerId = existing.data[0].id;
+    await updateUser(userId, { stripeCustomerId: customerId });
+    return customerId;
+  }
+
+  const created = await stripe.customers.create({
+    email: userEmail,
+    metadata: { user_id: userId },
+  });
+  await updateUser(userId, { stripeCustomerId: created.id });
+  return created.id;
 }
 
 /**
@@ -55,8 +88,10 @@ async function createStripeCheckout(
 ): Promise<CheckoutResult> {
   const { planId, userId, userEmail, successUrl, cancelUrl, metadata } = options;
 
+  const customerId = await resolveStripeCustomer(userId, userEmail);
+
   const session = await stripe.checkout.sessions.create({
-    customer_email: userEmail,
+    customer: customerId,
     line_items: [
       {
         price: planId, // Stripe Price ID
@@ -215,8 +250,10 @@ async function createStripeOneTimeCheckout(
     metadata,
   } = options;
 
+  const customerId = await resolveStripeCustomer(userId, userEmail);
+
   const session = await stripe.checkout.sessions.create({
-    customer_email: userEmail,
+    customer: customerId,
     line_items: [
       {
         price_data: {

@@ -13,20 +13,10 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
-  
-  // ✅ Use React Query hook for cached user data
-  const { data: user, isLoading: isAuthLoading, error: authError } = useAuth();
 
-  // Get variant ID from environment or props
+  const { data: user, isLoading: isAuthLoading } = useAuth();
+
   const productVariantId = variantId || process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID;
-
-  // Check authentication status
-  useEffect(() => {
-    if (!isAuthLoading && !user) {
-      logger.warn("User not authenticated for checkout");
-      setError("Please sign in to continue with checkout.");
-    }
-  }, [isAuthLoading, user]);
 
   useEffect(() => {
     const initiateCheckout = async () => {
@@ -37,14 +27,12 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
       }
 
       if (isAuthLoading || !user) {
-        // Wait for auth to complete
         return;
       }
 
       try {
         setIsCheckoutLoading(true);
-        
-        // Use the unified checkout API
+
         const response = await fetch("/api/checkout", {
           method: "POST",
           headers: {
@@ -61,7 +49,7 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
         }
 
         const data = await response.json();
-        
+
         if (data.url) {
           setCheckoutUrl(data.url);
         } else {
@@ -89,27 +77,41 @@ export default function CheckoutPage({ variantId }: CheckoutPageProps) {
     );
   }
 
+  if (!user) {
+    logger.warn("User not authenticated for checkout");
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md p-6 bg-red-50 border border-red-200 rounded-lg">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Sign in required</h2>
+          <p className="text-red-600">
+            Please sign in to continue with checkout.
+          </p>
+          <div className="mt-4">
+            <a
+              href="/auth/login"
+              className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md p-6 bg-red-50 border border-red-200 rounded-lg">
           <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
           <p className="text-red-600">{error}</p>
-          <div className="mt-4 space-x-2">
+          <div className="mt-4">
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
               Try Again
             </button>
-            {error.includes("sign in") && (
-              <a
-                href="/auth/login"
-                className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Sign In
-              </a>
-            )}
           </div>
         </div>
       </div>

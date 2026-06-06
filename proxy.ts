@@ -6,7 +6,24 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const PUBLIC_WEBHOOK_PATHS = new Set<string>([
+  "/api/stripe/webhook",
+  "/api/lemonsqueezy/webhook",
+  "/api/mailgun/webhook",
+  "/api/auth/webhook",
+  "/api/health",
+]);
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Short-circuit public webhooks BEFORE calling Supabase.
+  // These endpoints verify their own HMAC / signature and must respond
+  // quickly (Stripe / LS expect <5s). They never need a Supabase session.
+  if (PUBLIC_WEBHOOK_PATHS.has(pathname)) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -40,8 +57,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
   // Define public routes that don't require authentication
   const publicRoutes = [
     "/",
@@ -54,16 +69,7 @@ export async function proxy(request: NextRequest) {
     "/contact",
     "/privacy-policy",
     "/tos",
-    "/robots.txt",
-    "/sitemap.xml",
-  ];
-
-  // API routes that should be public
-  const publicApiRoutes = [
-    "/api/stripe/webhook",
-    "/api/lemonsqueezy/webhook",
-    "/api/mailgun/webhook",
-    "/api/auth",
+    "/docs",
   ];
 
   // Check if current path is public
@@ -71,12 +77,8 @@ export async function proxy(request: NextRequest) {
     publicRoutes.includes(pathname) ||
     publicRoutes.some((route) => pathname.startsWith(route + "/"));
 
-  const isPublicApiRoute = publicApiRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  // Allow access to public routes and API routes
-  if (isPublicRoute || isPublicApiRoute) {
+  // Allow access to public routes
+  if (isPublicRoute) {
     return supabaseResponse;
   }
 

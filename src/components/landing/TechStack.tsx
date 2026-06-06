@@ -1,105 +1,87 @@
-"use client";
+type Item = { name: string; note: string };
 
-import { motion } from "framer-motion";
-import { Code2 } from "lucide-react";
-
-const techStack = [
+const groups: { category: string; items: Item[] }[] = [
   {
     category: "Frontend",
-    technologies: [
-      { name: "Next.js 16", description: "React framework with App Router" },
-      { name: "TypeScript", description: "Type-safe development" },
-      { name: "Tailwind CSS", description: "Utility-first styling" },
-      { name: "shadcn/ui", description: "Beautiful components" },
-      { name: "Framer Motion", description: "Smooth animations" },
+    items: [
+      { name: "Next.js 16", note: "App Router, Turbopack, Server Actions" },
+      { name: "React 19", note: "Server Components by default" },
+      { name: "TypeScript", note: "strict mode, no `any` in the public surface" },
+      { name: "Tailwind CSS", note: "CSS-variable tokens, no inline colors" },
+      { name: "Radix UI", note: "Headless primitives, fully accessible" },
+      { name: "TanStack Query", note: "Server-state cache, devtools in dev" },
     ],
   },
   {
     category: "Backend",
-    technologies: [
-      { name: "Supabase", description: "PostgreSQL database & Auth" },
-      { name: "Drizzle ORM", description: "Type-safe database queries" },
-      { name: "Edge Functions", description: "Serverless API routes" },
+    items: [
+      { name: "Supabase", note: "Auth, Postgres, RLS, file storage" },
+      { name: "Drizzle ORM", note: "Schema → types → queries" },
+      { name: "Next.js Route Handlers", note: "Typed, rate-limited, signed" },
     ],
   },
   {
     category: "Payments",
-    technologies: [
-      { name: "Stripe", description: "Payment processing" },
-      { name: "LemonSqueezy", description: "Alternative payment provider" },
+    items: [
+      { name: "Stripe", note: "Subscriptions, portal, idempotent webhooks" },
+      { name: "LemonSqueezy", note: "Drop-in alternative behind one switch" },
     ],
   },
   {
-    category: "Infrastructure",
-    technologies: [
-      { name: "Docker", description: "Containerization" },
-      { name: "Mailgun", description: "Transactional emails" },
-      { name: "Vercel", description: "Deployment platform" },
+    category: "Infra",
+    items: [
+      { name: "Mailgun", note: "DKIM, DMARC, SPF configured" },
+      { name: "Docker", note: "Dev + production compose files" },
+      { name: "PostHog + Sentry", note: "Opt-in shim, no SDK at install" },
     ],
   },
 ];
 
 export const TechStack = () => {
   return (
-    <section className="relative py-24 overflow-hidden bg-secondary/20">
-      <div className="container relative z-10 px-4">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-primary/10 border border-primary/20"
-          >
-            <Code2 className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Modern Tech Stack</span>
-          </motion.div>
-          
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-            Built with the{" "}
-            <span className="text-gradient">best tools</span>
+    <section
+      id="stack"
+      aria-labelledby="stack-heading"
+      className="border-border bg-muted/30 border-t"
+    >
+      <div className="section">
+        <div className="max-w-2xl">
+          <p className="eyebrow">Stack</p>
+          <h2 id="stack-heading" className="text-display mt-3 text-balance">
+            Boring, deliberate choices.
           </h2>
-          
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Industry-leading technologies, carefully selected for performance, 
-            developer experience, and scalability.
+          <p className="text-foreground/70 mt-4 text-base leading-relaxed md:text-lg">
+            Tools picked for stability and the developer experience. Nothing
+            here is a fad.
           </p>
-        </motion.div>
-
-        {/* Tech stack grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {techStack.map((stack, stackIndex) => (
-            <motion.div
-              key={stackIndex}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: stackIndex * 0.1, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="glass rounded-2xl p-6 hover:bg-card/80 transition-all duration-300 hover:border-primary/30"
-            >
-              <h3 className="text-lg font-bold mb-4 text-primary">{stack.category}</h3>
-              <ul className="space-y-3">
-                {stack.technologies.map((tech, techIndex) => (
-                  <li key={techIndex} className="group">
-                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {tech.name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {tech.description}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
         </div>
+
+        <dl className="mt-12 grid grid-cols-1 gap-x-12 gap-y-10 md:grid-cols-2 lg:grid-cols-4">
+          {groups.map(({ category, items }) => (
+            <div key={category}>
+              <dt className="text-foreground text-sm font-semibold tracking-tight">
+                {category}
+              </dt>
+              <dd className="mt-4">
+                <ul className="divide-border divide-y">
+                  {items.map((item) => (
+                    <li
+                      key={item.name}
+                      className="flex flex-col gap-0.5 py-3 first:pt-0"
+                    >
+                      <span className="text-foreground text-sm font-medium">
+                        {item.name}
+                      </span>
+                      <span className="text-muted-foreground text-xs leading-relaxed">
+                        {item.note}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

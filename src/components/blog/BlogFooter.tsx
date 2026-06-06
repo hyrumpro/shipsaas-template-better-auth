@@ -1,34 +1,37 @@
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import { Logo } from "@/components/Logo";
+
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Blog", href: "/blog" },
+  { label: "Components", href: "/playground" },
+  { label: "Docs", href: "/docs" },
+];
 
 export function BlogFooter() {
   return (
-    <footer className="border-t border-border/50 py-12 mt-20">
-      <div className="container px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl">ShipSaaS</span>
-          </Link>
-
-          <div className="flex gap-6 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground transition-colors">
-              Home
+    <footer className="border-border border-t">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-6 px-6 py-10 md:flex-row md:items-center">
+        <Link href="/" aria-label="ShipSaaS home">
+          <Logo />
+        </Link>
+        <nav
+          aria-label="Footer"
+          className="text-muted-foreground flex flex-wrap items-center gap-x-6 gap-y-2 text-sm"
+        >
+          {links.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="hover:text-foreground transition-colors"
+            >
+              {link.label}
             </Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors">
-              Blog
-            </Link>
-            <Link href="/playground" className="hover:text-foreground transition-colors">
-              Components
-            </Link>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            © 2024 ShipSaaS. All rights reserved.
-          </p>
-        </div>
+          ))}
+        </nav>
+        <p className="text-muted-foreground text-sm">
+          © {new Date().getFullYear()} ShipSaaS
+        </p>
       </div>
     </footer>
   );

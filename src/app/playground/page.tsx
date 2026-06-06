@@ -1,10 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSwitcher } from "@/components/playground/ui/ThemeSwitcher";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import {
   HeroGradient,
   HeroFloating,
@@ -12,160 +14,149 @@ import {
   HeroMinimal,
   Hero3D,
 } from "@/components/playground/hero";
-import { 
-  GlassNavbar, 
-  MinimalNavbar, 
-  StickyNavbar, 
-  AnimatedNavbar 
+import {
+  GlassNavbar,
+  MinimalNavbar,
+  StickyNavbar,
+  AnimatedNavbar
 } from "@/components/playground/nav";
-import { 
-  PricingCards, 
-  PricingComparison, 
-  PricingToggle, 
-  PricingSlider 
+import {
+  PricingCards,
+  PricingComparison,
+  PricingToggle,
+  PricingSlider
 } from "@/components/playground/pricing";
-import { 
-  TestimonialCards, 
-  TestimonialMarquee, 
-  TestimonialGrid, 
-  TestimonialSlider 
-} from "@/components/playground/testimonials";
-import { 
-  ContactForm, 
-  NewsletterForm, 
-  WaitlistForm, 
-  FeedbackForm 
+import {
+  ContactForm,
+  NewsletterForm,
+  WaitlistForm,
+  FeedbackForm
 } from "@/components/playground/forms";
-import { 
-  StatsCards, 
-  ActivityFeed, 
-  QuickActions, 
-  RecentActivity 
-} from "@/components/playground/dashboard";
-import { 
-  AnimatedBorder, 
-  GlassCard, 
-  ParallaxCard, 
-  HolographicCard 
-} from "@/components/playground/premium";
-import { 
-  FeatureGrid, 
-  FeatureCards, 
-  FeatureComparison, 
-  FeatureTabs 
+import {
+  FeatureGrid,
+  FeatureCards,
+  FeatureComparison,
+  FeatureTabs
 } from "@/components/playground/features";
-import { 
-  CTAGradient, 
-  CTAMinimal, 
-  CTANewsletter, 
-  CTASplit 
+import {
+  CTAGradient,
+  CTAMinimal,
+  CTANewsletter,
+  CTASplit
 } from "@/components/playground/cta";
-import { 
-  FAQAccordion, 
-  FAQSearch, 
-  FAQTabs, 
-  FAQCollapsible 
+import {
+  FAQAccordion,
+  FAQSearch,
+  FAQTabs,
+  FAQCollapsible
 } from "@/components/playground/faq";
-import { 
-  LogoCloud, 
-  TrustBadges, 
-  BrandLogos, 
-  SocialProof 
+import {
+  LogoCloud,
+  TrustBadges,
+  BrandLogos,
+  SocialProof
 } from "@/components/playground/social";
-import { 
-  StatCounter, 
-  StatsProgress, 
-  StatsGrid, 
-  StatsComparison 
+import {
+  StatCounter,
+  StatsProgress,
+  StatsGrid,
+  StatsComparison
 } from "@/components/playground/stats";
-import { 
-  Timeline, 
-  TimelineVertical, 
-  TimelineHorizontal, 
-  TimelineRoadmap 
+import {
+  Timeline,
+  TimelineVertical,
+  TimelineHorizontal,
+  TimelineRoadmap
 } from "@/components/playground/timeline";
-import { Sparkles, Code2, Palette, Zap, Layout, ArrowRight } from "lucide-react";
+import { Code2, ArrowRight } from "lucide-react";
+
+const TestimonialCards = dynamic(
+  () => import("@/components/playground/testimonials").then((m) => m.TestimonialCards)
+);
+const TestimonialMarquee = dynamic(
+  () => import("@/components/playground/testimonials").then((m) => m.TestimonialMarquee)
+);
+const TestimonialGrid = dynamic(
+  () => import("@/components/playground/testimonials").then((m) => m.TestimonialGrid)
+);
+const TestimonialSlider = dynamic(
+  () => import("@/components/playground/testimonials").then((m) => m.TestimonialSlider)
+);
+
+const StatsCards = dynamic(
+  () => import("@/components/playground/dashboard").then((m) => m.StatsCards)
+);
+const ActivityFeed = dynamic(
+  () => import("@/components/playground/dashboard").then((m) => m.ActivityFeed)
+);
+const QuickActions = dynamic(
+  () => import("@/components/playground/dashboard").then((m) => m.QuickActions)
+);
+const RecentActivity = dynamic(
+  () => import("@/components/playground/dashboard").then((m) => m.RecentActivity)
+);
+
+const AnimatedBorder = dynamic(
+  () => import("@/components/playground/premium").then((m) => m.AnimatedBorder)
+);
+const GlassCard = dynamic(
+  () => import("@/components/playground/premium").then((m) => m.GlassCard)
+);
+const ParallaxCard = dynamic(
+  () => import("@/components/playground/premium").then((m) => m.ParallaxCard)
+);
+const HolographicCard = dynamic(
+  () => import("@/components/playground/premium").then((m) => m.HolographicCard)
+);
 
 export default function PlaygroundPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
-        <div className="container flex items-center justify-between h-16 px-4">
+      <header className="border-border bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-6">
+          <Link href="/" aria-label="ShipSaaS home" className="hover:opacity-80 transition-opacity">
+            <Logo />
+          </Link>
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">Component Playground</h1>
-                <p className="text-xs text-muted-foreground">56+ Production-Ready Components</p>
-              </div>
-            </Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
+            <Button asChild variant="outline" size="sm">
               <Link href="/">
-                <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-                Back to Home
+                <ArrowRight className="h-3.5 w-3.5 rotate-180" />
+                Back to home
               </Link>
             </Button>
             <ThemeSwitcher />
-            <Button variant="hero" size="sm">
-              <Code2 className="w-4 h-4 mr-2" />
-              View Docs
+            <Button asChild size="sm">
+              <Link href="/docs">
+                <Code2 className="h-3.5 w-3.5" />
+                View docs
+              </Link>
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 text-center">
-        <div className="container px-4">
+      <section className="border-b border-border">
+        <div className="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-primary/10 border border-primary/20"
+            transition={{ duration: 0.4 }}
           >
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Ready to Use</span>
+            <p className="eyebrow">Playground</p>
+            <h1 className="text-display-xl mt-2">Component library</h1>
+            <p className="text-muted-foreground mt-4 max-w-2xl text-base leading-7 md:text-lg">
+              Copy, paste, and customize the components on this page. Every
+              variant is themeable and production-ready.
+            </p>
           </motion.div>
-
-          <h1 className="text-4xl md:text-6xl font-black mb-6">
-            Build Beautiful Pages <span className="text-gradient">in Minutes</span>
-          </h1>
-
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Copy, paste, and customize 56+ premium components. All themeable with a single color change.
-          </p>
-
-          <div className="flex gap-4 justify-center flex-wrap mb-12">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border/50">
-              <Layout className="w-5 h-5 text-primary" />
-              <span className="font-medium">56+ Components</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border/50">
-              <Palette className="w-5 h-5 text-primary" />
-              <span className="font-medium">8 Color Themes</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border/50">
-              <Zap className="w-5 h-5 text-primary" />
-              <span className="font-medium">Fully Responsive</span>
-            </div>
-          </div>
-
-          <Button variant="hero" size="lg" className="gap-2">
-            Try Theme Switcher <ArrowRight className="w-4 h-4" />
-          </Button>
         </div>
       </section>
 
-      {/* Component Showcase */}
-      <section className="py-20 bg-secondary/20">
-        <div className="container px-4">
+      <section className="bg-secondary/30 border-b border-border">
+        <div className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
           <Tabs defaultValue="hero" className="w-full">
             <div className="overflow-x-auto pb-4">
-              <TabsList className="inline-flex w-auto min-w-full justify-start gap-2 mb-12 flex-wrap">
+              <TabsList aria-label="Component categories" className="inline-flex w-auto min-w-full justify-start gap-2 mb-12 flex-wrap">
                 <TabsTrigger value="hero">Hero</TabsTrigger>
                 <TabsTrigger value="features">Features</TabsTrigger>
                 <TabsTrigger value="pricing">Pricing</TabsTrigger>
@@ -437,24 +428,26 @@ export default function PlaygroundPage() {
         </div>
       </section>
 
-      {/* Documentation Link */}
-      <section className="py-20">
-        <div className="container px-4 text-center">
-          <div className="max-w-3xl mx-auto p-12 rounded-3xl bg-gradient-to-br from-primary/20 via-background to-accent/10 border border-primary/20">
-            <h2 className="text-3xl font-bold mb-4">
-              All Components Ready to Use
-            </h2>
-            <p className="text-muted-foreground mb-8">
+      <section className="border-b border-border">
+        <div className="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
+          <div className="hairline rounded-lg p-10 md:p-14">
+            <p className="eyebrow">All components ready to use</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
               Hero sections, pricing tables, testimonials, forms, dashboards, and premium effects.
-              All code is production-ready and fully themeable.
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-2xl text-sm leading-relaxed md:text-base">
+              Every component on this page is themeable. Switch the active
+              theme in the header to preview them in any of the 24 presets.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Button variant="hero" size="lg">
-                <Code2 className="w-5 h-5 mr-2" />
-                View Theme Guide
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link href="/docs/styling">
+                  <Code2 />
+                  Theme guide
+                </Link>
               </Button>
-              <Button variant="outline" size="lg">
-                Browse Components
+              <Button asChild size="lg" variant="outline">
+                <Link href="/docs">Read the docs</Link>
               </Button>
             </div>
           </div>
@@ -476,10 +469,10 @@ function ComponentPreview({
   return (
     <div className="space-y-4">
       <div className="max-w-4xl mx-auto">
-        <h3 className="text-2xl font-bold mb-2">{title}</h3>
-        <p className="text-muted-foreground">{description}</p>
+        <h3 className="text-2xl font-semibold tracking-tight mb-2">{title}</h3>
+        <p className="text-muted-foreground text-sm">{description}</p>
       </div>
-      <div className="rounded-2xl border border-border/50 bg-card/30 p-8 overflow-hidden">
+      <div className="rounded-lg border border-border bg-card/40 p-8 overflow-hidden">
         {children}
       </div>
     </div>

@@ -2,11 +2,11 @@ import { LoginForm } from "@/components/LoginForm/LoginForm";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Login",
-  description: "Log in to your account",
+  title: "Sign in",
+  description: "Sign in to your account with a magic link, password, or Google.",
   openGraph: {
-    title: "Login | My App",
-    description: "Log in to your account on My App",
+    title: "Sign in",
+    description: "Sign in to your account with a magic link, password, or Google.",
   },
 };
 

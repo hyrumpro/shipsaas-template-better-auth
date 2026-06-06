@@ -1,14 +1,14 @@
 version: "3.8"
 services:
   app:
-    image: ghcr.io/idee8/shipfree:latest
+    image: ghcr.io/yourname/shipsaas:latest
     ports:
       - "3000:3000"
     env_file:
       - ../../.env.production
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://produser:prodpass@postgres:5432/shipfreeprod
+      - DATABASE_URL=postgresql://produser:prodpass@postgres:5432/shipsaasprod
       - HUSKY=0
     restart: unless-stopped
     depends_on:
@@ -20,13 +20,13 @@ services:
     environment:
       - POSTGRES_USER=produser
       - POSTGRES_PASSWORD=prodpass
-      - POSTGRES_DB=shipfreeprod
+      - POSTGRES_DB=shipsaasprod
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U produser -d shipfreeprod"]
+      test: ["CMD-SHELL", "pg_isready -U produser -d shipsaasprod"]
       interval: 5s
       timeout: 5s
       retries: 5

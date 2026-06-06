@@ -26,7 +26,12 @@ export function ThemeSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full">
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full"
+          aria-label={`Theme: ${currentTheme.name}. Click to change theme`}
+        >
           <Palette className="w-5 h-5" />
         </Button>
       </DropdownMenuTrigger>
@@ -38,6 +43,7 @@ export function ThemeSwitcher() {
             key={theme.name}
             onClick={() => handleThemeChange(theme)}
             className="cursor-pointer"
+            aria-label={`Switch to ${theme.name} theme`}
           >
             <div className="flex items-center gap-3 w-full">
               <div

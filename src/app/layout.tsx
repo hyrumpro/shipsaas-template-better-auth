@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import type React from "react";
 import { cn } from "@/lib/utils";
 import { StructuredData } from "@/components/StructuredData";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { ObservabilityProvider } from "@/providers/ObservabilityProvider";
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -71,6 +72,29 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  alternates: {
+    types: {
+      "application/rss+xml": `${baseUrl}/rss.xml`,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.png", type: "image/png", sizes: "256x256" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f1a" },
+  ],
+  colorScheme: "light dark",
 };
 
 // Organization structured data
@@ -97,11 +121,6 @@ const webAppSchema = {
     "Premium SaaS template with authentication, payments, and email integration",
   applicationCategory: "DeveloperApplication",
   operatingSystem: "Web",
-  offers: {
-    "@type": "Offer",
-    price: "29",
-    priceCurrency: "USD",
-  },
   featureList: [
     "User Authentication",
     "Payment Integration",
@@ -124,7 +143,9 @@ export default function RootLayout({
       </head>
       <body className={cn(bricolageGrotesque.className, "antialiased")}>
         <QueryProvider>
-          {children}
+          <ObservabilityProvider>
+            {children}
+          </ObservabilityProvider>
         </QueryProvider>
       </body>
     </html>

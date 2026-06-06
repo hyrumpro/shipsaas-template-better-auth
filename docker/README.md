@@ -172,8 +172,8 @@ pnpm docker:prod:postgres
 - Data persistence
 
 **Default credentials:**
-- Dev: `devuser` / `devpass` / `shipfreedev`
-- Prod: `produser` / `prodpass` / `shipfreeprod`
+- Dev: `devuser` / `devpass` / `shipsaasdev`
+- Prod: `produser` / `prodpass` / `shipsaasprod`
 
 ### Option 3: Local MongoDB
 
@@ -275,10 +275,10 @@ docker-compose -f docker/dev/docker-compose.postgres.yml exec app pnpm db:push
 docker-compose -f docker/dev/docker-compose.postgres.yml exec app pnpm db:studio
 
 # Backup PostgreSQL
-docker-compose -f docker/prod/docker-compose.postgres.yml exec postgres pg_dump -U produser shipfreeprod > backup.sql
+docker-compose -f docker/prod/docker-compose.postgres.yml exec postgres pg_dump -U produser shipsaasprod > backup.sql
 
 # Restore PostgreSQL
-docker-compose -f docker/prod/docker-compose.postgres.yml exec -T postgres psql -U produser shipfreeprod < backup.sql
+docker-compose -f docker/prod/docker-compose.postgres.yml exec -T postgres psql -U produser shipsaasprod < backup.sql
 ```
 
 ---
@@ -427,8 +427,8 @@ sudo apt install docker-compose-plugin
 ### 2. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/shipfree.git
-cd shipfree
+git clone https://github.com/yourusername/shipsaas.git
+cd shipsaas
 ```
 
 ### 3. Configure Environment
@@ -515,7 +515,7 @@ pnpm docker:prod:build
 Having issues? Check:
 1. This README
 2. [DEPLOYMENT.md](../DEPLOYMENT.md)
-3. [GitHub Issues](https://github.com/yourusername/shipfree/issues)
+3. [GitHub Issues](https://github.com/yourusername/shipsaas/issues)
 
 ---
 

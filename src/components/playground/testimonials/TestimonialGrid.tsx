@@ -71,7 +71,7 @@ export const TestimonialGrid = () => {
 
               {/* Quote */}
               <p className="text-foreground leading-relaxed">
-                "{testimonial.quote}"
+                &ldquo;{testimonial.quote}&rdquo;
               </p>
 
               {/* Author */}

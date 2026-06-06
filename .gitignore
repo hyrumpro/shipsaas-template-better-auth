@@ -38,13 +38,16 @@
 .vscode/
 .claude/
 .kiro/
-.github/
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# Local dev server logs
+dev-server.log
+dev-server.err.log
 
 # env files (can opt-in for committing if needed)
 .env

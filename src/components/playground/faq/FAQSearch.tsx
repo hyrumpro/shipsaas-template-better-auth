@@ -130,7 +130,7 @@ export const FAQSearch = () => {
       ) : (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            No results found for "{searchQuery}"
+            No results found for &ldquo;{searchQuery}&rdquo;
           </p>
         </div>
       )}

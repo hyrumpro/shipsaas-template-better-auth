@@ -4,7 +4,7 @@ excerpt: "Learn how to set up and deploy your SaaS application in minutes with S
 date: "2026-01-08"
 author: "ShipSaaS Team"
 tags: ["tutorial", "getting-started", "saas"]
-image: "/images/shipfree-how-to-use.png"
+image: "/images/shipsaas-how-to-use.png"
 ---
 
 # Getting Started with ShipSaaS

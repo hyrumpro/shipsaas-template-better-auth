@@ -15,6 +15,7 @@ import { createUser, updateUser, getUserById } from "@/db/queries";
 import { logger } from "@/lib/logger";
 import { handleApiError } from "@/lib/error-handler";
 import { sendWelcomeEmail } from "@/lib/mailgun";
+import { trackEventServer } from "@/lib/observability";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -23,14 +24,46 @@ export async function POST(req: Request) {
     const payload = JSON.parse(rawBody);
 
     // Verify webhook signature
-    const signature = req.headers.get("x-supabase-signature");
+    const signature =
+      req.headers.get("x-supabase-signature") ||
+      req.headers.get("x-webhook-signature");
     const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
+    const isProduction = process.env.NODE_ENV === "production";
 
-    if (webhookSecret && signature) {
+    if (isProduction && !webhookSecret) {
+      logger.error(
+        "SUPABASE_WEBHOOK_SECRET is not configured in production; refusing webhook"
+      );
+      return NextResponse.json(
+        { error: "Webhook secret not configured" },
+        { status: 500 }
+      );
+    }
+
+    if (webhookSecret) {
+      if (!signature) {
+        logger.warn("Supabase auth webhook missing signature header");
+        return NextResponse.json(
+          { error: "Missing signature" },
+          { status: 401 }
+        );
+      }
+
       const hmac = crypto.createHmac("sha256", webhookSecret);
       const digest = hmac.update(rawBody).digest("hex");
 
-      if (signature !== digest) {
+      // Accept Supabase v1,<hex> format or plain hex
+      const provided = signature.includes(",")
+        ? (signature.split(",").pop() ?? "").trim()
+        : signature.trim();
+
+      const providedBuf = Buffer.from(provided, "hex");
+      const digestBuf = Buffer.from(digest, "hex");
+
+      if (
+        providedBuf.length !== digestBuf.length ||
+        !crypto.timingSafeEqual(providedBuf, digestBuf)
+      ) {
         logger.warn("Supabase auth webhook signature verification failed");
         return NextResponse.json(
           { error: "Invalid signature" },
@@ -41,7 +74,20 @@ export async function POST(req: Request) {
 
     const { type, record } = payload;
 
-    logger.info("Supabase auth webhook received", { type, userId: record?.id });
+    if (
+      !type ||
+      !record ||
+      typeof record.id !== "string" ||
+      typeof record.email !== "string"
+    ) {
+      logger.warn("Supabase auth webhook missing required fields", { type });
+      return NextResponse.json(
+        { error: "Invalid payload" },
+        { status: 400 }
+      );
+    }
+
+    logger.info("Supabase auth webhook received", { type, userId: record.id });
 
     switch (type) {
       case "INSERT":
@@ -114,6 +160,7 @@ async function handleUserCreated(record: any) {
       hasFullName: !!fullName,
       hasAvatar: !!avatarUrl,
     });
+    void trackEventServer("user_signed_up", { userId, hasFullName: !!fullName });
 
     // Send welcome email
     const name = fullName || email.split("@")[0];

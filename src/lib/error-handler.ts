@@ -1,6 +1,8 @@
 // lib/error-handler.ts
 // Centralized error handling utility
 
+import { captureError } from "@/lib/observability";
+
 export type ErrorType =
   | "validation"
   | "authentication"
@@ -130,6 +132,15 @@ export function handleApiError(error: unknown): {
   statusCode: number;
 } {
   if (error instanceof ApplicationError) {
+    if (error.statusCode >= 500) {
+      void captureError(error, {
+        tags: {
+          error_type: error.type,
+          source: "api",
+        },
+        extras: { details: error.details },
+      });
+    }
     return {
       error: error.userMessage,
       details:
@@ -139,6 +150,9 @@ export function handleApiError(error: unknown): {
   }
 
   if (error instanceof Error) {
+    void captureError(error, {
+      tags: { error_type: "unknown", source: "api" },
+    });
     return {
       error:
         process.env.NODE_ENV === "development"
@@ -148,6 +162,9 @@ export function handleApiError(error: unknown): {
     };
   }
 
+  void captureError(new Error(String(error)), {
+    tags: { error_type: "unknown", source: "api" },
+  });
   return {
     error: "An unexpected error occurred",
     statusCode: 500,

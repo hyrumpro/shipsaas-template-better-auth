@@ -56,7 +56,7 @@ export const FeedbackForm = () => {
       <div className="text-center space-y-2">
         <h3 className="text-2xl font-bold">How was your experience?</h3>
         <p className="text-muted-foreground">
-          We'd love to hear your thoughts
+          We&apos;d love to hear your thoughts
         </p>
       </div>
 

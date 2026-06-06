@@ -37,7 +37,7 @@ export function generateSEOMetadata({
       title,
       description,
       url: fullCanonical,
-      siteName: "ShipFree",
+      siteName: "ShipSaaS",
       images: [
         {
           url: fullOgImage,
@@ -54,7 +54,7 @@ export function generateSEOMetadata({
       title,
       description,
       images: [fullOgImage],
-      creator: "@shipfree",
+      creator: "@shipsaas",
     },
   };
 

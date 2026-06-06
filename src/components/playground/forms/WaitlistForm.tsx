@@ -30,9 +30,9 @@ export const WaitlistForm = () => {
         <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
           <CheckCircle2 className="w-8 h-8 text-primary" />
         </div>
-        <h3 className="text-2xl font-bold">You're on the list!</h3>
+        <h3 className="text-2xl font-bold">You&apos;re on the list!</h3>
         <p className="text-muted-foreground">
-          We'll notify you when we launch. Check your email for confirmation.
+          We&apos;ll notify you when we launch. Check your email for confirmation.
         </p>
       </motion.div>
     );

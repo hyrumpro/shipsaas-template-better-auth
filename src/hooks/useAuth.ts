@@ -2,20 +2,20 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { isAuthSessionMissingError } from "@supabase/auth-js";
 import { logger } from "@/lib/logger";
 
-export function useAuth() {
-  const supabase = createClient();
-
+export function useAuth(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["auth", "user"],
     queryFn: async () => {
+      const supabase = createClient();
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
 
-      if (error) {
+      if (error && !isAuthSessionMissingError(error)) {
         logger.error("Failed to get user", error);
         throw error;
       }
@@ -25,6 +25,7 @@ export function useAuth() {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
     retry: false,
+    enabled: options?.enabled ?? true,
   });
 }
 

@@ -10,9 +10,20 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { createCheckoutSession } from "@/lib/checkout";
 import { getPlanById } from "@/config/payments";
+import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
+import { trackEventServer } from "@/lib/observability";
 
 export async function POST(req: Request) {
   try {
+    // Rate limit: 10 checkout attempts per user per minute. Stops script
+    // kiddies from spamming the Stripe / LS API with our keys.
+    const limit = rateLimit({
+      key: `checkout:${getClientIp(req)}`,
+      limit: 10,
+      windowMs: 60_000,
+    });
+    if (!limit.allowed) return rateLimitResponse(limit);
+
     // Get authenticated user
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
@@ -25,10 +36,18 @@ export async function POST(req: Request) {
       throw Errors.authentication("You must be logged in to checkout");
     }
 
-    const { planId } = await req.json();
+    const body = await req.json();
+    const { planId } = body ?? {};
 
-    if (!planId) {
+    if (typeof planId !== "string" || !planId) {
       throw Errors.validation("Plan ID is required");
+    }
+
+    // Plan IDs are user-controlled strings from the client. Reject anything
+    // that doesn't match the expected slug shape (alphanumeric, dashes,
+    // underscores) to keep them out of the SQL/log path.
+    if (!/^[a-zA-Z0-9_-]{1,64}$/.test(planId)) {
+      throw Errors.validation("Invalid plan ID format");
     }
 
     // Validate plan exists
@@ -63,6 +82,11 @@ export async function POST(req: Request) {
       provider: result.provider,
       sessionId: result.sessionId,
       userId: user.id,
+    });
+    void trackEventServer("checkout_started", {
+      userId: user.id,
+      planId,
+      provider: result.provider,
     });
 
     return NextResponse.json({

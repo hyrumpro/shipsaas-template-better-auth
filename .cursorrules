@@ -1,0 +1,49 @@
+# Cursor rules for ShipSaaS
+# Cursor loads this file automatically. Keep it short and high-signal.
+# See AGENTS.md for the full operational notes.
+
+# Stack
+- Next.js 16 (App Router, RSC by default, Turbopack)
+- React 19, TypeScript 5 strict, Tailwind CSS 3, Radix UI primitives
+- Supabase (auth, Postgres, RLS), Drizzle ORM 0.45
+- Stripe + LemonSqueezy behind a unified switch at src/lib/checkout.ts
+- Mailgun for transactional email (templates at src/lib/email-templates.ts)
+- TanStack Query 5 for client data, Framer Motion 12 for animation
+- Optional PostHog + Sentry via the shim at src/lib/observability.ts (no-op unless env set + package installed)
+
+# Ground rules
+- Server components by default. Add "use client" only when you need state, effects, or browser APIs.
+- Database access goes through src/db/queries.ts. Every create uses onConflictDoNothing so webhook retries are safe.
+- Webhooks (src/app/api/*/webhook/route.ts) must verify the provider signature before parsing the body, and early-return on duplicate event_id.
+- Server-only secrets (DATABASE_URL, STRIPE_SECRET_KEY, SUPABASE_SERVICE_ROLE_KEY) are read inside Proxy-wrapped lazy clients at src/db/index.ts, src/utils/stripe.ts, and src/lib/supabase/admin.ts. Never instantiate Pool, new Stripe(), or createClient() at module top level — that breaks the CI build.
+- Anything user-callable in src/app/api/* that is not idempotent must call rateLimit() from src/lib/rate-limit.ts first.
+- Logs go through src/lib/logger.ts. The info/warn/error helpers redact PII keys (email, password, token, apiKey, secret, authorization, cookie) automatically.
+- Observability goes through the shim at src/lib/observability.ts (trackEventServer, trackEventClient, captureError). Never import posthog-js or @sentry/nextjs directly.
+- New env vars go in .env.example with inline comments. Never commit a real .env* file.
+
+# Design system
+- Genre: modern-minimal (Stripe / Linear / ElevenLabs school). Quiet palette, hairline borders, no glow, no glassmorphism, no gradient orbs.
+- Use the CSS variables in src/app/globals.css (--background, --foreground, --primary, etc.). Never hardcode colors.
+- Use the component utilities: .section, .section-sm, .text-display, .text-display-xl, .eyebrow, .card-quiet, .hairline.
+- Wrap long-form content (blog, docs, legal) in .prose.
+- Use the shared <Logo /> from src/components/Logo.tsx in any nav, footer, or auth shell.
+- Button variants are restricted to: default, destructive, outline, secondary, ghost, link, hero (alias of default), glass (alias of outline). Do not invent new variants.
+- On shell chrome, avoid: text-gradient, font-black, border-primary/20, bg-gradient-to-br, backdrop-blur-xl. Playground components under src/components/playground/* are exempt — they exist to demonstrate alternative styles.
+- Mobile tap targets must be at least 44x44 px.
+
+# Patterns
+- Adding an API route: see AGENTS.md "Adding a new API route" for the boilerplate (rate limit, logger, captureError, force-dynamic, nodejs runtime).
+- Adding a database column: edit src/db/schema.ts, add a matching migration in supabase/migrations/, update src/db/queries.ts, then run npm run db:generate to confirm types match.
+- Adding a theme: add a new entry to the THEMES array in src/config/theme.ts with name, light/dark CSS-variable values, and any accent overrides. The theme switcher in the navbar picks it up automatically.
+
+# Things to avoid
+- Hardcoded colors in components.
+- "use client" at the top of a page component.
+- Top-level new Pool(...), new Stripe(...), new Mailgun(...), or createClient(...).
+- Webhook handlers that don't early-return on duplicate event_id.
+- Logging raw request bodies or user input.
+- Adding env vars without updating .env.example.
+- Importing server-only modules from "use client" files.
+- Calling posthog-js / @sentry/nextjs directly — go through the observability shim.
+- Using useSearchParams() at the top of a client component without wrapping it in <Suspense> (breaks prerendering).
+- Using invented metrics in copy ("10x faster", "40+ hours saved"). Use real numbers or "—".

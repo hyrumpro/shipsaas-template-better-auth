@@ -21,11 +21,19 @@ export type ThemeConfig = {
 };
 
 /**
- * Predefined color schemes
+ * Predefined color schemes.
+ *
+ * Default is now `slate` (modern-minimal, Stripe/Linear school).
+ * The 24-theme catalog is preserved for users who want a louder brand.
  */
 export const THEME_PRESETS: Record<string, ThemeConfig> = {
+  slate: {
+    name: "Slate (Default)",
+    primary: { h: 222, s: 47, l: 11 },
+    accent: { h: 215, s: 16, l: 47 },
+  },
   amber: {
-    name: "Amber (Default)",
+    name: "Amber",
     primary: { h: 35, s: 100, l: 55 },
     accent: { h: 25, s: 100, l: 50 },
   },
@@ -64,6 +72,76 @@ export const THEME_PRESETS: Record<string, ThemeConfig> = {
     primary: { h: 25, s: 100, l: 50 },
     accent: { h: 15, s: 100, l: 45 },
   },
+  teal: {
+    name: "Deep Teal",
+    primary: { h: 175, s: 80, l: 35 },
+    accent: { h: 185, s: 75, l: 45 },
+  },
+  indigo: {
+    name: "Cosmic Indigo",
+    primary: { h: 240, s: 80, l: 55 },
+    accent: { h: 250, s: 75, l: 60 },
+  },
+  violet: {
+    name: "Electric Violet",
+    primary: { h: 290, s: 85, l: 55 },
+    accent: { h: 305, s: 90, l: 60 },
+  },
+  lime: {
+    name: "Electric Lime",
+    primary: { h: 84, s: 80, l: 45 },
+    accent: { h: 95, s: 85, l: 50 },
+  },
+  yellow: {
+    name: "Sunshine Yellow",
+    primary: { h: 50, s: 95, l: 50 },
+    accent: { h: 40, s: 100, l: 45 },
+  },
+  coral: {
+    name: "Coral Reef",
+    primary: { h: 15, s: 85, l: 60 },
+    accent: { h: 5, s: 90, l: 55 },
+  },
+  fuchsia: {
+    name: "Fuchsia Burst",
+    primary: { h: 320, s: 90, l: 55 },
+    accent: { h: 310, s: 95, l: 60 },
+  },
+  emerald: {
+    name: "Forest Emerald",
+    primary: { h: 160, s: 70, l: 35 },
+    accent: { h: 170, s: 65, l: 40 },
+  },
+  sapphire: {
+    name: "Sapphire",
+    primary: { h: 215, s: 90, l: 50 },
+    accent: { h: 205, s: 95, l: 55 },
+  },
+  rose: {
+    name: "Dusty Rose",
+    primary: { h: 340, s: 70, l: 55 },
+    accent: { h: 350, s: 65, l: 60 },
+  },
+  mint: {
+    name: "Fresh Mint",
+    primary: { h: 155, s: 60, l: 45 },
+    accent: { h: 165, s: 70, l: 50 },
+  },
+  lavender: {
+    name: "Soft Lavender",
+    primary: { h: 260, s: 55, l: 65 },
+    accent: { h: 250, s: 60, l: 70 },
+  },
+  chocolate: {
+    name: "Dark Chocolate",
+    primary: { h: 25, s: 60, l: 30 },
+    accent: { h: 20, s: 70, l: 40 },
+  },
+  neon: {
+    name: "Neon Green",
+    primary: { h: 130, s: 100, l: 50 },
+    accent: { h: 165, s: 100, l: 45 },
+  },
 };
 
 /**
@@ -100,12 +178,12 @@ export function applyTheme(theme: ThemeConfig): void {
  * Get saved theme or default
  */
 export function getSavedTheme(): ThemeConfig {
-  if (typeof window === "undefined") return THEME_PRESETS.amber;
+  if (typeof window === "undefined") return THEME_PRESETS.slate;
 
   const savedTheme = localStorage.getItem("theme-preset");
   const preset = Object.values(THEME_PRESETS).find(t => t.name === savedTheme);
 
-  return preset || THEME_PRESETS.amber;
+  return preset || THEME_PRESETS.slate;
 }
 
 /**

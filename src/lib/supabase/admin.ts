@@ -2,7 +2,7 @@
  * Supabase Admin Client
  * Uses service role key to bypass Row Level Security (RLS)
  *
- * ⚠️ SECURITY WARNING:
+ * SECURITY WARNING:
  * This client bypasses all RLS policies. Only use server-side.
  * Never expose service role key to the client.
  *
@@ -11,77 +11,93 @@
  * - Background jobs (cleanup, migrations)
  * - Webhook handlers (system operations)
  * - Data imports/exports
+ *
+ * The client is lazy-initialised so the production build does not require
+ * Supabase env vars to be set (matches the pattern in src/utils/stripe.ts
+ * and src/db/index.ts).
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+let _supabaseAdmin: SupabaseClient | null = null;
 
-// Validate configuration
-if (!supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+function getSupabaseAdmin(): SupabaseClient {
+  if (_supabaseAdmin) return _supabaseAdmin;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL environment variable");
+  }
+
+  if (!supabaseServiceRoleKey && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Missing SUPABASE_SERVICE_ROLE_KEY environment variable in production"
+    );
+  }
+
+  _supabaseAdmin = createClient(
+    supabaseUrl,
+    supabaseServiceRoleKey || "dummy-key-for-development",
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+  return _supabaseAdmin;
 }
 
-if (!supabaseServiceRoleKey && process.env.NODE_ENV === 'production') {
-  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable in production');
-}
+type AdminAuthClient = SupabaseClient["auth"]["admin"];
 
-/**
- * Admin client with service role permissions
- * Bypasses Row Level Security (RLS)
- *
- * @example
- * // Delete a user (admin only)
- * await supabaseAdmin.auth.admin.deleteUser(userId);
- *
- * @example
- * // Query without RLS
- * const { data } = await supabaseAdmin
- *   .from('users')
- *   .select('*')
- *   .eq('email', 'user@example.com');
- */
-export const supabaseAdmin = createClient(
-  supabaseUrl,
-  supabaseServiceRoleKey || 'dummy-key-for-development',
+const adminAuthProxy = new Proxy(
+  {} as AdminAuthClient,
   {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
+    get(_target, prop) {
+      const client = getSupabaseAdmin();
+      const admin = client.auth.admin;
+      const value = Reflect.get(admin, prop, admin);
+      return typeof value === "function" ? value.bind(admin) : value;
     },
   }
-);
+) as AdminAuthClient;
 
-/**
- * Admin Auth Operations
- * Convenience functions for common admin tasks
- */
+const adminDbProxy = new Proxy(
+  {} as Pick<SupabaseClient, "from" | "auth">,
+  {
+    get(_target, prop) {
+      const client = getSupabaseAdmin();
+      const value = Reflect.get(client, prop, client);
+      return typeof value === "function" ? value.bind(client) : value;
+    },
+  }
+) as SupabaseClient;
+
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseAdmin();
+    const value = Reflect.get(client, prop, client);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+}) as SupabaseClient;
+
 export const adminAuth = {
-  /**
-   * Delete a user from Supabase Auth
-   * Also triggers cascade delete in your database
-   */
   async deleteUser(userId: string) {
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    const { error } = await adminAuthProxy.deleteUser(userId);
     if (error) throw error;
     return true;
   },
 
-  /**
-   * Get user by ID (bypasses RLS)
-   */
   async getUserById(userId: string) {
-    const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const { data, error } = await adminAuthProxy.getUserById(userId);
     if (error) throw error;
     return data.user;
   },
 
-  /**
-   * List all users (paginated)
-   */
   async listUsers(page: number = 1, perPage: number = 50) {
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+    const { data, error } = await adminAuthProxy.listUsers({
       page,
       perPage,
     });
@@ -89,97 +105,66 @@ export const adminAuth = {
     return data;
   },
 
-  /**
-   * Update user metadata
-   */
   async updateUserMetadata(userId: string, metadata: Record<string, any>) {
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    const { error } = await adminAuthProxy.updateUserById(userId, {
       user_metadata: metadata,
     });
     if (error) throw error;
     return true;
   },
 
-  /**
-   * Ban a user (soft delete)
-   */
   async banUser(userId: string) {
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-      ban_duration: 'none', // Permanent ban
+    const { error } = await adminAuthProxy.updateUserById(userId, {
+      ban_duration: "none",
     });
     if (error) throw error;
     return true;
   },
 };
 
-/**
- * Admin Database Operations
- * Direct database access bypassing RLS
- */
 export const adminDb = {
-  /**
-   * Get any user from database (bypasses RLS)
-   */
   async getUser(userId: string) {
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .select('*')
-      .eq('id', userId)
+    const { data, error } = await adminDbProxy
+      .from("users")
+      .select("*")
+      .eq("id", userId)
       .single();
-
     if (error) throw error;
     return data;
   },
 
-  /**
-   * Update any user (bypasses RLS)
-   */
   async updateUser(userId: string, updates: Record<string, any>) {
-    const { data, error } = await supabaseAdmin
-      .from('users')
+    const { data, error } = await adminDbProxy
+      .from("users")
       .update(updates)
-      .eq('id', userId)
+      .eq("id", userId)
       .select()
       .single();
-
     if (error) throw error;
     return data;
   },
 
-  /**
-   * Get all active subscriptions
-   */
   async getActiveSubscriptions() {
-    const { data, error } = await supabaseAdmin
-      .from('subscriptions')
-      .select('*, users(*)')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false });
-
+    const { data, error } = await adminDbProxy
+      .from("subscriptions")
+      .select("*, users(*)")
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
   },
 
-  /**
-   * Admin analytics
-   */
   async getStats() {
-    // Get total users
-    const { count: totalUsers } = await supabaseAdmin
-      .from('users')
-      .select('*', { count: 'exact', head: true });
-
-    // Get active subscriptions
-    const { count: activeSubscriptions } = await supabaseAdmin
-      .from('subscriptions')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'active');
-
-    // Get recent orders
-    const { count: totalOrders } = await supabaseAdmin
-      .from('orders')
-      .select('*', { count: 'exact', head: true });
-
+    const { count: totalUsers } = await adminDbProxy
+      .from("users")
+      .select("*", { count: "exact", head: true });
+    const { count: activeSubscriptions } = await adminDbProxy
+      .from("subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+    const { count: totalOrders } = await adminDbProxy
+      .from("orders")
+      .select("*", { count: "exact", head: true });
     return {
       totalUsers: totalUsers || 0,
       activeSubscriptions: activeSubscriptions || 0,
@@ -188,5 +173,4 @@ export const adminDb = {
   },
 };
 
-// Export the admin client as default
 export default supabaseAdmin;

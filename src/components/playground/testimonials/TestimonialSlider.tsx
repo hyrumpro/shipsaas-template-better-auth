@@ -72,7 +72,7 @@ export const TestimonialSlider = () => {
 
             {/* Quote */}
             <p className="text-xl md:text-2xl text-center text-foreground leading-relaxed">
-              "{current.quote}"
+              &ldquo;{current.quote}&rdquo;
             </p>
 
             {/* Author */}

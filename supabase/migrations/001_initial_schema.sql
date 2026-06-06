@@ -1,5 +1,5 @@
 -- ============================================================================
--- ShipFree Database Schema
+-- ShipSaaS Database Schema
 -- Production-ready schema for SaaS applications with Supabase
 -- ============================================================================
 

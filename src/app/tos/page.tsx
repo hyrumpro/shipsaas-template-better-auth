@@ -1,90 +1,150 @@
 import { Metadata } from "next";
 import Link from "next/link";
-
-// CHATGPT PROMPT TO GENERATE YOUR TERMS & SERVICES — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
-// I need your help to write a simple Terms & Services for my website. Here is some context:
-// - Website: https://gopump.co
-// - Name: Pump
-// - Contact information: official@gopump.co
-// - Description: An application responsible for help Personal Trainers and People that like to go to the gym improve their performance.
-// - Ownership: when buying a plan/subscription, users can interact with many features. They can ask for a full refund within 7 day after the purchase.
-// - User data collected: name, email, phone and payment information
-// - Non-personal data collection: web cookies
-// - Link to privacy-policy: https://gopump.co/privacy-policy
-// - Governing Law: France
-// - Updates to the Terms: users will be updated by email
-
-// Please write a simple Terms & Services for my site. Add the current date. Do not add or explain your reasoning. Answer:
+import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: "Privacy policy",
+  title: "Terms of service",
+  description:
+    "Terms of service for ShipSaaS, the premium Next.js SaaS template. Replace this boilerplate with your own terms before going to production.",
 };
 
 const TOS = () => {
   return (
-    <main className="max-w-xl mx-auto">
-      <div className="p-5">
-        <Link href="/" className="btn btn-ghost">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="w-5 h-5"
-          >
-            <path
-              fillRule="evenodd"
-              d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Voltar
-        </Link>
-        <h1 className="text-3xl font-extrabold pb-6">
-          Termos e Condições de Uso do Pump
-        </h1>
+    <div className="min-h-screen">
+      <header className="border-border border-b">
+        <div className="mx-auto flex h-14 w-full max-w-3xl items-center px-6">
+          <Link href="/" aria-label="ShipSaaS home">
+            <Logo />
+          </Link>
+        </div>
+      </header>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
-          style={{ fontFamily: "sans-serif" }}
-        >
-          {`Última atualização: 12/12/2023
+      <main className="mx-auto w-full max-w-3xl px-6 py-16 md:py-20">
+        <p className="eyebrow">Legal</p>
+        <h1 className="text-display mt-2">Terms of Service</h1>
+        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+          Placeholder boilerplate. Replace with your own terms reviewed
+          by counsel before launch.
+        </p>
 
-Bem-vindo ao Pump (https://gopump.co). Estes Termos e Condições de Uso ("Termos") regem o uso do nosso aplicativo, que visa ajudar treinadores pessoais e pessoas que frequentam academias a melhorarem seu desempenho. Ao acessar ou usar o Pump, você concorda em cumprir estes Termos.
+        <article className="prose mt-10">
+          <p className="text-muted-foreground">
+            Last updated: {new Date().toISOString().slice(0, 10)}
+          </p>
 
-1. Informações de Contato
+          <p>
+            These Terms of Service (&ldquo;Terms&rdquo;) govern your
+            access to and use of the services made available through this
+            website. By accessing or using the services, you agree to be
+            bound by these Terms. If you do not agree, you may not use
+            the services.
+          </p>
 
-Para quaisquer dúvidas ou informações, entre em contato conosco pelo e-mail official@gopump.co.
+          <h2>1. Eligibility</h2>
+          <p>
+            You must be at least 18 years old (or the age of digital
+            consent in your jurisdiction) to use the services. By using
+            the services, you represent and warrant that you meet this
+            requirement.
+          </p>
 
-2. Propriedade e Uso do Serviço
+          <h2>2. Accounts</h2>
+          <p>
+            You are responsible for safeguarding your account
+            credentials and for all activity that occurs under your
+            account. Notify us immediately at the contact address below
+            if you suspect any unauthorized access.
+          </p>
 
-Ao adquirir um plano ou assinatura no Pump, você tem acesso a diversas funcionalidades. Caso não esteja satisfeito, oferecemos um reembolso integral dentro de 7 dias após a compra.
+          <h2>3. Plans and Payment</h2>
+          <p>
+            Paid plans are billed in advance on a recurring basis
+            (monthly or yearly) through our payment processors (Stripe
+            and/or Lemon Squeezy). Prices, features, and billing cycles
+            are described on the pricing page at the time of purchase.
+            Unless otherwise stated, subscriptions automatically renew
+            at the then-current rate until canceled.
+          </p>
 
-3. Coleta de Dados
+          <h2>4. Cancellation and Refunds</h2>
+          <p>
+            You may cancel your subscription at any time from your
+            account settings; cancellation takes effect at the end of
+            the current billing period and we do not pro-rate refunds
+            for partial periods. If you experience a chargeback or
+            dispute, please contact us first &mdash; we will do our best
+            to resolve the issue.
+          </p>
 
-Coletamos dados pessoais, como nome, e-mail, telefone e informações de pagamento. Também utilizamos cookies da web para coletar dados não pessoais. Mais informações podem ser encontradas em nossa Política de Privacidade: https://gopump.co/privacy-policy.
+          <h2>5. Acceptable Use</h2>
+          <p>
+            You agree not to: (a) use the services to violate any
+            applicable law or third-party right; (b) upload malicious
+            content or attempt to disrupt the services; (c) reverse
+            engineer, decompile, or otherwise attempt to derive source
+            code from the services except as permitted by law; or (d)
+            resell or sublicense access to the services without our
+            written permission.
+          </p>
 
-4. Lei Aplicável
+          <h2>6. Intellectual Property</h2>
+          <p>
+            The services, including all underlying software, designs, and
+            content, are owned by us or our licensors and are protected
+            by copyright and other intellectual-property laws. You retain
+            all rights to the content you upload to the services.
+          </p>
 
-Estes Termos são regidos pelas leis do Brasil.
+          <h2>7. Termination</h2>
+          <p>
+            We may suspend or terminate your access to the services at
+            any time, with or without cause, with notice. Upon
+            termination, your right to use the services ceases
+            immediately.
+          </p>
 
-5. Alterações nos Termos
+          <h2>8. Disclaimers and Limitation of Liability</h2>
+          <p>
+            The services are provided &ldquo;as is&rdquo; and
+            &ldquo;as available&rdquo; without warranties of any kind,
+            express or implied, including warranties of merchantability,
+            fitness for a particular purpose, and non-infringement. To
+            the maximum extent permitted by law, our aggregate liability
+            arising out of or relating to these Terms will not exceed
+            the amounts you paid us in the twelve (12) months preceding
+            the event giving rise to the liability.
+          </p>
 
-Reservamo-nos o direito de modificar estes Termos a qualquer momento. As alterações entrarão em vigor imediatamente após a publicação no site. Informaremos sobre alterações significativas através do e-mail fornecido por você.
+          <h2>9. Governing Law</h2>
+          <p>
+            These Terms are governed by the laws of the jurisdiction in
+            which our company is registered, without regard to
+            conflict-of-laws principles. Any dispute will be resolved
+            exclusively in the courts located in that jurisdiction.
+          </p>
 
-6. Aceitação dos Termos
+          <h2>10. Changes to These Terms</h2>
+          <p>
+            We may update these Terms from time to time. The &ldquo;Last
+            updated&rdquo; date above will reflect the date of the most
+            recent change. Continued use of the services after changes
+            take effect constitutes your acceptance of the revised
+            Terms.
+          </p>
 
-Ao usar o Pump, você declara que leu, entendeu e concordou em estar vinculado a estes Termos.`}
-        </pre>
-      </div>
-    </main>
+          <h2>11. Contact</h2>
+          <p>
+            If you have any questions about these Terms, please contact
+            us at the email address listed on our home page.
+          </p>
+
+          <p>
+            See also our{" "}
+            <Link href="/privacy-policy">Privacy Policy</Link>.
+          </p>
+        </article>
+      </main>
+    </div>
   );
 };
 
