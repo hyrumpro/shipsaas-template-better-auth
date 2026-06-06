@@ -49,6 +49,12 @@ yarn-error.log*
 dev-server.log
 dev-server.err.log
 
+# Stale pnpm lockfile (this project is npm-only; pnpm-lock.yaml was
+# accidentally committed at one point and breaks Vercel builds because
+# pnpm@10 enforces lockfile/package.json integrity. Keep it ignored so
+# running pnpm locally never re-introduces the conflict.)
+pnpm-lock.yaml
+
 # env files (can opt-in for committing if needed)
 .env
 .env.local
