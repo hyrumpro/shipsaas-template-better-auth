@@ -1,0 +1,165 @@
+ShipSaaS — Premium Next.js SaaS Template
+Copyright (c) 2026 ShipSaaS. All rights reserved.
+
+================================================================================
+COMMERCIAL LICENSE AGREEMENT
+================================================================================
+
+This license governs use of the ShipSaaS source code, design system,
+documentation, and accompanying materials (collectively, the "Template").
+
+By purchasing, downloading, installing, or otherwise using the Template, you
+("Licensee") agree to the terms below. If you do not agree, do not use the
+Template.
+
+--------------------------------------------------------------------------------
+1. GRANT OF LICENSE
+--------------------------------------------------------------------------------
+
+Subject to your continued compliance with this Agreement, the Licensor grants
+you a non-exclusive, non-transferable, worldwide license to:
+
+  a) Use the Template to build an unlimited number of software products,
+     including products you sell, license, or distribute to third parties
+     (each, a "Customer Project").
+
+  b) Modify the Template for use in Customer Projects, including adapting
+     branding, copy, business logic, integrations, and visual design.
+
+  c) Host, deploy, and operate Customer Projects on infrastructure of your
+     choice, including public cloud providers (e.g. Vercel, AWS) and
+     self-hosted environments.
+
+  d) Distribute the compiled output of Customer Projects to your end users,
+     including as a hosted service or as a downloadable build.
+
+This license is perpetual for the version of the Template you purchased, and
+applies to all Customer Projects built from that version.
+
+--------------------------------------------------------------------------------
+2. RESTRICTIONS
+--------------------------------------------------------------------------------
+
+You may NOT:
+
+  a) Resell, sublicense, rent, lease, or redistribute the Template itself,
+     in whole or in part, as source code, as a starter kit, or as a derivative
+     product intended to compete with the Template. Compiled output embedded
+     inside a Customer Project is permitted.
+
+  b) Distribute the Template as part of a "starter", "boilerplate", "SaaS
+     template", "Next.js template", or similar product offered for sale or
+     free download, regardless of how it has been modified.
+
+  c) Use the Licensor's name, logo, trademarks, or branding to endorse or
+     promote a Customer Project without prior written permission.
+
+  d) Remove or alter copyright notices, license headers, or attribution
+     included in the Template source.
+
+  e) Use the Template, including its design system, in any way that competes
+     with the Licensor's commercial offering of the Template. Customer
+     Projects are not competitive; template products are.
+
+For clarity: building a SaaS application with this Template and selling
+subscriptions to that application is permitted. Selling the modified Template
+to other developers is not.
+
+--------------------------------------------------------------------------------
+3. OWNERSHIP
+--------------------------------------------------------------------------------
+
+The Licensor retains all right, title, and interest in and to the Template,
+including all intellectual property rights. Your rights are limited to those
+expressly granted in Section 1. No rights are granted by implication,
+estoppel, or otherwise.
+
+You retain ownership of the Customer Projects you build, including all
+modifications, additions, and customisations you make.
+
+--------------------------------------------------------------------------------
+4. THIRD-PARTY COMPONENTS
+--------------------------------------------------------------------------------
+
+The Template includes third-party open-source components (e.g. Next.js,
+React, Tailwind, Drizzle, Radix UI, Framer Motion) governed by their own
+licenses. Those licenses are included in the `node_modules` directory after
+installation, and are not modified by this Agreement. Your use of those
+components is governed by their respective licenses.
+
+The Template also integrates with hosted services (Supabase, Stripe,
+LemonSqueezy, Mailgun, Vercel, etc.) governed by their own terms of service.
+You are responsible for compliance with those terms, including any fees
+they charge.
+
+--------------------------------------------------------------------------------
+5. SUPPORT AND UPDATES
+--------------------------------------------------------------------------------
+
+This license does not entitle you to ongoing support, maintenance, or
+updates. Support terms, if any, are described in the purchase receipt and
+the Licensor's website.
+
+--------------------------------------------------------------------------------
+6. WARRANTY DISCLAIMER
+--------------------------------------------------------------------------------
+
+THE TEMPLATE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND
+NON-INFRINGEMENT. THE LICENSOR DOES NOT WARRANT THAT THE TEMPLATE WILL BE
+UNINTERRUPTED, ERROR-FREE, SECURE, OR FREE OF HARMFUL COMPONENTS.
+
+YOU ASSUME FULL RESPONSIBILITY FOR THE CONFIGURATION, DEPLOYMENT, AND
+OPERATION OF CUSTOMER PROJECTS BUILT FROM THE TEMPLATE, INCLUDING SECURITY
+HARDENING, ACCESS CONTROL, DATA PROTECTION, AND COMPLIANCE WITH APPLICABLE
+LAWS AND REGULATIONS.
+
+--------------------------------------------------------------------------------
+7. LIMITATION OF LIABILITY
+--------------------------------------------------------------------------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
+LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
+OR PUNITIVE DAMAGES (INCLUDING LOSS OF PROFITS, REVENUE, DATA, GOODWILL,
+OR BUSINESS OPPORTUNITY) ARISING OUT OF OR IN CONNECTION WITH THE TEMPLATE,
+WHETHER IN AN ACTION OF CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, OR
+OTHERWISE, EVEN IF THE LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+IN NO EVENT SHALL THE LICENSOR'S TOTAL CUMULATIVE LIABILITY EXCEED THE
+AMOUNT YOU PAID FOR THE TEMPLATE.
+
+--------------------------------------------------------------------------------
+8. TERMINATION
+--------------------------------------------------------------------------------
+
+This license terminates automatically if you breach any of its terms. Upon
+termination, you must stop using the Template in any new Customer Projects
+and destroy all copies in your possession. Customer Projects already shipped
+to end users may continue to operate.
+
+--------------------------------------------------------------------------------
+9. GOVERNING LAW
+--------------------------------------------------------------------------------
+
+This Agreement is governed by the laws of the Licensor's jurisdiction, without
+regard to conflict-of-laws principles. Any dispute will be resolved in the
+courts of that jurisdiction, unless both parties agree to arbitration.
+
+--------------------------------------------------------------------------------
+10. ENTIRE AGREEMENT
+--------------------------------------------------------------------------------
+
+This Agreement is the entire agreement between you and the Licensor with
+respect to the Template, and supersedes any prior or contemporaneous
+agreements, communications, or representations.
+
+--------------------------------------------------------------------------------
+Contact
+--------------------------------------------------------------------------------
+
+Questions about this license: see the support link in `package.json` or the
+Licensor's website.
+
+Last updated: 2026.

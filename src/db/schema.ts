@@ -301,6 +301,67 @@ export const webhookEvents = pgTable(
 );
 
 // ============================================================================
+// WAITLIST TABLE (Pre-launch email capture for /waitlist)
+// ============================================================================
+
+export const waitlist = pgTable(
+  "waitlist",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    name: varchar("name", { length: 255 }),
+    referrer: varchar("referrer", { length: 500 }),
+    userAgent: varchar("user_agent", { length: 500 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    emailIdx: index("waitlist_email_idx").on(table.email),
+    createdAtIdx: index("waitlist_created_at_idx").on(table.createdAt),
+  })
+);
+
+// ============================================================================
+// EMAIL LOG TABLE (Track every transactional email sent)
+// ============================================================================
+//
+// One row per email send. Updated by the Mailgun inbound webhook when a
+// bounce, complaint, or unsubscribe event arrives. The `providerMessageId`
+// is the Mailgun message id; `toUserId` is a soft reference to users.id
+// (we keep the log even if the user is hard-deleted, for audit).
+//
+// Reads: ops/debugging only — there is no public surface that queries this.
+// Writes: src/lib/mailgun.ts after every send + /api/mailgun/webhook on
+// delivery events.
+
+export const emailLog = pgTable(
+  "email_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    toEmail: varchar("to_email", { length: 255 }).notNull(),
+    toUserId: uuid("to_user_id"),
+    subject: varchar("subject", { length: 500 }).notNull(),
+    template: varchar("template", { length: 100 }).notNull(),
+    provider: varchar("provider", { length: 50 }).notNull().default("mailgun"),
+    providerMessageId: varchar("provider_message_id", { length: 255 }),
+    status: varchar("status", { length: 50 }).notNull().default("sent"),
+    failureReason: text("failure_reason"),
+    tags: jsonb("tags"),
+    metadata: jsonb("metadata"),
+    sentAt: timestamp("sent_at").defaultNow().notNull(),
+    lastEventAt: timestamp("last_event_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    toEmailIdx: index("email_log_to_email_idx").on(table.toEmail),
+    toUserIdx: index("email_log_to_user_idx").on(table.toUserId),
+    providerMessageIdx: index("email_log_provider_message_idx").on(
+      table.providerMessageId
+    ),
+    statusIdx: index("email_log_status_idx").on(table.status),
+    sentAtIdx: index("email_log_sent_at_idx").on(table.sentAt),
+  })
+);
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 

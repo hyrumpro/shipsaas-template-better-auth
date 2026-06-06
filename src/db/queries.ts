@@ -10,8 +10,10 @@ import {
   orders,
   payments,
   webhookEvents,
+  waitlist,
+  emailLog,
 } from "./schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
 
 // ============================================================================
 // USER OPERATIONS
@@ -76,7 +78,7 @@ export async function getActiveSubscription(userId: string) {
     .where(
       and(
         eq(subscriptions.userId, userId),
-        eq(subscriptions.status, "active")
+        inArray(subscriptions.status, ["active", "trialing"])
       )
     )
     .orderBy(desc(subscriptions.createdAt))
@@ -137,6 +139,7 @@ export async function createSubscription(data: {
   const [subscription] = await db
     .insert(subscriptions)
     .values(data)
+    .onConflictDoNothing({ target: subscriptions.providerSubscriptionId })
     .returning();
   return subscription;
 }
@@ -232,7 +235,11 @@ export async function createOrder(data: {
   invoiceUrl?: string;
   metadata?: any;
 }) {
-  const [order] = await db.insert(orders).values(data).returning();
+  const [order] = await db
+    .insert(orders)
+    .values(data)
+    .onConflictDoNothing({ target: orders.providerOrderId })
+    .returning();
   return order;
 }
 
@@ -308,7 +315,11 @@ export async function createPayment(data: {
   paidAt?: Date;
   metadata?: any;
 }) {
-  const [payment] = await db.insert(payments).values(data).returning();
+  const [payment] = await db
+    .insert(payments)
+    .values(data)
+    .onConflictDoNothing({ target: payments.providerPaymentId })
+    .returning();
   return payment;
 }
 
@@ -338,12 +349,16 @@ export async function createWebhookEvent(data: {
   eventType: string;
   payload: any;
 }) {
-  const [event] = await db.insert(webhookEvents).values(data).returning();
+  const [event] = await db
+    .insert(webhookEvents)
+    .values(data)
+    .onConflictDoNothing({ target: webhookEvents.eventId })
+    .returning();
   return event;
 }
 
 export async function markWebhookEventProcessed(
-  eventId: string,
+  providerEventId: string,
   error?: string
 ) {
   const [event] = await db
@@ -353,7 +368,7 @@ export async function markWebhookEventProcessed(
       processedAt: new Date(),
       error,
     })
-    .where(eq(webhookEvents.id, eventId))
+    .where(eq(webhookEvents.eventId, providerEventId))
     .returning();
   return event;
 }
@@ -413,4 +428,133 @@ export async function getActiveSubscriptionsCount() {
     .from(subscriptions)
     .where(eq(subscriptions.status, "active"));
   return result.length;
+}
+
+// ============================================================================
+// WAITLIST
+// ============================================================================
+
+export async function addToWaitlist(data: {
+  email: string;
+  name?: string | null;
+  referrer?: string | null;
+  userAgent?: string | null;
+}) {
+  // onConflictDoNothing so duplicate sign-ups are a no-op (idempotent)
+  const [entry] = await db
+    .insert(waitlist)
+    .values({
+      email: data.email.toLowerCase().trim(),
+      name: data.name?.trim() || null,
+      referrer: data.referrer?.slice(0, 500) || null,
+      userAgent: data.userAgent?.slice(0, 500) || null,
+    })
+    .onConflictDoNothing({ target: waitlist.email })
+    .returning();
+  return entry;
+}
+
+export async function getWaitlistCount() {
+  const [result] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(waitlist);
+  return Number(result?.count ?? 0);
+}
+
+export async function isOnWaitlist(email: string) {
+  const [row] = await db
+    .select({ id: waitlist.id })
+    .from(waitlist)
+    .where(eq(waitlist.email, email.toLowerCase().trim()));
+  return Boolean(row);
+}
+
+// ============================================================================
+// EMAIL LOG OPERATIONS
+// ============================================================================
+//
+// The email log is written to from src/lib/mailgun.ts on every send and
+// updated from /api/mailgun/webhook on delivery events (delivered, bounced,
+// complained, unsubscribed, failed).
+//
+// Why a log table?
+//   - Audit trail: "what emails did we send to X last month?"
+//   - Delivery debugging: see whether a payment receipt actually landed.
+//   - Bounce suppression: unsubscribe / hard-bounce users so we stop mailing.
+//   - Replay: re-send a failed email by reading the log row + template.
+
+export async function logEmailSent(data: {
+  toEmail: string;
+  toUserId?: string | null;
+  subject: string;
+  template: string;
+  providerMessageId?: string | null;
+  tags?: string[];
+  metadata?: any;
+}) {
+  const [row] = await db
+    .insert(emailLog)
+    .values({
+      toEmail: data.toEmail.toLowerCase().trim(),
+      toUserId: data.toUserId ?? null,
+      subject: data.subject,
+      template: data.template,
+      providerMessageId: data.providerMessageId ?? null,
+      tags: data.tags ?? [],
+      metadata: data.metadata ?? null,
+      status: "sent",
+    })
+    .returning();
+  return row;
+}
+
+export async function getEmailLogByProviderMessageId(
+  providerMessageId: string
+) {
+  const [row] = await db
+    .select()
+    .from(emailLog)
+    .where(eq(emailLog.providerMessageId, providerMessageId));
+  return row;
+}
+
+export async function updateEmailLogStatus(
+  providerMessageId: string,
+  status:
+    | "sent"
+    | "delivered"
+    | "bounced"
+    | "complained"
+    | "unsubscribed"
+    | "failed",
+  failureReason?: string | null
+) {
+  const [row] = await db
+    .update(emailLog)
+    .set({
+      status,
+      failureReason: failureReason ?? null,
+      lastEventAt: new Date(),
+    })
+    .where(eq(emailLog.providerMessageId, providerMessageId))
+    .returning();
+  return row;
+}
+
+export async function getUserEmailLog(userId: string, limit = 20) {
+  return db
+    .select()
+    .from(emailLog)
+    .where(eq(emailLog.toUserId, userId))
+    .orderBy(desc(emailLog.sentAt))
+    .limit(limit);
+}
+
+export async function getRecentBounces(limit = 50) {
+  return db
+    .select()
+    .from(emailLog)
+    .where(eq(emailLog.status, "bounced"))
+    .orderBy(desc(emailLog.lastEventAt))
+    .limit(limit);
 }

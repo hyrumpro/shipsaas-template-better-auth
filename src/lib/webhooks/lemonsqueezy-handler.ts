@@ -13,13 +13,36 @@ import {
   getOrderByProviderId,
   createPayment,
   updateUser,
+  getUserById,
   createWebhookEvent,
   markWebhookEventProcessed,
+  getWebhookEventByEventId,
 } from "@/db/queries";
+import {
+  sendPaymentSuccessEmail,
+  sendPaymentFailedEmail,
+  sendRefundIssuedEmail,
+} from "@/lib/mailgun";
 
 export async function handleLemonSqueezyWebhook(payload: any) {
   const eventName = payload.meta?.event_name;
   const eventId = payload.meta?.custom_data?.event_id || payload.data?.id;
+
+  // Idempotency: short-circuit if we've already processed this LS event id
+  if (eventId) {
+    try {
+      const existing = await getWebhookEventByEventId("lemonsqueezy", eventId);
+      if (existing?.processed) {
+        logger.info("LemonSqueezy webhook already processed, skipping", {
+          eventId,
+          eventName,
+        });
+        return;
+      }
+    } catch (error) {
+      logger.error("Failed to check webhook idempotency", error);
+    }
+  }
 
   // Log webhook event for audit trail
   try {
@@ -216,6 +239,18 @@ async function handleOrderRefunded(data: any, attributes: any, userId: string) {
       refundedAt: new Date().toISOString(),
     },
   });
+
+  // Refund email
+  const refundAmountCents = Math.round(
+    parseFloat(attributes.refunded_amount || attributes.total) * 100,
+  );
+  void sendLsRefund(
+    dbOrder.userId,
+    dbOrder.productName,
+    refundAmountCents,
+    attributes.currency?.toLowerCase() || "usd",
+    data.id,
+  );
 
   logger.payment("order_refunded", { userId, orderId });
 }
@@ -463,20 +498,37 @@ async function handleSubscriptionPaymentSuccess(
   attributes: any,
   userId: string
 ) {
-  const subscriptionId = data.id;
+  const invoiceId = data.id;
+  const subscriptionId =
+    attributes.subscription_id?.toString() ||
+    attributes.subscription?.id?.toString();
+
+  if (!subscriptionId) {
+    logger.warn("subscription_payment_success without subscription_id", {
+      invoiceId,
+    });
+    return;
+  }
+
   const dbSubscription = await getSubscriptionByProviderId(
     "lemonsqueezy",
     subscriptionId
   );
 
-  if (!dbSubscription) return;
+  if (!dbSubscription) {
+    logger.warn("Subscription not found for payment success", {
+      subscriptionId,
+      invoiceId,
+    });
+    return;
+  }
 
   // Record payment
   await createPayment({
     userId: dbSubscription.userId,
     subscriptionId: dbSubscription.id,
     provider: "lemonsqueezy",
-    providerPaymentId: `ls_payment_${subscriptionId}_${Date.now()}`,
+    providerPaymentId: invoiceId,
     providerCustomerId: attributes.customer_id?.toString(),
     status: "succeeded",
     amount: Math.round(parseFloat(attributes.total || 0) * 100),
@@ -500,6 +552,16 @@ async function handleSubscriptionPaymentSuccess(
     isSubscribed: true,
   });
 
+  // Receipt email (never blocks the webhook)
+  const successAmount = Math.round(parseFloat(attributes.total || 0) * 100);
+  void sendLsPaymentReceipt(
+    dbSubscription.userId,
+    dbSubscription.planName,
+    successAmount,
+    attributes.currency?.toLowerCase() || "usd",
+    attributes.urls?.receipt_url as string | undefined,
+  );
+
   logger.payment("subscription_payment_success", {
     userId: dbSubscription.userId,
     subscriptionId,
@@ -511,20 +573,37 @@ async function handleSubscriptionPaymentFailed(
   attributes: any,
   userId: string
 ) {
-  const subscriptionId = data.id;
+  const invoiceId = data.id;
+  const subscriptionId =
+    attributes.subscription_id?.toString() ||
+    attributes.subscription?.id?.toString();
+
+  if (!subscriptionId) {
+    logger.warn("subscription_payment_failed without subscription_id", {
+      invoiceId,
+    });
+    return;
+  }
+
   const dbSubscription = await getSubscriptionByProviderId(
     "lemonsqueezy",
     subscriptionId
   );
 
-  if (!dbSubscription) return;
+  if (!dbSubscription) {
+    logger.warn("Subscription not found for payment failure", {
+      subscriptionId,
+      invoiceId,
+    });
+    return;
+  }
 
   // Record failed payment
   await createPayment({
     userId: dbSubscription.userId,
     subscriptionId: dbSubscription.id,
     provider: "lemonsqueezy",
-    providerPaymentId: `ls_payment_failed_${subscriptionId}_${Date.now()}`,
+    providerPaymentId: invoiceId,
     providerCustomerId: attributes.customer_id?.toString(),
     status: "failed",
     amount: Math.round(parseFloat(attributes.total || 0) * 100),
@@ -541,6 +620,17 @@ async function handleSubscriptionPaymentFailed(
   await updateSubscription(dbSubscription.id, {
     status: "past_due",
   });
+
+  // Failure email (never blocks the webhook)
+  const failureAmount = Math.round(parseFloat(attributes.total || 0) * 100);
+  const failureMessage = attributes.status_reason as string | undefined;
+  void sendLsPaymentFailure(
+    dbSubscription.userId,
+    dbSubscription.planName,
+    failureAmount,
+    attributes.currency?.toLowerCase() || "usd",
+    failureMessage,
+  );
 
   logger.payment("subscription_payment_failed", {
     userId: dbSubscription.userId,
@@ -577,6 +667,89 @@ async function handleSubscriptionPaymentRecovered(
 }
 
 // Helper functions
+
+function formatMoneyLs(amountCents: number, currency: string | null): string {
+  if (!currency) return `${(amountCents / 100).toFixed(2)}`;
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      minimumFractionDigits: amountCents % 100 === 0 ? 0 : 2,
+    }).format(amountCents / 100);
+  } catch {
+    return `${(amountCents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
+async function sendLsPaymentReceipt(
+  userId: string,
+  planName: string,
+  amountCents: number,
+  currency: string,
+  receiptUrl: string | undefined,
+) {
+  try {
+    const user = await getUserById(userId);
+    if (!user?.email) return;
+    await sendPaymentSuccessEmail(
+      user.email,
+      user.fullName ?? user.email.split("@")[0] ?? "there",
+      formatMoneyLs(amountCents, currency),
+      planName,
+      receiptUrl,
+    );
+  } catch (err) {
+    logger.warn("Failed to send LemonSqueezy receipt email", { userId, err });
+  }
+}
+
+async function sendLsPaymentFailure(
+  userId: string,
+  planName: string,
+  amountCents: number,
+  currency: string,
+  reason: string | undefined,
+) {
+  try {
+    const user = await getUserById(userId);
+    if (!user?.email) return;
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+      "http://localhost:3000";
+    await sendPaymentFailedEmail(
+      user.email,
+      user.fullName ?? user.email.split("@")[0] ?? "there",
+      planName,
+      formatMoneyLs(amountCents, currency),
+      reason,
+      `${siteUrl}/dashboard/billing`,
+    );
+  } catch (err) {
+    logger.warn("Failed to send LemonSqueezy payment-failed email", { userId, err });
+  }
+}
+
+async function sendLsRefund(
+  userId: string,
+  productName: string,
+  amountCents: number,
+  currency: string,
+  orderId: string,
+) {
+  try {
+    const user = await getUserById(userId);
+    if (!user?.email) return;
+    await sendRefundIssuedEmail(
+      user.email,
+      user.fullName ?? user.email.split("@")[0] ?? "there",
+      formatMoneyLs(amountCents, currency),
+      productName,
+      orderId,
+    );
+  } catch (err) {
+    logger.warn("Failed to send LemonSqueezy refund email", { userId, err });
+  }
+}
 
 function mapLemonSqueezyStatus(
   lsStatus: string
