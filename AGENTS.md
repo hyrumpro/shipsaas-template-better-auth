@@ -131,7 +131,7 @@ export async function POST(request: Request) {
 
 ### Adding a theme
 
-Add a new entry to the `THEMES` array in `src/config/theme.ts`. Provide `name`, CSS-variable values for both `light` and `dark`, and any accent overrides. The theme switcher in the navbar picks it up automatically.
+Add a new entry to the `THEME_PRESETS` record in `src/config/theme.ts` (each preset is `{ name, primary: {h,s,l}, accent: {h,s,l} }`). At runtime, `applyTheme()` writes `--primary`, `--accent`, `--ring`, `--gradient-primary`, and `--shadow-glow` to `<html>` and persists the choice in localStorage. The dropdown `ThemeSwitcher` is playground-scoped (`src/components/playground/ui/ThemeSwitcher.tsx`) — there is no global provider or navbar switcher; dark variants live under a `.dark` class (Tailwind `class` strategy) with no built-in toggle.
 
 ## Things to avoid
 
