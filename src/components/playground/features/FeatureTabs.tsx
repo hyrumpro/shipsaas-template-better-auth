@@ -1,5 +1,8 @@
 "use client";
 
+/* Showcase component intentionally demonstrates remote image URLs. */
+/* eslint-disable @next/next/no-img-element */
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Code, Database, Cloud, Shield, Check } from "lucide-react";
@@ -18,7 +21,8 @@ const features = [
       "Built-in testing framework",
       "Comprehensive documentation",
     ],
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
   },
   {
     id: "database",
@@ -32,7 +36,8 @@ const features = [
       "Automatic migrations",
       "Built-in caching layer",
     ],
-    image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80",
   },
   {
     id: "infrastructure",
@@ -46,7 +51,8 @@ const features = [
       "Multi-region deployment",
       "99.99% uptime SLA",
     ],
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
   },
   {
     id: "security",
@@ -60,7 +66,8 @@ const features = [
       "Regular security audits",
       "DDoS protection included",
     ],
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80",
   },
 ];
 

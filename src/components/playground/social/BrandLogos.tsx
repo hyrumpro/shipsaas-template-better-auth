@@ -1,5 +1,8 @@
 "use client";
 
+/* Showcase component intentionally demonstrates remote image URLs. */
+/* eslint-disable @next/next/no-img-element */
+
 import { motion } from "framer-motion";
 
 const brands = [

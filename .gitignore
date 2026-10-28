@@ -38,6 +38,8 @@
 .vscode/
 .claude/
 .kiro/
+.playwright-mcp/
+.qwen/
 
 # debug
 npm-debug.log*

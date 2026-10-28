@@ -15,8 +15,7 @@ type Post = {
 };
 
 export function BlogPostContent({ post }: { post: Post }) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const shareUrl = `${baseUrl}/blog/${post.slug}`;
 
   return (
@@ -48,11 +47,9 @@ export function BlogPostContent({ post }: { post: Post }) {
 
       {post.image && (
         <figure className="mt-10 overflow-hidden rounded-lg border border-border">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="h-auto w-full"
-          />
+          {/* Blog cover URLs may be user-hosted; keep the provider-agnostic img tag. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={post.image} alt={post.title} className="h-auto w-full" />
         </figure>
       )}
 

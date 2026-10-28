@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, HelpCircle, ChevronDown } from "lucide-react";
+import { Search, HelpCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -56,14 +56,16 @@ const faqs = [
 export const FAQSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredFaqs = faqs.map((category) => ({
-    ...category,
-    questions: category.questions.filter(
-      (q) =>
-        q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.a.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((category) => category.questions.length > 0);
+  const filteredFaqs = faqs
+    .map((category) => ({
+      ...category,
+      questions: category.questions.filter(
+        (q) =>
+          q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          q.a.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((category) => category.questions.length > 0);
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">

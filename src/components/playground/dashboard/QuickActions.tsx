@@ -1,8 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Plus, Upload, Download, Share2, FileText, Users, Settings, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Plus,
+  Upload,
+  Download,
+  Share2,
+  FileText,
+  Users,
+  Zap,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const actions = [
@@ -65,11 +72,15 @@ export const QuickActions = () => {
               whileTap={{ scale: 0.95 }}
               className="p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 transition-all text-left group"
             >
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+              <div
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}
+              >
                 <action.icon className="w-5 h-5 text-white" />
               </div>
               <p className="font-semibold text-sm mb-1">{action.label}</p>
-              <p className="text-xs text-muted-foreground">{action.description}</p>
+              <p className="text-xs text-muted-foreground">
+                {action.description}
+              </p>
             </motion.button>
           ))}
         </div>

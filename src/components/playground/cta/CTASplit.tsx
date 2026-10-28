@@ -1,5 +1,8 @@
 "use client";
 
+/* Showcase component intentionally demonstrates a remote image URL. */
+/* eslint-disable @next/next/no-img-element */
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Check, Sparkles } from "lucide-react";
@@ -33,7 +36,8 @@ export const CTASplit = () => {
         </h2>
 
         <p className="text-xl text-muted-foreground">
-          Join thousands of teams already building better products with our platform
+          Join thousands of teams already building better products with our
+          platform
         </p>
 
         <ul className="space-y-3">
@@ -84,7 +88,7 @@ export const CTASplit = () => {
             className="w-full h-[400px] object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-          
+
           {/* Floating stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
