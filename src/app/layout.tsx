@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | ShipSaaS",
   },
   description:
-    "Premium Next.js 16 SaaS template with authentication, payments, and stunning UI. Launch your startup in days with production-ready code.",
+    "Premium Next.js 16 SaaS foundation with authentication, payments, email, SEO, and a deployment-ready design system.",
   keywords: [
     "saas",
     "boilerplate",
@@ -104,11 +104,8 @@ const organizationSchema = {
   name: "ShipSaaS",
   url: baseUrl,
   logo: `${baseUrl}/logo.png`,
-  description:
-    "Premium Next.js SaaS template for launching startups quickly",
-  sameAs: [
-    "https://twitter.com/shipsaas",
-  ],
+  description: "Premium Next.js SaaS template for launching startups quickly",
+  sameAs: ["https://twitter.com/shipsaas"],
 };
 
 // WebApplication structured data
@@ -143,9 +140,7 @@ export default function RootLayout({
       </head>
       <body className={cn(bricolageGrotesque.className, "antialiased")}>
         <QueryProvider>
-          <ObservabilityProvider>
-            {children}
-          </ObservabilityProvider>
+          <ObservabilityProvider>{children}</ObservabilityProvider>
         </QueryProvider>
       </body>
     </html>

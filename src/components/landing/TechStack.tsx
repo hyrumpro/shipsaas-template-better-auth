@@ -6,7 +6,10 @@ const groups: { category: string; items: Item[] }[] = [
     items: [
       { name: "Next.js 16", note: "App Router, Turbopack, Server Actions" },
       { name: "React 19", note: "Server Components by default" },
-      { name: "TypeScript", note: "strict mode, no `any` in the public surface" },
+      {
+        name: "TypeScript",
+        note: "strict mode with explicit integration boundaries",
+      },
       { name: "Tailwind CSS", note: "CSS-variable tokens, no inline colors" },
       { name: "Radix UI", note: "Headless primitives, fully accessible" },
       { name: "TanStack Query", note: "Server-state cache, devtools in dev" },
@@ -15,7 +18,7 @@ const groups: { category: string; items: Item[] }[] = [
   {
     category: "Backend",
     items: [
-      { name: "Supabase", note: "Auth, Postgres, RLS, file storage" },
+      { name: "Supabase", note: "Auth, Postgres, RLS, and session management" },
       { name: "Drizzle ORM", note: "Schema → types → queries" },
       { name: "Next.js Route Handlers", note: "Typed, rate-limited, signed" },
     ],
@@ -23,14 +26,23 @@ const groups: { category: string; items: Item[] }[] = [
   {
     category: "Payments",
     items: [
-      { name: "Stripe", note: "Subscriptions, portal, idempotent webhooks" },
-      { name: "LemonSqueezy", note: "Drop-in alternative behind one switch" },
+      {
+        name: "Stripe",
+        note: "Subscriptions, portal, signed retry-safe webhooks",
+      },
+      {
+        name: "LemonSqueezy",
+        note: "Alternative provider behind the same plan API",
+      },
     ],
   },
   {
     category: "Infra",
     items: [
-      { name: "Mailgun", note: "DKIM, DMARC, SPF configured" },
+      {
+        name: "Mailgun",
+        note: "Transactional email, delivery hooks, DNS checklist",
+      },
       { name: "Docker", note: "Dev + production compose files" },
       { name: "PostHog + Sentry", note: "Opt-in shim, no SDK at install" },
     ],

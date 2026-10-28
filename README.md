@@ -1,11 +1,11 @@
 # ShipSaaS
 
-> Production-grade Next.js 16 SaaS template. **The plumbing, the design, the
+> Production-minded Next.js 16 SaaS foundation. **The plumbing, the design, the
 > boring stuff — done. You ship the product.**
 
 Most templates sell you a fresh `create-next-app` with a landing page and
 wish you luck. ShipSaaS is the template you wish you'd had on your last
-project: auth wired, payments wired, webhooks idempotent, emails branded,
+project: auth wired, payments wired, retry-safe webhooks, emails branded,
 rate limits in place, design system enforced, and every "oh, I forgot about
 that" problem already solved.
 
@@ -28,8 +28,8 @@ Built for solo indie SaaS developers who want to ship, not configure.
   updates `delivered`/`bounced`/`complained`/`unsubscribed`/`failed`
 - **One-click unsubscribe** (RFC 8058) on every marketing send
 - **PII-redacting logger** that walks objects before writing
-- **Rate limiting** on every non-idempotent API route
-- **Webhook idempotency** — duplicate `event_id` is a 200 no-op
+- **Rate limiting** on key user-callable mutation routes
+- **Webhook processing** — signed delivery claims, duplicate no-ops, and retryable failures
 - **Modern-minimal design system** — 24 themes, 1 visual language, no
   glassmorphism, no gradient orbs, no AI-slop. The aesthetic of Linear,
   Stripe, and ElevenLabs.
@@ -68,7 +68,7 @@ recommended next steps for each.
 
 ### Prerequisites
 
-- Node.js 20+ and npm 10+ (pnpm 9 also works; the lockfile is the source of truth)
+- Node.js 20+ and npm 10+ (the committed `package-lock.json` is the source of truth)
 - A [Supabase](https://supabase.com) project — free tier is fine
 - A payment account — [Stripe](https://stripe.com) or [LemonSqueezy](https://lemonsqueezy.com)
 - A [Mailgun](https://mailgun.com) account — optional in dev, required in production
@@ -94,7 +94,7 @@ and email actually hit third-party APIs.
 1. Push the repo to GitHub.
 2. Import on Vercel.
 3. Add the env vars from `.env.example` in the Vercel dashboard.
-4. Apply `supabase/migrations/*.sql` to your Supabase project.
+4. Apply `supabase/migrations/*.sql` to your Supabase project, including `006_webhook_processing.sql`.
 5. Configure Stripe (or LemonSqueezy) and Mailgun webhooks — URLs are
    documented in `src/app/docs/payments` and `src/app/docs/email`.
 6. Ship.
@@ -135,22 +135,22 @@ and the brand config all stay identical. Full guide in `src/app/docs/email`.
 All variables are documented inline in `.env.example`. The minimum to get a
 runnable dev server:
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Public anon key (safe in browser) |
-| `SUPABASE_SERVICE_ROLE_KEY` | yes | Admin client for webhooks |
-| `DATABASE_URL` | yes | Postgres connection string |
-| `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` | for Stripe | Server-side checkout + webhook verify |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | for Stripe | Browser-side redirect |
-| `LEMONSQUEEZY_API_KEY` + store/variant ids | for LS | Alternative to Stripe |
-| `MAILGUN_API_KEY` + `MAILGUN_DOMAIN` | for email | Transactional + inbound |
-| `MAILGUN_WEBHOOK_SIGNING_KEY` | for email | Verifies delivery event callbacks |
-| `SUPABASE_WEBHOOK_SECRET` | production | HMAC for the auth sync webhook |
-| `NEXT_PUBLIC_SITE_URL` | yes | Used for absolute URLs in metadata, OAuth, emails |
-| `NEXT_PUBLIC_PAYMENT_PROVIDER` | yes | `stripe` or `lemonsqueezy` |
-| `EMAIL_BRAND_NAME` … `EMAIL_BACKGROUND_COLOR` | optional | Brand customization (defaults supplied) |
-| `NEXT_PUBLIC_WAITLIST_ENABLED` | optional | Set to `true` to enable `/waitlist` |
+| Variable                                      | Required   | Purpose                                           |
+| --------------------------------------------- | ---------- | ------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`                    | yes        | Supabase project URL                              |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`               | yes        | Public anon key (safe in browser)                 |
+| `SUPABASE_SERVICE_ROLE_KEY`                   | yes        | Admin client for webhooks                         |
+| `DATABASE_URL`                                | yes        | Postgres connection string                        |
+| `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` | for Stripe | Server-side checkout + webhook verify             |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`          | for Stripe | Browser-side redirect                             |
+| `LEMONSQUEEZY_API_KEY` + store/variant ids    | for LS     | Alternative to Stripe                             |
+| `MAILGUN_API_KEY` + `MAILGUN_DOMAIN`          | for email  | Transactional + inbound                           |
+| `MAILGUN_WEBHOOK_SIGNING_KEY`                 | for email  | Verifies delivery event callbacks                 |
+| `SUPABASE_WEBHOOK_SECRET`                     | production | HMAC for the auth sync webhook                    |
+| `NEXT_PUBLIC_SITE_URL`                        | yes        | Used for absolute URLs in metadata, OAuth, emails |
+| `NEXT_PUBLIC_PAYMENT_PROVIDER`                | yes        | `stripe` or `lemonsqueezy`                        |
+| `EMAIL_BRAND_NAME` … `EMAIL_BACKGROUND_COLOR` | optional   | Brand customization (defaults supplied)           |
+| `NEXT_PUBLIC_WAITLIST_ENABLED`                | optional   | Set to `true` to enable `/waitlist`               |
 
 Generate the Supabase webhook secret with `openssl rand -hex 32` and paste
 it into both `.env.local` and the Supabase dashboard.
@@ -204,7 +204,7 @@ src/
   db/                   # Drizzle schema, queries, lazy-initialised client
   lib/
     checkout.ts         # unified Stripe + LemonSqueezy switch
-    webhooks/           # idempotent webhook handlers
+  webhooks/           # signed, retry-safe webhook handlers
     supabase/           # client / server / admin tiers
     mailgun.ts          # lazy Mailgun client + send helpers (logs to email_log)
     email-templates.ts  # 10 Hallmark modern-minimal templates
@@ -253,48 +253,48 @@ Browse the live catalog at <http://localhost:3000/playground>.
 
 ## Tech stack
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Framework | Next.js 16 (App Router, Turbopack) | RSC, streaming, server actions |
-| Language | TypeScript 5 | strict mode |
-| Styling | Tailwind CSS 3 + CSS variables | Theming without runtime cost |
-| UI primitives | Radix UI + custom shadcn-style | Accessible, unstyled |
-| Animation | Framer Motion 12 | Production-tested, tree-shaken |
-| Auth | Supabase Auth | Email, OAuth, magic links, sessions, RLS |
-| Database | PostgreSQL (Supabase) | RLS, branching, backups |
-| ORM | Drizzle 0.45 | Type-safe SQL, no runtime overhead |
-| Payments | Stripe + LemonSqueezy | Two providers, one checkout API |
-| Email | Mailgun | Transactional + inbound + delivery webhooks |
-| Data fetching | TanStack Query 5 | Caching, retries, devtools |
-| CI | GitHub Actions on Postgres 16 | lint + typecheck + build |
+| Layer         | Choice                             | Why                                         |
+| ------------- | ---------------------------------- | ------------------------------------------- |
+| Framework     | Next.js 16 (App Router, Turbopack) | RSC, streaming, server actions              |
+| Language      | TypeScript 5                       | strict mode                                 |
+| Styling       | Tailwind CSS 3 + CSS variables     | Theming without runtime cost                |
+| UI primitives | Radix UI + custom shadcn-style     | Accessible, unstyled                        |
+| Animation     | Framer Motion 12                   | Production-tested, tree-shaken              |
+| Auth          | Supabase Auth                      | Email, OAuth, magic links, sessions, RLS    |
+| Database      | PostgreSQL (Supabase)              | RLS, branching, backups                     |
+| ORM           | Drizzle 0.45                       | Type-safe SQL, no runtime overhead          |
+| Payments      | Stripe + LemonSqueezy              | Two providers, one checkout API             |
+| Email         | Mailgun                            | Transactional + inbound + delivery webhooks |
+| Data fetching | TanStack Query 5                   | Caching, retries, devtools                  |
+| CI            | GitHub Actions on Postgres 16      | lint + typecheck + build                    |
 
 ---
 
 ## Scripts
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Dev server with Turbopack |
-| `npm run build` | Production build (lazy init for Stripe + DB) |
-| `npm start` | Start the production server |
-| `npm run lint` | Run ESLint with the Next.js config |
-| `npm run format` | Format with Prettier |
-| `npm run db:generate` | Generate Drizzle migrations from `src/db/schema.ts` |
-| `npm run db:push` | Apply schema to the database (dev) |
-| `npm run db:studio` | Open Drizzle Studio in the browser |
-| `npm run db:init` | Run `scripts/init-db.ts` (seed roles, etc.) |
-| `npm run email:test` | Send a real test email (e.g. `npm run email:test -- welcome you@you.com`) |
-| `npm run assets:generate` | Regenerate og-image, favicon, logo |
-| `npm run docker:dev` | Bring up the dev docker-compose stack |
-| `npm run docker:prod` | Start the production stack in the background |
-| `npm run docker:prod:build` | Rebuild and start the production stack |
+| Script                      | What it does                                                              |
+| --------------------------- | ------------------------------------------------------------------------- |
+| `npm run dev`               | Dev server with Turbopack                                                 |
+| `npm run build`             | Production build (lazy init for Stripe + DB)                              |
+| `npm start`                 | Start the production server                                               |
+| `npm run lint`              | Run ESLint with the Next.js config                                        |
+| `npm run format`            | Format with Prettier                                                      |
+| `npm run db:generate`       | Generate Drizzle migrations from `src/db/schema.ts`                       |
+| `npm run db:push`           | Apply schema to the database (dev)                                        |
+| `npm run db:studio`         | Open Drizzle Studio in the browser                                        |
+| `npm run db:init`           | Run `scripts/init-db.ts` (seed roles, etc.)                               |
+| `npm run email:test`        | Send a real test email (e.g. `npm run email:test -- welcome you@you.com`) |
+| `npm run assets:generate`   | Regenerate og-image, favicon, logo                                        |
+| `npm run docker:dev`        | Bring up the dev docker-compose stack                                     |
+| `npm run docker:prod`       | Start the production stack in the background                              |
+| `npm run docker:prod:build` | Rebuild and start the production stack                                    |
 
 ---
 
 ## Production checklist
 
-This repo was hardened against the common Next.js 16 SaaS traps before
-shipping. Run through this once before going live:
+This repo includes a hardened starting point for common Next.js 16 SaaS traps.
+Run through this once before going live:
 
 ### Auth & data
 
@@ -348,13 +348,10 @@ shipping. Run through this once before going live:
 
 ### What was already done (so you don't redo it)
 
-- **Webhook idempotency.** Stripe and LemonSqueezy handlers early-return on
-  duplicate `event_id` and use `onConflictDoNothing` on every create — see
-  `src/lib/webhooks/`.
-- **Real LemonSqueezy ids.** The handler uses the actual `data.id` (invoice)
-  and `attributes.subscription_id` (subscription) instead of fabricating an
-  id, so retries don't collide on the `payments.provider_payment_id` unique
-  index.
+- **Webhook processing.** Stripe uses its real event id. Lemon Squeezy,
+  Supabase, and Mailgun use an internal body dedupe key because those webhook
+  shapes do not consistently expose a delivery id. Failed claims remain
+  retryable and stale claims expire.
 - **RLS performance.** All policies in
   `supabase/migrations/003_rls_optimization.sql` wrap auth lookups in
   `(SELECT auth.uid())` and `(SELECT auth.jwt()->>'role')` so the planner
@@ -418,9 +415,10 @@ The simplest target is Vercel:
 3. Add the env vars from `.env.example` (everything is documented inline)
 4. Deploy
 
-The included `Dockerfile` and `docker/prod/docker-compose.yml` also work for
-self-hosted deployments. The image uses Next.js `standalone` output so the
-runtime image is small.
+The included Dockerfiles and compose files use the committed npm lockfile and
+Next.js `standalone` output. The production compose file builds a small
+non-root runtime image; copy `.env.docker.example` to `.env.docker` for local
+development or provide `.env.production` for self-hosting.
 
 For local production simulation:
 
@@ -461,7 +459,10 @@ Then add the send helper in `src/lib/mailgun.ts`:
 
 ```ts
 export const sendMyNewEmail = async (
-  email: string, name: string, data: SomeData, userId?: string
+  email: string,
+  name: string,
+  data: SomeData,
+  userId?: string
 ): Promise<boolean> => {
   const template = EmailTemplates.myNewEmail(name, data);
   const messageId = await sendEmail({
@@ -469,10 +470,10 @@ export const sendMyNewEmail = async (
     subject: template.subject,
     html: template.html,
     text: template.text,
-    tags: ["my-tag", "notification"],   // add "marketing" to opt into List-Unsubscribe
-    template: "myNewEmail",            // appears in email_log.template
+    tags: ["my-tag", "notification"], // add "marketing" to opt into List-Unsubscribe
+    template: "myNewEmail", // appears in email_log.template
     userId,
-    metadata: { ...data },              // appears in email_log.metadata
+    metadata: { ...data }, // appears in email_log.metadata
   });
   return messageId !== null;
 };

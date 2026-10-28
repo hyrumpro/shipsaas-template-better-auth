@@ -8,7 +8,7 @@ import {
 const faqs = [
   {
     q: "What does the template include?",
-    a: "A Next.js 16 app with Supabase auth, Stripe and LemonSqueezy payments behind a unified switch, Mailgun email, a real dashboard, a blog, a docs site, and a 55-component playground. All wired up, all typed.",
+    a: "A Next.js 16 app with Supabase auth, Stripe and LemonSqueezy payments behind a unified plan-based checkout, Mailgun email, a dashboard, a markdown blog, in-app docs, and a 55-component playground. You still configure the providers and build your product domain model.",
   },
   {
     q: "Do I need to use the same providers?",
@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "Is the code production-ready?",
-    a: "It runs in production. The template has lazy-initialized server clients, idempotent webhooks, rate limiting, PII redaction, and a hardened middleware. The CI runs lint, typecheck, and build with no environment variables set.",
+    a: "It is a production-minded foundation, not a finished product. It includes lazy server clients, signed retry-safe webhook processing, rate limiting on key mutations, PII redaction, and hardened middleware. Add your provider credentials, migrations, tests, and production rate-limit store before launch.",
   },
   {
     q: "What about subscriptions and the billing portal?",
@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     q: "Can I deploy this for free?",
-    a: "Yes. Vercel, Netlify, and Cloudflare Pages all work. The repo ships with Docker compose for self-hosting if you prefer.",
+    a: "Yes. Vercel is the shortest path, and the repository includes npm-based Docker development and production compose files for self-hosting. Netlify and Cloudflare Pages are not the primary supported targets.",
   },
   {
     q: "How do I add observability?",
