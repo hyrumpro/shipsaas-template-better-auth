@@ -1,23 +1,26 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { getStripe } from "@/utils/stripe";
 import { logger } from "@/lib/logger";
 
 interface CheckoutButtonProps {
-  priceId: string;
+  planId: string;
+  provider?: "stripe" | "lemonsqueezy";
 }
 
-export default function CheckoutButton({ priceId }: CheckoutButtonProps) {
+export default function CheckoutButton({
+  planId,
+  provider,
+}: CheckoutButtonProps) {
   // ✅ Use React Query mutation for better error handling and state management
   const checkoutMutation = useMutation({
-    mutationFn: async (priceId: string) => {
+    mutationFn: async (selectedPlanId: string) => {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ planId: selectedPlanId, provider }),
       });
 
       if (!response.ok) {
@@ -28,12 +31,10 @@ export default function CheckoutButton({ priceId }: CheckoutButtonProps) {
       return response.json();
     },
     onSuccess: async (data) => {
-      const stripe = await getStripe();
-      if (stripe && data.sessionId) {
-        await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      } else {
+      if (!data.url) {
         throw new Error("Failed to initialize Stripe");
       }
+      window.location.assign(data.url);
     },
     onError: (error) => {
       logger.error("Checkout failed", error);
@@ -42,7 +43,7 @@ export default function CheckoutButton({ priceId }: CheckoutButtonProps) {
   });
 
   const handleCheckout = () => {
-    checkoutMutation.mutate(priceId);
+    checkoutMutation.mutate(planId);
   };
 
   return (

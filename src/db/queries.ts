@@ -13,7 +13,9 @@ import {
   waitlist,
   emailLog,
 } from "./schema";
-import { eq, and, desc, inArray, sql } from "drizzle-orm";
+import { eq, and, desc, inArray, or, sql } from "drizzle-orm";
+
+type WebhookProvider = "stripe" | "lemonsqueezy" | "supabase" | "mailgun";
 
 // ============================================================================
 // USER OPERATIONS
@@ -206,7 +208,10 @@ export async function getOrderByProviderId(
     .select()
     .from(orders)
     .where(
-      and(eq(orders.provider, provider), eq(orders.providerOrderId, providerOrderId))
+      and(
+        eq(orders.provider, provider),
+        eq(orders.providerOrderId, providerOrderId)
+      )
     );
   return order;
 }
@@ -328,7 +333,7 @@ export async function createPayment(data: {
 // ============================================================================
 
 export async function getWebhookEventByEventId(
-  provider: "stripe" | "lemonsqueezy",
+  provider: WebhookProvider,
   eventId: string
 ) {
   const [event] = await db
@@ -344,7 +349,7 @@ export async function getWebhookEventByEventId(
 }
 
 export async function createWebhookEvent(data: {
-  provider: "stripe" | "lemonsqueezy";
+  provider: WebhookProvider;
   eventId: string;
   eventType: string;
   payload: any;
@@ -357,6 +362,49 @@ export async function createWebhookEvent(data: {
   return event;
 }
 
+/**
+ * Atomically claim a webhook for processing. A stale claim can be recovered
+ * after five minutes, which protects serverless deployments from a crashed
+ * invocation permanently blocking provider retries.
+ */
+export async function claimWebhookEvent(data: {
+  provider: WebhookProvider;
+  eventId: string;
+  eventType: string;
+  payload: unknown;
+}): Promise<boolean> {
+  const inserted = await db
+    .insert(webhookEvents)
+    .values({
+      provider: data.provider,
+      eventId: data.eventId,
+      eventType: data.eventType,
+      payload: data.payload,
+    })
+    .onConflictDoNothing({ target: webhookEvents.eventId })
+    .returning({ id: webhookEvents.id });
+
+  const [claimed] = await db
+    .update(webhookEvents)
+    .set({
+      processing: true,
+      processingStartedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(webhookEvents.eventId, data.eventId),
+        eq(webhookEvents.processed, false),
+        or(
+          eq(webhookEvents.processing, false),
+          sql`${webhookEvents.processingStartedAt} < now() - interval '5 minutes'`
+        )
+      )
+    )
+    .returning({ id: webhookEvents.id });
+
+  return Boolean(inserted[0] && claimed) || Boolean(claimed);
+}
+
 export async function markWebhookEventProcessed(
   providerEventId: string,
   error?: string
@@ -365,7 +413,9 @@ export async function markWebhookEventProcessed(
     .update(webhookEvents)
     .set({
       processed: true,
+      processing: false,
       processedAt: new Date(),
+      processingStartedAt: null,
       error,
     })
     .where(eq(webhookEvents.eventId, providerEventId))
@@ -373,11 +423,26 @@ export async function markWebhookEventProcessed(
   return event;
 }
 
-export async function getUnprocessedWebhookEvents(
-  provider?: "stripe" | "lemonsqueezy"
+export async function markWebhookEventFailed(
+  providerEventId: string,
+  error: string
 ) {
+  const [event] = await db
+    .update(webhookEvents)
+    .set({
+      processed: false,
+      processing: false,
+      processingStartedAt: null,
+      error,
+    })
+    .where(eq(webhookEvents.eventId, providerEventId))
+    .returning();
+  return event;
+}
+
+export async function getUnprocessedWebhookEvents(provider?: WebhookProvider) {
   const conditions = [eq(webhookEvents.processed, false)];
-  
+
   if (provider) {
     conditions.push(eq(webhookEvents.provider, provider));
   }

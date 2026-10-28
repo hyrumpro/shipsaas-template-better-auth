@@ -14,7 +14,9 @@ async function initializeDatabase() {
     // Test database connection
     console.log("📡 Testing database connection...");
     const result = await db.select().from(users).limit(1);
-    console.log("✅ Database connection successful!");
+    console.log(
+      `✅ Database connection successful (${result.length} users checked)!`
+    );
 
     // Check if Supabase is configured
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -31,12 +33,15 @@ async function initializeDatabase() {
 
     // Test Supabase connection
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data: authData, error: authError } = await supabase.auth.getSession();
+    const { data: authData, error: authError } =
+      await supabase.auth.getSession();
 
     if (authError) {
       console.warn("⚠️  Supabase auth check failed:", authError.message);
     } else {
-      console.log("✅ Supabase connection successful!");
+      console.log(
+        `✅ Supabase connection successful (session: ${Boolean(authData?.session)})!`
+      );
     }
 
     console.log("\n📋 Database Setup Checklist:");

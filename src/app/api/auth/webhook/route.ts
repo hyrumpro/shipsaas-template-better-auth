@@ -11,28 +11,35 @@
  */
 
 import { NextResponse } from "next/server";
-import { createUser, updateUser, getUserById } from "@/db/queries";
+import {
+  claimWebhookEvent,
+  createUser,
+  updateUser,
+  getUserById,
+  markWebhookEventFailed,
+  markWebhookEventProcessed,
+} from "@/db/queries";
 import { logger } from "@/lib/logger";
 import { handleApiError } from "@/lib/error-handler";
 import { sendWelcomeEmail } from "@/lib/mailgun";
 import { trackEventServer } from "@/lib/observability";
-import crypto from "crypto";
+import {
+  createWebhookBodyDedupeKey,
+  verifyHmacSha256,
+} from "@/lib/webhook-security";
 
 export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
-    const payload = JSON.parse(rawBody);
 
     // Verify webhook signature
     const signature =
       req.headers.get("x-supabase-signature") ||
       req.headers.get("x-webhook-signature");
     const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
-    const isProduction = process.env.NODE_ENV === "production";
-
-    if (isProduction && !webhookSecret) {
+    if (!webhookSecret) {
       logger.error(
-        "SUPABASE_WEBHOOK_SECRET is not configured in production; refusing webhook"
+        "SUPABASE_WEBHOOK_SECRET is not configured; refusing webhook"
       );
       return NextResponse.json(
         { error: "Webhook secret not configured" },
@@ -40,73 +47,87 @@ export async function POST(req: Request) {
       );
     }
 
-    if (webhookSecret) {
-      if (!signature) {
-        logger.warn("Supabase auth webhook missing signature header");
-        return NextResponse.json(
-          { error: "Missing signature" },
-          { status: 401 }
-        );
-      }
+    const providedSignature = signature?.includes(",")
+      ? (signature.split(",").pop()?.trim() ?? null)
+      : signature;
 
-      const hmac = crypto.createHmac("sha256", webhookSecret);
-      const digest = hmac.update(rawBody).digest("hex");
-
-      // Accept Supabase v1,<hex> format or plain hex
-      const provided = signature.includes(",")
-        ? (signature.split(",").pop() ?? "").trim()
-        : signature.trim();
-
-      const providedBuf = Buffer.from(provided, "hex");
-      const digestBuf = Buffer.from(digest, "hex");
-
-      if (
-        providedBuf.length !== digestBuf.length ||
-        !crypto.timingSafeEqual(providedBuf, digestBuf)
-      ) {
-        logger.warn("Supabase auth webhook signature verification failed");
-        return NextResponse.json(
-          { error: "Invalid signature" },
-          { status: 401 }
-        );
-      }
+    if (!verifyHmacSha256(rawBody, providedSignature ?? null, webhookSecret)) {
+      logger.warn("Supabase auth webhook signature verification failed");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    const { type, record } = payload;
+    // Parse only after the signature has been verified.
+    const payload = JSON.parse(rawBody);
+    const record = payload.record ?? payload.user;
+    const type =
+      payload.type ?? payload.event ?? (payload.user ? "UPSERT" : "");
+    const userId = record?.id;
+    const eventId =
+      req.headers.get("x-supabase-event-id") ??
+      payload.event_id ??
+      createWebhookBodyDedupeKey("supabase", rawBody);
 
     if (
       !type ||
       !record ||
       typeof record.id !== "string" ||
-      typeof record.email !== "string"
+      (type !== "DELETE" &&
+        type !== "user.deleted" &&
+        typeof record.email !== "string")
     ) {
       logger.warn("Supabase auth webhook missing required fields", { type });
-      return NextResponse.json(
-        { error: "Invalid payload" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    logger.info("Supabase auth webhook received", { type, userId: record.id });
+    const claimed = await claimWebhookEvent({
+      provider: "supabase",
+      eventId,
+      eventType: String(type),
+      payload,
+    });
 
-    switch (type) {
-      case "INSERT":
-        // User created (sign up)
-        await handleUserCreated(record);
-        break;
+    if (!claimed) {
+      logger.info("Supabase auth webhook already processed, skipping", {
+        eventId,
+        type,
+      });
+      return NextResponse.json({ success: true });
+    }
 
-      case "UPDATE":
-        // User updated (profile changes, email verification, etc.)
-        await handleUserUpdated(record);
-        break;
+    logger.info("Supabase auth webhook received", { type, userId });
 
-      case "DELETE":
-        // User deleted
-        await handleUserDeleted(record);
-        break;
+    try {
+      switch (type) {
+        case "INSERT":
+        case "user.created":
+          // User created (sign up)
+          await handleUserCreated(record);
+          break;
 
-      default:
-        logger.info("Unhandled auth webhook event type", { type });
+        case "UPDATE":
+        case "UPSERT":
+        case "user.updated":
+          // User updated (profile changes, email verification, etc.)
+          await handleUserUpdated(record);
+          break;
+
+        case "DELETE":
+        case "user.deleted":
+          // User deleted
+          await handleUserDeleted(record);
+          break;
+
+        default:
+          logger.info("Unhandled auth webhook event type", { type });
+      }
+
+      await markWebhookEventProcessed(eventId);
+    } catch (error) {
+      await markWebhookEventFailed(
+        eventId,
+        error instanceof Error ? error.message : "Unknown error"
+      );
+      throw error;
     }
 
     return NextResponse.json({ success: true });
@@ -134,16 +155,11 @@ async function handleUserCreated(record: any) {
     }
 
     // Extract user metadata from OAuth or email signup
+    const metadata = record.raw_user_meta_data ?? record.user_metadata ?? {};
     const fullName =
-      record.raw_user_meta_data?.full_name ||
-      record.raw_user_meta_data?.name ||
-      record.raw_user_meta_data?.display_name ||
-      null;
+      metadata.full_name || metadata.name || metadata.display_name || null;
 
-    const avatarUrl =
-      record.raw_user_meta_data?.avatar_url ||
-      record.raw_user_meta_data?.picture ||
-      null;
+    const avatarUrl = metadata.avatar_url || metadata.picture || null;
 
     // Create user in database
     await createUser({
@@ -160,7 +176,10 @@ async function handleUserCreated(record: any) {
       hasFullName: !!fullName,
       hasAvatar: !!avatarUrl,
     });
-    void trackEventServer("user_signed_up", { userId, hasFullName: !!fullName });
+    void trackEventServer("user_signed_up", {
+      userId,
+      hasFullName: !!fullName,
+    });
 
     // Send welcome email
     const name = fullName || email.split("@")[0];
@@ -195,16 +214,15 @@ async function handleUserUpdated(record: any) {
     }
 
     // Extract updated metadata
+    const metadata = record.raw_user_meta_data ?? record.user_metadata ?? {};
     const fullName =
-      record.raw_user_meta_data?.full_name ||
-      record.raw_user_meta_data?.name ||
-      record.raw_user_meta_data?.display_name ||
+      metadata.full_name ||
+      metadata.name ||
+      metadata.display_name ||
       existingUser.fullName;
 
     const avatarUrl =
-      record.raw_user_meta_data?.avatar_url ||
-      record.raw_user_meta_data?.picture ||
-      existingUser.avatarUrl;
+      metadata.avatar_url || metadata.picture || existingUser.avatarUrl;
 
     // Update user in database
     await updateUser(userId, {

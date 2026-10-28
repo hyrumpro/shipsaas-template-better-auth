@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { createCheckoutSession } from "@/lib/checkout";
 import { getPlanById } from "@/config/payments";
+import type { CheckoutProvider } from "@/config/payments";
 import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 import { trackEventServer } from "@/lib/observability";
 
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { planId } = body ?? {};
+    const { planId, provider } = body ?? {};
 
     if (typeof planId !== "string" || !planId) {
       throw Errors.validation("Plan ID is required");
@@ -56,21 +57,24 @@ export async function POST(req: Request) {
       throw Errors.validation("Invalid plan ID");
     }
 
-    // Get the provider-specific price/variant ID
-    const providerPlanId = plan.stripePriceId || plan.lemonSqueezyVariantId;
-    if (!providerPlanId) {
-      throw Errors.validation("Plan not available for current payment provider");
+    if (
+      provider !== undefined &&
+      provider !== "stripe" &&
+      provider !== "lemonsqueezy"
+    ) {
+      throw Errors.validation("Invalid payment provider");
     }
 
     logger.payment("creating_checkout", {
       userId: user.id,
       planId,
-      providerPlanId,
+      provider,
     });
 
     // Create checkout session with the unified service
     const result = await createCheckoutSession({
-      planId: providerPlanId,
+      planId,
+      provider: provider as CheckoutProvider | undefined,
       userId: user.id,
       userEmail: user.email!,
       metadata: {

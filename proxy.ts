@@ -10,7 +10,10 @@ const PUBLIC_WEBHOOK_PATHS = new Set<string>([
   "/api/stripe/webhook",
   "/api/lemonsqueezy/webhook",
   "/api/mailgun/webhook",
+  "/api/mailgun",
   "/api/auth/webhook",
+  "/api/waitlist",
+  "/api/unsubscribe",
   "/api/health",
 ]);
 
@@ -36,7 +39,13 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options: CookieOptions }>) {
+        setAll(
+          cookiesToSet: Array<{
+            name: string;
+            value: string;
+            options: CookieOptions;
+          }>
+        ) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -70,6 +79,8 @@ export async function proxy(request: NextRequest) {
     "/privacy-policy",
     "/tos",
     "/docs",
+    "/changelog",
+    "/rss.xml",
   ];
 
   // Check if current path is public

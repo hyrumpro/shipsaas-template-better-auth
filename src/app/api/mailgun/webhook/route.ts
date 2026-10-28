@@ -20,26 +20,37 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { handleApiError } from "@/lib/error-handler";
-import { updateEmailLogStatus } from "@/db/queries";
+import {
+  claimWebhookEvent,
+  markWebhookEventFailed,
+  markWebhookEventProcessed,
+  updateEmailLogStatus,
+} from "@/db/queries";
 import { sendEmail } from "@/lib/mailgun";
-import crypto from "crypto";
+import {
+  createWebhookBodyDedupeKey,
+  verifyHmacSha256,
+} from "@/lib/webhook-security";
 
 export async function POST(req: Request) {
   try {
     const contentType = req.headers.get("content-type") ?? "";
-    const isFormEncoded = contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data");
+    const isFormEncoded =
+      contentType.includes("application/x-www-form-urlencoded") ||
+      contentType.includes("multipart/form-data");
 
     const fields: Record<string, string> = {};
-    let rawBody = "";
+    const rawBody = await req.text();
 
     if (isFormEncoded) {
-      const formData = await req.formData();
+      const formData = await new Response(rawBody, {
+        headers: { "content-type": contentType },
+      }).formData();
       for (const [key, value] of formData.entries()) {
         fields[key] = value.toString();
       }
     } else {
       // JSON delivery events from Mailgun Events API or webhook
-      rawBody = await req.text();
       try {
         const json = JSON.parse(rawBody);
         // Normalize to flat string map for the handler below
@@ -62,23 +73,20 @@ export async function POST(req: Request) {
     const token = fields.token ?? "";
     const signature = fields.signature ?? "";
 
-    if (process.env.MAILGUN_WEBHOOK_SIGNING_KEY) {
-      const encodedToken = crypto
-        .createHmac("sha256", process.env.MAILGUN_WEBHOOK_SIGNING_KEY)
-        .update(timestamp + token)
-        .digest("hex");
-
-      if (encodedToken !== signature) {
-        logger.warn("Mailgun webhook signature verification failed");
-        return NextResponse.json(
-          { error: "Invalid signature" },
-          { status: 401 }
-        );
-      }
-    } else {
-      logger.warn(
-        "MAILGUN_WEBHOOK_SIGNING_KEY not configured; skipping verification (dev only)"
+    const signingKey = process.env.MAILGUN_WEBHOOK_SIGNING_KEY;
+    if (!signingKey) {
+      logger.error(
+        "MAILGUN_WEBHOOK_SIGNING_KEY is not configured; refusing webhook"
       );
+      return NextResponse.json(
+        { error: "Webhook secret not configured" },
+        { status: 500 }
+      );
+    }
+
+    if (!verifyHmacSha256(timestamp + token, signature, signingKey)) {
+      logger.warn("Mailgun webhook signature verification failed");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     // ---------------------------------------------------------------------
@@ -86,12 +94,45 @@ export async function POST(req: Request) {
     // ---------------------------------------------------------------------
     const event = fields["event"];
 
-    if (event && isDeliveryEvent(event)) {
-      await handleDeliveryEvent(fields);
-    } else if (fields.sender || fields.recipient) {
-      await handleInboundMessage(fields);
-    } else {
-      logger.info("Mailgun webhook: unknown payload shape", { keys: Object.keys(fields).slice(0, 20) });
+    if (
+      !(event && isDeliveryEvent(event)) &&
+      !(fields.sender || fields.recipient)
+    ) {
+      logger.info("Mailgun webhook: unknown payload shape", {
+        keys: Object.keys(fields).slice(0, 20),
+      });
+      return NextResponse.json({ received: true });
+    }
+
+    const eventId =
+      fields.event_id ??
+      fields.id ??
+      createWebhookBodyDedupeKey("mailgun", rawBody);
+    const claimed = await claimWebhookEvent({
+      provider: "mailgun",
+      eventId,
+      eventType: event || "inbound",
+      payload: fields,
+    });
+
+    if (!claimed) {
+      logger.info("Mailgun duplicate delivery, skipping", { eventId, event });
+      return NextResponse.json({ received: true });
+    }
+
+    try {
+      if (event && isDeliveryEvent(event)) {
+        await handleDeliveryEvent(fields);
+      } else {
+        await handleInboundMessage(fields);
+      }
+      await markWebhookEventProcessed(eventId);
+    } catch (error) {
+      await markWebhookEventFailed(
+        eventId,
+        error instanceof Error ? error.message : "Unknown error"
+      );
+      throw error;
     }
 
     return NextResponse.json({ received: true });
@@ -119,7 +160,8 @@ function isDeliveryEvent(event: string): boolean {
 
 async function handleDeliveryEvent(fields: Record<string, string>) {
   const event = fields.event;
-  const messageId = fields["Message-Id"] ?? fields["message-id"] ?? fields["message_id"];
+  const messageId =
+    fields["Message-Id"] ?? fields["message-id"] ?? fields["message_id"];
   const recipient = fields.recipient ?? fields.recipient_email ?? "";
   const severity = fields.severity ?? "";
   const reason =
@@ -130,7 +172,10 @@ async function handleDeliveryEvent(fields: Record<string, string>) {
     null;
 
   if (!messageId) {
-    logger.info("Mailgun delivery event missing message-id", { event, recipient });
+    logger.info("Mailgun delivery event missing message-id", {
+      event,
+      recipient,
+    });
     return;
   }
 
@@ -181,13 +226,7 @@ async function handleDeliveryEvent(fields: Record<string, string>) {
 
 function mapEventToStatus(
   event: string
-):
-  | "delivered"
-  | "bounced"
-  | "complained"
-  | "unsubscribed"
-  | "failed"
-  | null {
+): "delivered" | "bounced" | "complained" | "unsubscribed" | "failed" | null {
   switch (event) {
     case "delivered":
       return "delivered";
@@ -215,7 +254,11 @@ async function handleInboundMessage(fields: Record<string, string>) {
   const bodyHtml = fields["body-html"] ?? "";
   const fromHeader = fields.From ?? sender;
 
-  logger.info("Mailgun inbound message received", { sender, recipient, subject });
+  logger.info("Mailgun inbound message received", {
+    sender,
+    recipient,
+    subject,
+  });
 
   const forwardTo = process.env.MAILGUN_FORWARD_TO;
   if (!forwardTo) {
@@ -231,12 +274,12 @@ async function handleInboundMessage(fields: Record<string, string>) {
     subject: `[Inbound] ${subject}`,
     html: `
       <div style="border-left: 4px solid #0F0F0F; padding-left: 16px; margin-bottom: 24px;">
-        <p><strong>From:</strong> ${sender}</p>
-        <p><strong>To:</strong> ${recipient}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>From:</strong> ${escapeHtml(sender)}</p>
+        <p><strong>To:</strong> ${escapeHtml(recipient)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
       </div>
       <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e5e5e5;" />
-      ${bodyHtml || `<pre style="white-space: pre-wrap;">${bodyPlain}</pre>`}
+      <pre style="white-space: pre-wrap;">${escapeHtml(bodyHtml || bodyPlain)}</pre>
     `,
     text: `From: ${sender}\nTo: ${recipient}\nSubject: ${subject}\n\n---\n\n${bodyPlain}`,
     replyTo: fromHeader,
@@ -245,6 +288,20 @@ async function handleInboundMessage(fields: Record<string, string>) {
   });
 
   logger.info("Inbound message forwarded", { to: forwardTo });
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character] ?? character
+  );
 }
 
 // Mailgun also sends GET requests to verify the webhook endpoint

@@ -4,12 +4,19 @@
  */
 
 import { stripe } from "@/utils/stripe";
-import { paymentConfig, getPrimaryProvider } from "@/config/payments";
+import {
+  getPlanById,
+  getPrimaryProvider,
+  getProviderPlanId,
+  paymentConfig,
+  type CheckoutProvider,
+} from "@/config/payments";
 import { logger } from "@/lib/logger";
 import { getUserById, updateUser } from "@/db/queries";
 
 export interface CheckoutOptions {
   planId: string;
+  provider?: CheckoutProvider;
   userId: string;
   userEmail: string;
   successUrl?: string;
@@ -61,7 +68,7 @@ async function resolveStripeCustomer(
 export async function createCheckoutSession(
   options: CheckoutOptions
 ): Promise<CheckoutResult> {
-  const provider = getPrimaryProvider();
+  const provider = getPrimaryProvider(options.provider);
 
   if (!provider) {
     throw new Error("No payment provider configured");
@@ -73,11 +80,18 @@ export async function createCheckoutSession(
     userId: options.userId,
   });
 
-  if (provider === "stripe") {
-    return createStripeCheckout(options);
-  } else {
-    return createLemonSqueezyCheckoutSession(options);
+  const plan = getPlanById(options.planId);
+  if (!plan) throw new Error("Unknown pricing plan");
+
+  const providerPlanId = getProviderPlanId(plan, provider);
+  if (!providerPlanId) {
+    throw new Error(`Plan is not configured for ${provider}`);
   }
+
+  const providerOptions = { ...options, planId: providerPlanId };
+  return provider === "stripe"
+    ? createStripeCheckout(providerOptions)
+    : createLemonSqueezyCheckoutSession(providerOptions);
 }
 
 /**
@@ -86,7 +100,8 @@ export async function createCheckoutSession(
 async function createStripeCheckout(
   options: CheckoutOptions
 ): Promise<CheckoutResult> {
-  const { planId, userId, userEmail, successUrl, cancelUrl, metadata } = options;
+  const { planId, userId, userEmail, successUrl, cancelUrl, metadata } =
+    options;
 
   const customerId = await resolveStripeCustomer(userId, userEmail);
 
@@ -151,7 +166,7 @@ async function createLemonSqueezyCheckoutSession(
 
   // Dynamic import to prevent build-time initialization
   const lemonSqueezyModule = await import("@lemonsqueezy/lemonsqueezy.js");
-  
+
   lemonSqueezyModule.lemonSqueezySetup({
     apiKey,
     onError: (error) => {
@@ -176,11 +191,11 @@ async function createLemonSqueezyCheckoutSession(
     userId,
   });
 
-  const { data, error } = await lemonSqueezyModule.createCheckout(
+  const { data, error } = (await lemonSqueezyModule.createCheckout(
     storeId,
     planId,
     newCheckout
-  ) as { data?: any; error?: any };
+  )) as { data?: any; error?: any };
 
   if (error) {
     logger.error("Failed to create LemonSqueezy checkout", error, {

@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { handleApiError } from "@/lib/error-handler";
 import { handleLemonSqueezyWebhook } from "@/lib/webhooks/lemonsqueezy-handler";
-import crypto from "crypto";
+import {
+  createWebhookBodyDedupeKey,
+  verifyHmacSha256,
+} from "@/lib/webhook-security";
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
-    const payload = JSON.parse(rawBody);
     const signature = request.headers.get("x-signature");
 
     const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
@@ -22,18 +24,11 @@ export async function POST(request: Request) {
     // Verify webhook signature
     if (!signature) {
       logger.warn("LemonSqueezy webhook received without signature");
-      return NextResponse.json(
-        { error: "Missing signature" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
     }
 
-    const hmac = crypto.createHmac("sha256", secret);
-    const digest = hmac.update(rawBody).digest("hex");
-
-    if (signature !== digest) {
+    if (!verifyHmacSha256(rawBody, signature, secret)) {
       logger.warn("LemonSqueezy webhook signature verification failed", {
-        expectedSignature: digest.substring(0, 10) + "...",
         receivedSignature: signature.substring(0, 10) + "...",
       });
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
@@ -41,8 +36,11 @@ export async function POST(request: Request) {
 
     logger.info("LemonSqueezy webhook signature verified");
 
+    const payload = JSON.parse(rawBody);
+    const dedupeKey = createWebhookBodyDedupeKey("lemonsqueezy", rawBody);
+
     // Handle the verified webhook with database operations
-    await handleLemonSqueezyWebhook(payload);
+    await handleLemonSqueezyWebhook(payload, dedupeKey);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -54,4 +52,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

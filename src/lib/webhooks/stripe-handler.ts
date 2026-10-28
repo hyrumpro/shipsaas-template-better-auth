@@ -14,9 +14,9 @@ import {
   createPayment,
   updateUser,
   getUserById,
-  createWebhookEvent,
+  claimWebhookEvent,
   markWebhookEventProcessed,
-  getWebhookEventByEventId,
+  markWebhookEventFailed,
 } from "@/db/queries";
 import {
   sendPaymentSuccessEmail,
@@ -29,30 +29,19 @@ import {
 import type Stripe from "stripe";
 
 export async function handleStripeWebhook(event: Stripe.Event) {
-  // Idempotency: short-circuit if we've already processed this Stripe event id
-  try {
-    const existing = await getWebhookEventByEventId("stripe", event.id);
-    if (existing?.processed) {
-      logger.info("Stripe webhook already processed, skipping", {
-        eventId: event.id,
-        eventType: event.type,
-      });
-      return;
-    }
-  } catch (error) {
-    logger.error("Failed to check webhook idempotency", error);
-  }
+  const claimed = await claimWebhookEvent({
+    provider: "stripe",
+    eventId: event.id,
+    eventType: event.type,
+    payload: event,
+  });
 
-  // Log webhook event for audit trail
-  try {
-    await createWebhookEvent({
-      provider: "stripe",
+  if (!claimed) {
+    logger.info("Stripe webhook already claimed or processed, skipping", {
       eventId: event.id,
       eventType: event.type,
-      payload: event as any,
     });
-  } catch (error) {
-    logger.error("Failed to log webhook event", error);
+    return;
   }
 
   try {
@@ -97,15 +86,15 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         logger.info("Unhandled Stripe webhook event", { type: event.type });
     }
 
-    // Mark webhook as processed
+    // Mark webhook as processed only after all database side effects succeed.
     await markWebhookEventProcessed(event.id);
   } catch (error) {
     logger.error("Error processing Stripe webhook", error, {
       eventType: event.type,
       eventId: event.id,
     });
-    // Mark webhook as processed with error
-    await markWebhookEventProcessed(
+    // Leave the event retryable. Stripe retries non-2xx responses.
+    await markWebhookEventFailed(
       event.id,
       error instanceof Error ? error.message : "Unknown error"
     );
@@ -209,7 +198,8 @@ async function handleSubscriptionCreated(event: Stripe.Event) {
   // Update user's Stripe customer ID and subscription status
   await updateUser(userId, {
     stripeCustomerId: subscription.customer as string,
-    isSubscribed: subscription.status === "active" || subscription.status === "trialing",
+    isSubscribed:
+      subscription.status === "active" || subscription.status === "trialing",
     subscriptionTier: productName,
   });
 
@@ -268,7 +258,8 @@ async function handleSubscriptionUpdated(event: Stripe.Event) {
 
   // Update user subscription status
   await updateUser(dbSubscription.userId, {
-    isSubscribed: subscription.status === "active" || subscription.status === "trialing",
+    isSubscribed:
+      subscription.status === "active" || subscription.status === "trialing",
     subscriptionTier:
       subscription.status === "active" || subscription.status === "trialing"
         ? updateData.planName || dbSubscription.planName
@@ -316,14 +307,10 @@ async function handleSubscriptionDeleted(event: Stripe.Event) {
   const endDate = subscription.current_period_end
     ? new Date(subscription.current_period_end * 1000).toLocaleDateString(
         "en-US",
-        { year: "numeric", month: "long", day: "numeric" },
+        { year: "numeric", month: "long", day: "numeric" }
       )
     : "the end of the current billing period";
-  void sendCancellation(
-    dbSubscription.userId,
-    endDate,
-    subscription.id,
-  );
+  void sendCancellation(dbSubscription.userId, endDate, subscription.id);
 
   logger.payment("subscription_deleted", {
     userId: dbSubscription.userId,
@@ -394,7 +381,7 @@ async function handlePaymentSucceeded(event: Stripe.Event) {
     dbSubscription.planName,
     invoice.amount_paid,
     invoice.currency,
-    invoice.hosted_invoice_url ?? undefined,
+    invoice.hosted_invoice_url ?? undefined
   );
 
   logger.payment("payment_succeeded", {
@@ -448,14 +435,15 @@ async function handlePaymentFailed(event: Stripe.Event) {
   });
 
   // Failure email (never blocks the webhook)
-  const failureMessage =
-    (invoice as any).last_finalization_error?.message as string | undefined;
+  const failureMessage = (invoice as any).last_finalization_error?.message as
+    | string
+    | undefined;
   void sendPaymentFailure(
     dbSubscription.userId,
     dbSubscription.planName,
     invoice.amount_due,
     invoice.currency,
-    failureMessage,
+    failureMessage
   );
 
   logger.payment("payment_failed", {
@@ -499,7 +487,7 @@ async function handleChargeRefunded(event: Stripe.Event) {
     dbOrder.userId,
     formatMoney(charge.amount_refunded, charge.currency),
     dbOrder.productName,
-    charge.id,
+    charge.id
   );
 
   logger.payment("charge_refunded", {
@@ -533,7 +521,7 @@ async function sendPaymentReceipt(
   planName: string,
   amountCents: number,
   currency: string | null,
-  invoiceUrl: string | undefined,
+  invoiceUrl: string | undefined
 ) {
   try {
     const user = await getUserById(userId);
@@ -543,7 +531,7 @@ async function sendPaymentReceipt(
       user.fullName ?? user.email.split("@")[0] ?? "there",
       formatMoney(amountCents, currency),
       planName,
-      invoiceUrl,
+      invoiceUrl
     );
   } catch (err) {
     logger.warn("Failed to send payment receipt email", { userId, err });
@@ -555,7 +543,7 @@ async function sendPaymentFailure(
   planName: string,
   amountCents: number,
   currency: string | null,
-  reason: string | undefined,
+  reason: string | undefined
 ) {
   try {
     const user = await getUserById(userId);
@@ -569,7 +557,7 @@ async function sendPaymentFailure(
       planName,
       formatMoney(amountCents, currency),
       reason,
-      `${siteUrl}/dashboard/billing`,
+      `${siteUrl}/dashboard/billing`
     );
   } catch (err) {
     logger.warn("Failed to send payment failure email", { userId, err });
@@ -579,7 +567,7 @@ async function sendPaymentFailure(
 async function sendCancellation(
   userId: string,
   endDate: string,
-  subscriptionId: string,
+  subscriptionId: string
 ) {
   try {
     const user = await getUserById(userId);
@@ -587,7 +575,7 @@ async function sendCancellation(
     await sendSubscriptionCancelledEmail(
       user.email,
       user.fullName ?? user.email.split("@")[0] ?? "there",
-      endDate,
+      endDate
     );
     logger.info("Subscription cancellation email queued", {
       userId,
@@ -609,14 +597,14 @@ async function handleInvoiceUpcoming(event: Stripe.Event) {
 
   const dbSubscription = await getSubscriptionByProviderId(
     "stripe",
-    subscriptionId,
+    subscriptionId
   );
   if (!dbSubscription) return;
 
   const renewalDate = invoice.next_payment_attempt
     ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString(
         "en-US",
-        { year: "numeric", month: "long", day: "numeric" },
+        { year: "numeric", month: "long", day: "numeric" }
       )
     : new Date(invoice.period_end * 1000).toLocaleDateString("en-US", {
         year: "numeric",
@@ -629,7 +617,7 @@ async function handleInvoiceUpcoming(event: Stripe.Event) {
     dbSubscription.planName,
     invoice.amount_due,
     invoice.currency,
-    renewalDate,
+    renewalDate
   );
 
   logger.info("invoice.upcoming processed", {
@@ -643,23 +631,26 @@ async function handleTrialWillEnd(event: Stripe.Event) {
   const subscription = event.data.object as Stripe.Subscription;
   const dbSubscription = await getSubscriptionByProviderId(
     "stripe",
-    subscription.id,
+    subscription.id
   );
   if (!dbSubscription) return;
 
   if (!subscription.trial_end) return;
 
-  const trialEndDate = new Date(subscription.trial_end * 1000).toLocaleDateString(
-    "en-US",
-    { year: "numeric", month: "long", day: "numeric" },
-  );
+  const trialEndDate = new Date(
+    subscription.trial_end * 1000
+  ).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   void sendTrialEndReminder(
     dbSubscription.userId,
     dbSubscription.planName,
     trialEndDate,
     dbSubscription.amount,
-    dbSubscription.currency,
+    dbSubscription.currency
   );
 
   logger.info("customer.subscription.trial_will_end processed", {
@@ -674,7 +665,7 @@ async function sendRenewalReminder(
   planName: string,
   amountCents: number,
   currency: string | null,
-  renewalDate: string,
+  renewalDate: string
 ) {
   try {
     const user = await getUserById(userId);
@@ -688,7 +679,7 @@ async function sendRenewalReminder(
       planName,
       formatMoney(amountCents, currency),
       renewalDate,
-      `${siteUrl}/dashboard/billing`,
+      `${siteUrl}/dashboard/billing`
     );
   } catch (err) {
     logger.warn("Failed to send renewal upcoming email", { userId, err });
@@ -700,7 +691,7 @@ async function sendTrialEndReminder(
   planName: string,
   trialEndDate: string,
   amountCents: number,
-  currency: string,
+  currency: string
 ) {
   try {
     const user = await getUserById(userId);
@@ -714,7 +705,7 @@ async function sendTrialEndReminder(
       planName,
       trialEndDate,
       formatMoney(amountCents, currency),
-      `${siteUrl}/dashboard/billing`,
+      `${siteUrl}/dashboard/billing`
     );
   } catch (err) {
     logger.warn("Failed to send trial ending email", { userId, err });
@@ -725,7 +716,7 @@ async function sendRefund(
   userId: string,
   amount: string,
   productName: string,
-  refundId: string,
+  refundId: string
 ) {
   try {
     const user = await getUserById(userId);
@@ -735,7 +726,7 @@ async function sendRefund(
       user.fullName ?? user.email.split("@")[0] ?? "there",
       amount,
       productName,
-      refundId,
+      refundId
     );
   } catch (err) {
     logger.warn("Failed to send refund email", { userId, err });

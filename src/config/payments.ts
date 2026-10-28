@@ -4,6 +4,7 @@
  */
 
 export type PaymentProvider = "stripe" | "lemonsqueezy" | "both";
+export type CheckoutProvider = "stripe" | "lemonsqueezy";
 
 // ============================================================================
 // PAYMENT PROVIDER CONFIGURATION
@@ -27,7 +28,7 @@ export const paymentConfig = {
     publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     secretKey: process.env.STRIPE_SECRET_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-    
+
     // Stripe-specific settings
     currency: "usd",
     successUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?payment=success`,
@@ -36,13 +37,12 @@ export const paymentConfig = {
 
   // LemonSqueezy configuration
   lemonsqueezy: {
-    enabled:
-      PAYMENT_PROVIDER === "lemonsqueezy" || PAYMENT_PROVIDER === "both",
+    enabled: PAYMENT_PROVIDER === "lemonsqueezy" || PAYMENT_PROVIDER === "both",
     apiKey: process.env.LEMONSQUEEZY_API_KEY,
     storeId: process.env.LEMONSQUEEZY_STORE_ID,
     webhookSecret: process.env.LEMONSQUEEZY_WEBHOOK_SECRET,
     variantId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID,
-    
+
     // LemonSqueezy-specific settings
     successUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?payment=success`,
     cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/pricing?payment=canceled`,
@@ -73,21 +73,44 @@ export function isLemonSqueezyEnabled(): boolean {
  * Get the primary payment provider
  * Returns the first enabled provider
  */
-export function getPrimaryProvider(): "stripe" | "lemonsqueezy" | null {
+export function getPrimaryProvider(
+  preferred?: CheckoutProvider
+): CheckoutProvider | null {
+  if (preferred) {
+    if (preferred === "stripe" && isStripeEnabled()) return "stripe";
+    if (preferred === "lemonsqueezy" && isLemonSqueezyEnabled()) {
+      return "lemonsqueezy";
+    }
+    return null;
+  }
+
   if (PAYMENT_PROVIDER === "both") {
     // If both enabled, prefer Stripe
-    return isStripeEnabled() ? "stripe" : isLemonSqueezyEnabled() ? "lemonsqueezy" : null;
+    return isStripeEnabled()
+      ? "stripe"
+      : isLemonSqueezyEnabled()
+        ? "lemonsqueezy"
+        : null;
   }
-  
+
   if (PAYMENT_PROVIDER === "stripe" && isStripeEnabled()) {
     return "stripe";
   }
-  
+
   if (PAYMENT_PROVIDER === "lemonsqueezy" && isLemonSqueezyEnabled()) {
     return "lemonsqueezy";
   }
-  
+
   return null;
+}
+
+export function getProviderPlanId(
+  plan: PricingPlan,
+  provider: CheckoutProvider
+): string | undefined {
+  return provider === "stripe"
+    ? plan.stripePriceId
+    : plan.lemonSqueezyVariantId;
 }
 
 /**
@@ -95,15 +118,15 @@ export function getPrimaryProvider(): "stripe" | "lemonsqueezy" | null {
  */
 export function getEnabledProviders(): Array<"stripe" | "lemonsqueezy"> {
   const providers: Array<"stripe" | "lemonsqueezy"> = [];
-  
+
   if (isStripeEnabled()) {
     providers.push("stripe");
   }
-  
+
   if (isLemonSqueezyEnabled()) {
     providers.push("lemonsqueezy");
   }
-  
+
   return providers;
 }
 
@@ -169,18 +192,23 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: "premium",
     name: "Premium",
-    description: "One-time payment, lifetime access",
+    description: "Monthly subscription",
     price: 2900, // $29.00
     currency: "usd",
     interval: "month",
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID,
-    lemonSqueezyVariantId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_VARIANT_ID,
+    stripePriceId:
+      process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ||
+      process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
+    lemonSqueezyVariantId:
+      process.env.NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_VARIANT_ID ||
+      process.env.NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID ||
+      process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_MONTHLY_VARIANT_ID,
     features: [
       "All features",
       "Unlimited usage",
       "Priority support",
       "Advanced analytics",
-      "Lifetime access",
+      "Monthly billing",
     ],
     popular: true,
   },
@@ -198,16 +226,16 @@ export function getPlanById(planId: string): PricingPlan | undefined {
  */
 export function getAvailablePlans(): PricingPlan[] {
   const provider = getPrimaryProvider();
-  
+
   return pricingPlans.filter((plan) => {
     if (provider === "stripe") {
       return !!plan.stripePriceId;
     }
-    
+
     if (provider === "lemonsqueezy") {
       return !!plan.lemonSqueezyVariantId;
     }
-    
+
     return false;
   });
 }

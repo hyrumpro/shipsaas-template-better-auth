@@ -39,6 +39,13 @@ export const paymentProviderEnum = pgEnum("payment_provider", [
   "lemonsqueezy",
 ]);
 
+export const webhookProviderEnum = pgEnum("webhook_provider", [
+  "stripe",
+  "lemonsqueezy",
+  "supabase",
+  "mailgun",
+]);
+
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",
   "paid",
@@ -277,12 +284,14 @@ export const webhookEvents = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
 
     // Provider details
-    provider: paymentProviderEnum("provider").notNull(),
+    provider: webhookProviderEnum("provider").notNull(),
     eventId: varchar("event_id", { length: 255 }).notNull().unique(), // Provider's event ID
     eventType: varchar("event_type", { length: 100 }).notNull(),
 
     // Processing status
     processed: boolean("processed").default(false).notNull(),
+    processing: boolean("processing").default(false).notNull(),
+    processingStartedAt: timestamp("processing_started_at"),
     processedAt: timestamp("processed_at"),
     error: text("error"),
 
@@ -371,13 +380,16 @@ export const usersRelations = relations(users, ({ many }) => ({
   payments: many(payments),
 }));
 
-export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
-  user: one(users, {
-    fields: [subscriptions.userId],
-    references: [users.id],
-  }),
-  payments: many(payments),
-}));
+export const subscriptionsRelations = relations(
+  subscriptions,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [subscriptions.userId],
+      references: [users.id],
+    }),
+    payments: many(payments),
+  })
+);
 
 export const ordersRelations = relations(orders, ({ one }) => ({
   user: one(users, {

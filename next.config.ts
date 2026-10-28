@@ -5,11 +5,6 @@ const nextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
   output: "standalone",
 
-  // Dummy env vars for build (LemonSqueezy SDK uses dynamic imports)
-  env: {
-    LEMONSQUEEZY_API_KEY: process.env.LEMONSQUEEZY_API_KEY || "dummy_key_for_build",
-    LEMONSQUEEZY_STORE_ID: process.env.LEMONSQUEEZY_STORE_ID || "dummy_store_for_build",
-  },
   async headers() {
     return [
       {
