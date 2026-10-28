@@ -78,10 +78,7 @@ export const Features = () => {
       <div className="section">
         <div className="max-w-2xl">
           <p className="eyebrow">Features</p>
-          <h2
-            id="features-heading"
-            className="text-display mt-3 text-balance"
-          >
+          <h2 id="features-heading" className="text-display mt-3 text-balance">
             The boring infrastructure, handled.
           </h2>
           <p className="text-foreground/70 mt-4 text-base leading-relaxed md:text-lg">
@@ -98,9 +95,9 @@ export const Features = () => {
             <div
               key={title}
               role="listitem"
-              className="bg-card hover:bg-accent/40 flex flex-col gap-3 p-6 transition-colors"
+              className="hover:bg-accent/40 bg-card group flex flex-col gap-3 p-6 transition-all duration-200 hover:-translate-y-0.5"
             >
-              <div className="border-border bg-background text-foreground inline-flex h-9 w-9 items-center justify-center rounded-md border">
+              <div className="border-border bg-background text-foreground group-hover:border-foreground/20 inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors">
                 <Icon className="size-4" aria-hidden />
               </div>
               <h3 className="text-foreground text-base font-semibold">
@@ -116,8 +113,8 @@ export const Features = () => {
         <div className="mt-8 flex items-center gap-2 text-sm">
           <Gauge className="text-muted-foreground size-4" aria-hidden />
           <p className="text-muted-foreground">
-            Built on Next.js 16, React 19, Tailwind 3, Radix UI, and
-            TanStack Query 5.
+            Built on Next.js 16, React 19, Tailwind 3, Radix UI, and TanStack
+            Query 5.
           </p>
         </div>
       </div>

@@ -2,8 +2,10 @@ import { Metadata } from "next";
 import { StructuredData } from "@/components/StructuredData";
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
+import { SocialProof } from "@/components/landing/SocialProof";
 import { Features } from "@/components/landing/Features";
 import { TechStack } from "@/components/landing/TechStack";
+import { Testimonials } from "@/components/landing/Testimonials";
 import { FAQ } from "@/components/landing/FAQ";
 import { CTA } from "@/components/landing/CTA";
 import { Footer } from "@/components/landing/Footer";
@@ -41,8 +43,10 @@ export default function Home() {
         <Navbar />
         <main>
           <Hero />
+          <SocialProof />
           <Features />
           <TechStack />
+          <Testimonials />
           <FAQ />
           <CTA />
         </main>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/landing/Navbar";
@@ -23,8 +23,22 @@ const formatPrice = (cents: number, currency: string) => {
   }).format(cents / 100);
 };
 
+const everyPlanIncludes = [
+  "Supabase auth — email, magic links, Google",
+  "Stripe + LemonSqueezy checkout behind one switch",
+  "10 branded transactional email templates",
+  "Dashboard, blog, docs, and 55+ components",
+  "RLS, rate limiting, and retry-safe webhooks",
+  "SEO: metadata, sitemap, robots, JSON-LD",
+];
+
 export default function PricingPage() {
   const plans = pricingPlans;
+  const totalCards = 1 + plans.length; // Free + configured paid plans
+  const gridClass =
+    totalCards <= 2
+      ? "grid max-w-3xl grid-cols-1 gap-6 md:grid-cols-2"
+      : "grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3";
 
   return (
     <div className="bg-background min-h-screen">
@@ -39,8 +53,8 @@ export default function PricingPage() {
                 Simple pricing. No surprises.
               </h1>
               <p className="text-foreground/70 mt-6 max-w-2xl text-lg leading-relaxed md:text-xl">
-                One plan with everything you need to ship a real SaaS.
-                Free to start — upgrade when you outgrow the free tier.
+                One plan with everything you need to ship a real SaaS. Free to
+                start — upgrade when you outgrow the free tier.
               </p>
             </div>
           </div>
@@ -48,7 +62,7 @@ export default function PricingPage() {
 
         <section>
           <div className="mx-auto w-full max-w-6xl px-6 py-20 md:py-28">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className={gridClass}>
               <div className="card-quiet flex flex-col">
                 <h2 className="text-foreground text-lg font-semibold tracking-tight">
                   Free
@@ -87,13 +101,16 @@ export default function PricingPage() {
               {plans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="card-quiet relative flex flex-col"
+                  className={`card-quiet relative flex flex-col ${
+                    plan.popular ? "ring-foreground/15 ring-1" : ""
+                  }`}
                 >
                   {plan.popular && (
                     <Badge
                       variant="default"
-                      className="absolute -top-2 right-6 rounded-full"
+                      className="absolute -top-3 right-6 rounded-full shadow-sm"
                     >
+                      <Sparkles className="size-3" aria-hidden />
                       Most popular
                     </Badge>
                   )}
@@ -128,6 +145,29 @@ export default function PricingPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Every plan includes */}
+            <div className="border-border bg-muted/30 mt-16 rounded-lg border p-8 md:p-10">
+              <h2 className="text-center text-lg font-semibold tracking-tight">
+                Every plan includes
+              </h2>
+              <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-center text-sm leading-relaxed">
+                One source of truth — every plan unlocks the full template and
+                the complete component library. The only difference is how much
+                you pay for it.
+              </p>
+              <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {everyPlanIncludes.map((feature) => (
+                  <li
+                    key={feature}
+                    className="flex items-start gap-2 text-sm text-foreground/80"
+                  >
+                    <Check className="text-primary mt-0.5 size-4 shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-12 text-center">
