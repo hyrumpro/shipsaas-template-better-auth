@@ -1,15 +1,12 @@
-FROM node:21-alpine
-
-# Install pnpm globally
-RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Copy the npm lockfile used by CI and Vercel.
+COPY package.json package-lock.json ./
 
 # Install dependencies using pnpm
-RUN pnpm install --frozen-lockfile --prefer-offline
+RUN npm ci
 
 # Copy the rest of the application
 COPY . .
@@ -18,4 +15,4 @@ EXPOSE 3000
 
 # Note: Database migrations should be run after environment variables are available
 # They will be run via docker-compose command or manually
-CMD ["pnpm", "run", "dev"]
+CMD ["npm", "run", "dev"]

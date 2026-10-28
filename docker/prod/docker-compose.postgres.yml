@@ -1,11 +1,14 @@
-version: "3.8"
 services:
   app:
-    image: ghcr.io/yourname/shipsaas:latest
+    build:
+      context: ../..
+      dockerfile: docker/prod/Dockerfile
+    image: shipsaas:local
     ports:
       - "3000:3000"
     env_file:
-      - ../../.env.production
+      - path: ../../.env.production
+        required: false
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://produser:prodpass@postgres:5432/shipsaasprod
@@ -32,15 +35,5 @@ services:
       retries: 5
     restart: unless-stopped
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    restart: unless-stopped
-
 volumes:
   postgres_data:
-  portainer_data:

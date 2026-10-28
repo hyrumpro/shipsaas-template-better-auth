@@ -6,7 +6,8 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ../../.env.docker
+      - path: ../../.env.docker
+        required: false
     environment:
       - NODE_ENV=development
       - HUSKY=0
@@ -15,15 +16,3 @@ services:
       - /app/node_modules
       - /app/.next
     restart: unless-stopped
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    restart: unless-stopped
-
-volumes:
-  portainer_data:

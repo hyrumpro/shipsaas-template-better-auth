@@ -1,24 +1,28 @@
-version: "3.8"
 services:
   app:
-    image: ghcr.io/yourname/shipsaas:latest
+    build:
+      context: ../..
+      dockerfile: docker/prod/Dockerfile
+    image: shipsaas:local
     ports:
       - "3000:3000"
     env_file:
-      - ../../.env.production
+      - path: ../../.env.production
+        required: false
     environment:
       - NODE_ENV=production
       - HUSKY=0
     restart: unless-stopped
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    restart: unless-stopped
-
-volumes:
-  portainer_data:
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--spider",
+          "--quiet",
+          "http://127.0.0.1:3000/api/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
