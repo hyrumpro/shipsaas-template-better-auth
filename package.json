@@ -1,9 +1,9 @@
 {
   "name": "shipsaas-template",
   "version": "1.0.0",
-  "description": "Premium Next.js SaaS Template - Ship your SaaS in days with authentication, payments, 55+ components, and production-ready code.",
+  "description": "Premium Next.js SaaS foundation with authentication, payments, email, SEO, and deployment-ready UI.",
   "author": "ShipSaaS",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "keywords": [
     "nextjs",
@@ -45,11 +45,9 @@
     "prepare": "husky",
     "docker:dev": "docker-compose -f docker/dev/docker-compose.yml up",
     "docker:dev:postgres": "docker-compose -f docker/dev/docker-compose.postgres.yml up",
-    "docker:dev:mongodb": "docker-compose -f docker/dev/docker-compose.mongodb.yml up",
     "docker:dev:down": "docker-compose -f docker/dev/docker-compose.yml down",
     "docker:prod": "docker-compose -f docker/prod/docker-compose.yml up -d",
     "docker:prod:postgres": "docker-compose -f docker/prod/docker-compose.postgres.yml up -d",
-    "docker:prod:mongodb": "docker-compose -f docker/prod/docker-compose.mongodb.yml up -d",
     "docker:prod:build": "docker-compose -f docker/prod/docker-compose.yml up -d --build",
     "docker:logs": "docker-compose -f docker/prod/docker-compose.yml logs -f",
     "docker:down": "docker-compose -f docker/prod/docker-compose.yml down"
@@ -83,7 +81,7 @@
     "lucide-react": "^0.474.0",
     "mailgun.js": "^11.1.0",
     "marked": "^17.0.1",
-    "next": "^16.2.7",
+    "next": "^16.4.3",
     "pg": "^8.13.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
