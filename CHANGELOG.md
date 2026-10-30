@@ -2,10 +2,20 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-10-30
+
+### Better Auth edition
+- **Supabase Auth replaced with Better Auth 1.7** on any plain Postgres (Neon, Railway, Supabase, self-hosted). One `user` table carries auth + app fields; sessions, accounts, and verification are Better Auth-managed.
+- **Flows**: email/password with required email verification (stateless signed tokens), magic links (new template), Google OAuth, password reset with session revocation, account deletion with immediate cookie clearing.
+- **Security**: signed 5-minute cookie cache, 1-hour fresh-session window, AES-256-GCM encrypted OAuth tokens at rest, per-endpoint rate limits (sign-in 5/min, sign-up and reset 3/min), session audit hook, JSON 401s from the proxy for API routes.
+- **Proxy moved to `src/`** — Next.js silently ignores it at the repo root; `/playground` and `/waitlist` are public; API calls get JSON 401s.
+- **Fail-fast env validation** via `src/instrumentation.ts` (`SKIP_ENV_VALIDATION=1` for CI).
+- **`migrations/` replaces `supabase/`** — no RLS by design (app-layer authorization, documented); timestamps aligned to `timestamptz`.
+- **`SKIP_EMAILS` now logs action links**, so the whole auth flow is testable without Mailgun.
+- Docs rewritten for this edition: README, `/docs/auth`, `/docs/database`, AGENTS.md, CLAUDE.md, `.env.example`, CI, docker notes.
 
 ### Email integration (production-ready)
-- **Email log table** (`email_log`) — one row per send, updated by the Mailgun inbound webhook on delivery events. Soft FK to `users.id` so the log survives user hard-delete. See `supabase/migrations/005_email_log.sql` and `src/db/queries.ts`.
+- **Email log table** (`email_log`) — one row per send, updated by the Mailgun inbound webhook on delivery events. Soft FK to `user.id` so the log survives user hard-delete. See `migrations/003_email_log.sql` and `src/db/queries.ts`.
 - **Three new transactional templates** matching the modern-minimal design system:
   - `subscriptionRenewalUpcoming` — "Your subscription renews on <date>" reminder
   - `trialEnding` — "Your trial ends in 3 days" reminder
