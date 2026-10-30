@@ -7,14 +7,14 @@
 --                                          delivered, bounced, complained,
 --                                          unsubscribed, failed)
 --
--- Soft FK to users.id (no ON DELETE CASCADE) so the log survives user
+-- Soft FK to user.id (no ON DELETE CASCADE) so the log survives user
 -- hard-deletion for audit / debugging.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS email_log (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   to_email VARCHAR(255) NOT NULL,
-  to_user_id UUID,
+  to_user_id TEXT,
   subject VARCHAR(500) NOT NULL,
   template VARCHAR(100) NOT NULL,
   provider VARCHAR(50) NOT NULL DEFAULT 'mailgun',
@@ -33,11 +33,3 @@ CREATE INDEX IF NOT EXISTS email_log_provider_message_idx
   ON email_log (provider_message_id);
 CREATE INDEX IF NOT EXISTS email_log_status_idx ON email_log (status);
 CREATE INDEX IF NOT EXISTS email_log_sent_at_idx ON email_log (sent_at);
-
--- ============================================================================
--- RLS — email_log is server-only.
--- Service role (Drizzle admin client) bypasses RLS. Anon and authenticated
--- have no access; this is a write-only log from the app's perspective.
--- ============================================================================
-
-ALTER TABLE email_log ENABLE ROW LEVEL SECURITY;

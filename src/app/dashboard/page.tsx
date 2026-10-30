@@ -9,8 +9,7 @@ import {
   Receipt,
 } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "@/lib/auth";
 import { getUserByEmail, getActiveSubscription, getUserPayments } from "@/db/queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -63,11 +62,8 @@ function paymentTone(status: string) {
 }
 
 export default async function DashboardOverviewPage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
   if (!user) return null;
 
@@ -82,8 +78,7 @@ export default async function DashboardOverviewPage() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   const lastPayment = payments[0];
-  const fullName =
-    (user.user_metadata?.full_name as string | undefined) ?? null;
+  const fullName = user.name || null;
 
   return (
     <div className="space-y-8">

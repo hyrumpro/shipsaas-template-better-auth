@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,6 @@ export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +25,8 @@ export function ForgotPasswordForm() {
       const siteUrl =
         process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
         window.location.origin;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await authClient.requestPasswordReset({
+        email,
         redirectTo: `${siteUrl}/auth/reset-password`,
       });
 

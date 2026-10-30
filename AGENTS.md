@@ -7,7 +7,7 @@ Operational notes for AI coding agents (and humans) working in this repo.
 - Next.js 16 with App Router, Turbopack, React 19
 - TypeScript 5 strict
 - Tailwind CSS 3 + Radix UI primitives
-- Supabase (Auth, Postgres, RLS)
+- Better Auth (email/password, magic link, OAuth) on plain Postgres
 - Drizzle ORM 0.45
 - Stripe + LemonSqueezy behind a unified `src/lib/checkout.ts` switch
 - Mailgun for transactional email
@@ -18,11 +18,11 @@ Operational notes for AI coding agents (and humans) working in this repo.
 ## Ground rules
 
 1. **Server by default.** Components are RSC unless they need state, effects, or browser APIs. Add `"use client"` only when necessary.
-2. **Database access.** Use the helpers in `src/db/queries.ts`. They use `onConflictDoNothing` on every create so webhook retries are safe. Raw SQL goes in `supabase/migrations/`.
+2. **Database access.** Use the helpers in `src/db/queries.ts`. They use `onConflictDoNothing` on every create so webhook retries are safe. Raw SQL goes in `migrations/`.
 3. **Webhooks.** Every webhook handler in `src/app/api/*/webhook/route.ts` must verify the provider signature before parsing the body, and early-return on duplicate `event_id`. Both Stripe and LemonSqueezy use real provider ids; do not fabricate them.
 4. **Env vars.** Add new variables to `.env.example` with inline comments. Never commit a real `.env*` file. Server-only secrets must be read on the server, not imported into client code.
 5. **Theme tokens.** Use the CSS variables in `src/app/globals.css` (`--background`, `--foreground`, `--primary`, etc.) — never hardcode colors.
-6. **Lazy server clients.** `src/db/index.ts`, `src/utils/stripe.ts`, and `src/lib/supabase/admin.ts` are `Proxy`-wrapped so the build doesn't need `DATABASE_URL`, `STRIPE_SECRET_KEY`, or `SUPABASE_SERVICE_ROLE_KEY` in CI. Keep them that way: never instantiate `Pool`, `new Stripe(...)`, or `createClient(...)` at module top level.
+6. **Lazy server clients.** `src/db/index.ts` and `src/utils/stripe.ts` are `Proxy`-wrapped so the build doesn't need `DATABASE_URL` or `STRIPE_SECRET_KEY` in CI. Keep them that way: never instantiate `Pool`, `new Stripe(...)`, or `createClient(...)` at module top level.
 7. **Rate limit.** Anything user-callable in `src/app/api/*` that isn't idempotent should call `rateLimit()` from `src/lib/rate-limit.ts` first.
 8. **Logging.** Use `src/lib/logger.ts`. The `info`/`warn`/`error` helpers walk objects and redact PII keys (`email`, `password`, `token`, `apiKey`, `secret`, `authorization`, `cookie`) before logging.
 9. **Observability.** Use the shim in `src/lib/observability.ts` (`trackEventServer`, `trackEventClient`, `captureError`). It is a no-op unless the env var is set AND the package is installed. Never call `posthog-js` / `@sentry/nextjs` directly.
@@ -34,6 +34,16 @@ Operational notes for AI coding agents (and humans) working in this repo.
     - Use the shared `<Logo />` from `src/components/Logo.tsx` in any nav, footer, or auth shell
     - Button variants are restricted to the names in `src/components/ui/button.tsx`. `hero` and `glass` are quiet aliases for `default` and `outline`; do not invent new variants
     - Avoid `text-gradient`, `font-black`, `border-primary/20`, `bg-gradient-to-br`, and `backdrop-blur-xl` on shell chrome. The showcase components under `src/components/playground/*` are exempt (they exist to demonstrate alternative styles).
+
+## Authentication (Better Auth)
+
+- `src/lib/auth.ts` is the single source of truth for auth: database adapter, providers, email hooks, session and rate-limit policy. `src/lib/auth-client.ts` is the browser client — keep their plugin lists in sync.
+- Auth tables (`user`, `session`, `account`, `verification`) live in `src/db/schema.ts`. App fields on the user (`isSubscribed`, `stripeCustomerId`, ...) are declared as `user.additionalFields` with `input: false` - only server code writes them; never accept them from the client.
+- Read the session server-side with `getServerSession()` from `@/lib/auth`; client-side with `useAuth()` from `@/hooks/useAuth`. Do not read cookies directly or build a second session path.
+- `src/proxy.ts` lives in `src/` (not the repo root - Next.js ignores it there) and only checks cookie presence for early redirects. Real authorization always happens server-side in layouts and route handlers via `getServerSession()`.
+- Email-verification tokens are stateless signed JWTs (Better Auth 1.7); the `verification` table is only used by plugins that opt into database-backed tokens.
+- Deletion must log the user out immediately: `/api/account/delete` clears auth cookies in the same response, because the 5-minute cookie cache would otherwise keep serving the deleted session.
+- Adding a Better Auth plugin: add the server plugin to `auth.ts` AND the client plugin to `auth-client.ts`, then run `npx @better-auth/cli generate` and reconcile `src/db/schema.ts` with any new tables/columns.
 
 ## Local commands
 
@@ -55,7 +65,7 @@ CI runs lint + typecheck + build on every PR. The build must pass with no enviro
 
 ```
 src/
-  app/                    # App Router: routes, layouts, metadata, route handlers
+  app/                    # App Router: routes, layouts, metadata, route handlers (auth API at api/auth/[...all])
   components/
     landing/              # home page sections (Navbar, Hero, Features, TechStack, FAQ, CTA, Footer)
     playground/           # 55+ themed showcase components for /playground (intentionally varied styles)
@@ -68,20 +78,22 @@ src/
   lib/
     checkout.ts           # unified Stripe + LemonSqueezy switch
     webhooks/             # idempotent webhook handlers
-    supabase/             # client / server / admin tiers
+    auth.ts               # Better Auth server config (Drizzle adapter)
+    auth-client.ts        # Better Auth browser client
     mailgun.ts            # lazy Mailgun client + send helpers (logs to email_log)
     email-templates.ts    # 10 Hallmark modern-minimal templates
     rate-limit.ts         # in-memory token bucket (see SUGGESTIONS.md for Redis swap)
     logger.ts             # PII-redacting logger
     observability.ts      # opt-in PostHog + Sentry shim
-  hooks/                  # TanStack Query hooks (useAuth uses lazy Supabase client)
+  hooks/                  # TanStack Query hooks (useAuth wraps Better Auth)
   providers/              # QueryProvider, ObservabilityProvider (PageviewTracker inside Suspense)
   utils/                  # stripe (Proxy), mailgun helpers
   config/
     email.ts              # brand config (env-driven) used by every template
 content/blog/             # markdown posts (frontmatter required)
-supabase/migrations/      # 001 schema, 002 RLS, 003 RLS optim, 004 waitlist, 005 email_log
-proxy.ts                  # middleware (public paths, webhook allowlist)
+migrations/               # 001 schema (Better Auth + app), 002 waitlist, 003 email_log
+src/proxy.ts              # proxy/middleware (public paths, webhook allowlist)
+src/instrumentation.ts   # env validation at server startup (SKIP_ENV_VALIDATION=1 skips in CI)
 scripts/init-db.ts        # db:init script
 scripts/test-email.ts     # `npm run email:test -- <template> <email>` to send a real email
 app/dev/emails/           # dev-only template preview (404 in production)
@@ -125,7 +137,7 @@ export async function POST(request: Request) {
 ### Adding a database column
 
 1. Edit `src/db/schema.ts`
-2. Add a new migration file in `supabase/migrations/` with the matching DDL
+2. Add a new migration file in `migrations/` with the matching DDL
 3. Update any query helpers in `src/db/queries.ts`
 4. Run `npm run db:generate` to confirm types match
 
@@ -144,3 +156,5 @@ Add a new entry to the `THEME_PRESETS` record in `src/config/theme.ts` (each pre
 - Importing server-only modules from `"use client"` files
 - Calling `posthog-js` / `@sentry/nextjs` directly — go through the observability shim
 - Using `useSearchParams()` at the top of a client component without wrapping it in `<Suspense>` (it will break prerendering)
+- Reading or setting auth cookies outside Better Auth's helpers
+- Gating routes only in `src/proxy.ts` - it is a presence check, not authorization

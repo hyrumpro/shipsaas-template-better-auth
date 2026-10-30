@@ -166,13 +166,13 @@ export function DashboardSidebar({
             <div className="mb-3 flex items-center gap-3 rounded-md p-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                 {initialsFromName(
-                  (user.user_metadata?.full_name as string | undefined) ?? null,
+                  user.name ?? null,
                   (user.email?.[0] ?? "?").toUpperCase()
                 )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
-                  {user.user_metadata?.full_name || "Account"}
+                  {user.name || "Account"}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
                   {user.email}

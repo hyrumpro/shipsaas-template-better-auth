@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
             We do not sell your personal information. We share data only
             with vetted sub-processors who help us operate the service,
             including: payment processors (Stripe, Lemon Squeezy),
-            database hosting (Supabase / Postgres), email delivery
+            database hosting (managed Postgres), email delivery
             (Mailgun), and error monitoring. Each sub-processor is
             contractually obligated to protect your data.
           </p>

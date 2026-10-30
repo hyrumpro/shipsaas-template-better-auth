@@ -441,6 +441,38 @@ export const EmailTemplates = {
     };
   },
 
+  magicLink(name: string, magicLinkUrl: string): EmailTemplate {
+    const body = [
+      heading("Sign in to your account"),
+      paragraph(greeting(name)),
+      paragraph(
+        `Click the button below to sign in to your ${BRAND.productName} account. No password needed.`,
+      ),
+      button("Sign in", magicLinkUrl),
+      small(
+        `This link can only be used once and expires in 5 minutes. If you didn't request it, you can safely ignore this email.`,
+      ),
+    ].join("");
+
+    return {
+      subject: `Your ${BRAND.productName} sign-in link`,
+      html: shell("Sign-in link", "One-time link to access your account.", body),
+      text: [
+        `Sign in to your account`,
+        ``,
+        greeting(name),
+        ``,
+        `Click the link below to sign in to your ${BRAND.productName} account. No password needed.`,
+        ``,
+        `Sign in: ${magicLinkUrl}`,
+        ``,
+        `This link can only be used once and expires in 5 minutes.`,
+        ``,
+        `— The ${BRAND.name} team`,
+      ].join("\n"),
+    };
+  },
+
   notification(
     name: string,
     title: string,

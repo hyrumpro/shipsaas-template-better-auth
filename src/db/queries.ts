@@ -5,7 +5,7 @@
 
 import { db } from "./index";
 import {
-  users,
+  user,
   subscriptions,
   orders,
   payments,
@@ -15,45 +15,27 @@ import {
 } from "./schema";
 import { eq, and, desc, inArray, or, sql } from "drizzle-orm";
 
-type WebhookProvider = "stripe" | "lemonsqueezy" | "supabase" | "mailgun";
+type WebhookProvider = "stripe" | "lemonsqueezy" | "mailgun";
 
 // ============================================================================
 // USER OPERATIONS
 // ============================================================================
 
 export async function getUserById(userId: string) {
-  const [user] = await db.select().from(users).where(eq(users.id, userId));
-  return user;
+  const [row] = await db.select().from(user).where(eq(user.id, userId));
+  return row;
 }
 
 export async function getUserByEmail(email: string) {
-  const [user] = await db.select().from(users).where(eq(users.email, email));
-  return user;
-}
-
-export async function createUser(data: {
-  id: string; // From Supabase auth.users.id
-  email: string;
-  fullName?: string;
-  avatarUrl?: string;
-}) {
-  const [user] = await db
-    .insert(users)
-    .values({
-      id: data.id,
-      email: data.email,
-      fullName: data.fullName,
-      avatarUrl: data.avatarUrl,
-    })
-    .returning();
-  return user;
+  const [row] = await db.select().from(user).where(eq(user.email, email));
+  return row;
 }
 
 export async function updateUser(
   userId: string,
   data: {
-    fullName?: string;
-    avatarUrl?: string;
+    name?: string;
+    image?: string | null;
     stripeCustomerId?: string;
     lemonSqueezyCustomerId?: string;
     isSubscribed?: boolean;
@@ -61,12 +43,12 @@ export async function updateUser(
     metadata?: any;
   }
 ) {
-  const [user] = await db
-    .update(users)
+  const [row] = await db
+    .update(user)
     .set(data)
-    .where(eq(users.id, userId))
+    .where(eq(user.id, userId))
     .returning();
-  return user;
+  return row;
 }
 
 // ============================================================================

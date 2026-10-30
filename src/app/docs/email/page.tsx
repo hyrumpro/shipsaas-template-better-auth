@@ -119,23 +119,29 @@ Value: 10 mxa.mailgun.org
       </p>
       <ul>
         <li>
-          <strong>Welcome</strong> — sent by{" "}
-          <code>src/app/api/auth/webhook/route.ts</code> on user signup.
+          <strong>Welcome</strong> — sent by Better Auth&apos;s user-create
+          hook in <code>src/lib/auth.ts</code> on user signup.
         </li>
         <li>
-          <strong>Email verification</strong> — fired manually via{" "}
-          <code>sendEmailVerification()</code> or wired into your own
-          verification flow. The default Supabase email path handles this
-          automatically.
+          <strong>Email verification</strong> — sent automatically on sign-up
+          (<code>emailVerification.sendOnSignUp</code> in{" "}
+          <code>src/lib/auth.ts</code>) with the{" "}
+          <code>EmailTemplates.emailVerification()</code> template. Resending
+          is built into the sign-in form for unverified accounts.
+        </li>
+        <li>
+          <strong>Sign-in link</strong> — the magic-link email. Delivered by
+          the <code>magicLink</code> plugin via{" "}
+          <code>sendMagicLinkEmail()</code> using{" "}
+          <code>EmailTemplates.magicLink()</code>.
         </li>
         <li>
           <strong>Password reset</strong> — the user-facing form lives at{" "}
           <code>/auth/forgot-password</code> and{" "}
-          <code>/auth/reset-password</code>. Supabase delivers the actual reset
-          email using its own built-in template (configure the redirect URL to
-          your reset page in the Supabase dashboard). The{" "}
-          <code>EmailTemplates.passwordReset()</code> helper is the design
-          reference for when you swap in custom Mailgun delivery.
+          <code>/auth/reset-password</code>. Better Auth calls{" "}
+          <code>sendPasswordResetEmail()</code> (configured as{" "}
+          <code>emailAndPassword.sendResetPassword</code>) which uses the{" "}
+          <code>EmailTemplates.passwordReset()</code> template.
         </li>
         <li>
           <strong>Subscription receipt</strong> — sent automatically by{" "}
@@ -207,7 +213,7 @@ SKIP_EMAILS=true npm run email:test -- welcome`}
       <h2>Email log</h2>
       <p>
         Every send writes a row to <code>email_log</code> (table created by{" "}
-        <code>supabase/migrations/005_email_log.sql</code>) with the recipient,
+        <code>migrations/003_email_log.sql</code>) with the recipient,
         template, Mailgun message id, and tags. Use it to:
       </p>
       <ul>

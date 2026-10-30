@@ -8,11 +8,11 @@ import {
 const faqs = [
   {
     q: "What does the template include?",
-    a: "A Next.js 16 app with Supabase auth, Stripe and LemonSqueezy payments behind a unified plan-based checkout, Mailgun email, a dashboard, a markdown blog, in-app docs, and a 55-component playground. You still configure the providers and build your product domain model.",
+    a: "A Next.js 16 app with Better Auth (email, magic links, Google), Stripe and LemonSqueezy payments behind a unified plan-based checkout, Mailgun email, a dashboard, a markdown blog, in-app docs, and a 55-component playground. You still configure the providers and build your product domain model.",
   },
   {
     q: "Do I need to use the same providers?",
-    a: "No. Supabase, Stripe, and Mailgun are the defaults because they cover the most ground with the least ceremony, but every integration is in a single module. Swap any of them without rewriting the app.",
+    a: "No. Better Auth, Stripe, and Mailgun are the defaults because they cover the most ground with the least ceremony, but every integration is in a single module. Swap any of them without rewriting the app.",
   },
   {
     q: "Is the code production-ready?",

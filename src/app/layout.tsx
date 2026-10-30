@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "template",
     "premium",
     "next.js",
-    "supabase",
+    "better-auth",
     "stripe",
     "shipsaas",
     "startup",

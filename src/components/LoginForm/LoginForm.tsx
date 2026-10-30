@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,10 @@ import { cn } from "@/lib/utils";
 
 type LoginMode = "password" | "magic-link";
 
+/**
+ * Uses useSearchParams (to honor ?redirectTo=), so this component must be
+ * rendered inside a <Suspense> boundary — /auth/login does this.
+ */
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,32 +24,71 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
+    setNeedsVerification(false);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await authClient.signIn.email(
+        { email, password },
+        {
+          onSuccess: () => {
+            logger.auth("login_password", email, true);
+            setSuccessMessage("Login successful! Redirecting...");
+            router.push(redirectTo);
+            router.refresh();
+          },
+        }
+      );
 
       if (error) {
         logger.error("Password login failed", error);
-        setErrorMessage(error.message || "Failed to login. Please check your credentials.");
-      } else {
-        logger.auth("login_password", email, true);
-        setSuccessMessage("Login successful! Redirecting...");
-        router.push("/dashboard");
-        router.refresh();
+        if (
+          error.code === "USER_EMAIL_NOT_VERIFIED" ||
+          /not verified|verify your email/i.test(error.message ?? "")
+        ) {
+          setNeedsVerification(true);
+          setErrorMessage(
+            "Your email hasn't been verified yet. Check your inbox for the verification link, or resend it below."
+          );
+        } else {
+          setErrorMessage(
+            error.message ||
+              "Failed to login. Please check your credentials."
+          );
+        }
+        setIsLoading(false);
       }
     } catch (error) {
       logger.error("Unexpected login error", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await authClient.sendVerificationEmail({
+        email,
+        callbackURL: redirectTo,
+      });
+      if (error) {
+        setErrorMessage(error.message || "Failed to resend the email.");
+      } else {
+        setSuccessMessage("Verification email sent! Check your inbox.");
+        setErrorMessage("");
+      }
+    } catch (error) {
+      logger.error("Failed to resend verification email", error);
       setErrorMessage("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -59,18 +102,21 @@ export function LoginForm() {
     setSuccessMessage("");
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
-        },
-      });
+      const { error } = await authClient.signIn.magicLink(
+        { email, callbackURL: redirectTo },
+        {
+          onSuccess: () => {
+            logger.auth("login_magic_link", email, true);
+          },
+        }
+      );
 
       if (error) {
         logger.error("Magic link login failed", error);
-        setErrorMessage(error.message || "Failed to send magic link. Please try again.");
+        setErrorMessage(
+          error.message || "Failed to send magic link. Please try again."
+        );
       } else {
-        logger.auth("login_magic_link", email, true);
         setSuccessMessage(
           "Magic link sent! Check your email to complete the login."
         );
@@ -88,15 +134,9 @@ export function LoginForm() {
     setErrorMessage("");
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await authClient.signIn.social({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/confirm`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
+        callbackURL: redirectTo,
       });
 
       if (error) {
@@ -104,6 +144,7 @@ export function LoginForm() {
         setErrorMessage(error.message || "Failed to login with Google.");
         setIsLoading(false);
       }
+      // On success the browser is redirected to Google, so nothing to do.
     } catch (error) {
       logger.error("Unexpected Google login error", error);
       setErrorMessage("An unexpected error occurred. Please try again.");
@@ -136,6 +177,16 @@ export function LoginForm() {
       {errorMessage && (
         <div className="border-destructive/20 bg-destructive/5 text-destructive mb-4 rounded-md border p-3 text-sm">
           {errorMessage}
+          {needsVerification && (
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={isLoading}
+              className="text-foreground mt-2 block font-medium underline-offset-4 hover:underline disabled:opacity-50"
+            >
+              Resend verification email
+            </button>
+          )}
         </div>
       )}
 

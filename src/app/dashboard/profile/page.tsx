@@ -1,7 +1,6 @@
 import * as React from "react";
 
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "@/lib/auth";
 import { getUserByEmail } from "@/db/queries";
 import { PageHeader, Section } from "@/components/dashboard/PageHeader";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
@@ -10,11 +9,8 @@ import { PasswordForm } from "@/components/dashboard/PasswordForm";
 import { formatDate } from "@/lib/format";
 
 export default async function ProfilePage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
   if (!user) return null;
 
@@ -33,12 +29,7 @@ export default async function ProfilePage() {
       >
         <Card>
           <CardContent className="p-6">
-            <ProfileForm
-              defaultName={
-                (user.user_metadata?.full_name as string | undefined) ?? ""
-              }
-              email={user.email ?? ""}
-            />
+            <ProfileForm defaultName={user.name ?? ""} email={user.email ?? ""} />
           </CardContent>
         </Card>
       </Section>
@@ -52,10 +43,7 @@ export default async function ProfilePage() {
             <div className="space-y-1">
               <p className="text-sm font-medium">{user.email}</p>
               <p className="text-xs text-muted-foreground">
-                Verified{" "}
-                {user.email_confirmed_at
-                  ? formatDate(user.email_confirmed_at)
-                  : "—"}
+                Verified {user.emailVerified ? "yes" : "no"}
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -83,13 +71,13 @@ export default async function ProfilePage() {
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Created
               </p>
-              <p className="text-sm">{formatDate(dbUser?.createdAt ?? user.created_at)}</p>
+              <p className="text-sm">{formatDate(dbUser?.createdAt ?? user.createdAt)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Last sign in
               </p>
-              <p className="text-sm">{formatDate(user.last_sign_in_at)}</p>
+              <p className="text-sm">{formatDate(session.session.createdAt)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

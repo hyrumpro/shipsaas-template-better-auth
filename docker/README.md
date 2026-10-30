@@ -8,7 +8,7 @@ package-lock.json, and Next.js standalone output.
     cp .env.docker.example .env.docker
     npm run docker:dev
 
-For local Postgres instead of Supabase:
+For a local Postgres instead of a hosted provider:
 
     npm run docker:dev:postgres
 
@@ -34,12 +34,12 @@ local evaluation, not a recommendation for production data durability.
 ## Vercel
 
 Vercel uses the same npm run build path. Import the repository, add the
-variables from .env.example, apply all Supabase migrations, and configure the
+variables from .env.example, apply the migrations/ SQL files, and configure the
 selected payment and email webhook URLs. NEXT_PUBLIC_SITE_URL must match the
 deployed origin.
 
 ## Database migrations
 
-Apply migrations 001 through 006_webhook_processing.sql before enabling
-webhooks. The final migration adds shared webhook processing claims used by
-Stripe, Lemon Squeezy, Supabase, and Mailgun.
+Apply migrations 001 through 003 before enabling webhooks. The initial
+migration includes the shared webhook processing claims used by Stripe,
+Lemon Squeezy, and Mailgun.

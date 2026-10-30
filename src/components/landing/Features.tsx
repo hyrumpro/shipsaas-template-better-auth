@@ -22,7 +22,7 @@ const features: Feature[] = [
     icon: Shield,
     title: "Auth & sessions",
     description:
-      "Supabase Auth with email, magic links, and Google. Server-side session handling, protected routes, and a typed user model.",
+      "Better Auth with email, magic links, and Google. Server-side session handling, protected routes, and a typed user model.",
   },
   {
     icon: CreditCard,

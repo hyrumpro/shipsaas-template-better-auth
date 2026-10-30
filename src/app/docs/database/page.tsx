@@ -3,91 +3,108 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Database",
   description:
-    "Run the Supabase Postgres migrations for ShipSaaS, understand the row-level security model, and query the database with Drizzle.",
+    "Apply the ShipSaaS Postgres migrations, understand the schema (Better Auth + app tables), and query the database with Drizzle.",
 };
 
 export default function DatabaseDocsPage() {
   return (
     <article>
-      <h1>Database (Supabase Postgres + Drizzle)</h1>
+      <h1>Database (Postgres + Drizzle)</h1>
       <p>
-        ShipSaaS uses Supabase for the Postgres database, Drizzle for
-        the type-safe query layer, and Supabase Auth for user
-        management. This guide covers the schema, the RLS model, and
-        how to query the database.
+        ShipSaaS runs on plain Postgres — any provider works (Neon, Railway,
+        Supabase, RDS, self-hosted). Drizzle is the type-safe query layer, and
+        Better Auth owns the auth tables in the same schema. This guide covers
+        the schema, migrations, and how to query the database.
       </p>
 
       <h2>Schema overview</h2>
-      <p>The template ships with five tables:</p>
+      <p>The template ships with these tables:</p>
       <ul>
         <li>
-          <code>users</code> &mdash; mirrors <code>auth.users</code> with
-          app-specific fields like <code>stripeCustomerId</code>,{" "}
-          <code>isSubscribed</code>, and <code>subscriptionTier</code>.
+          <code>user</code> — the Better Auth user table. Auth fields
+          (<code>name</code>, <code>email</code>, <code>emailVerified</code>,{" "}
+          <code>image</code>) plus app fields like{" "}
+          <code>stripeCustomerId</code>, <code>isSubscribed</code>, and{" "}
+          <code>subscriptionTier</code>.
         </li>
         <li>
-          <code>subscriptions</code> &mdash; one row per active or
+          <code>session</code>, <code>account</code>,{" "}
+          <code>verification</code> — Better Auth&apos;s session store,
+          OAuth account links, and email-verification tokens.
+        </li>
+        <li>
+          <code>subscriptions</code> — one row per active or
           historical subscription, keyed by{" "}
           <code>(provider, providerSubscriptionId)</code>.
         </li>
         <li>
-          <code>orders</code> &mdash; one-time payments (digital
+          <code>orders</code> — one-time payments (digital
           downloads, lifetime deals, etc).
         </li>
         <li>
-          <code>payments</code> &mdash; every recurring charge or
+          <code>payments</code> — every recurring charge or
           invoice, keyed by <code>providerPaymentId</code> for
           idempotency.
         </li>
         <li>
-          <code>webhook_events</code> &mdash; audit trail of every
+          <code>webhook_events</code> — audit trail of every
           webhook received, with a <code>processed</code> flag for
           retry safety.
+        </li>
+        <li>
+          <code>waitlist</code> and <code>email_log</code> — optional
+          (see migrations 002 and 003).
         </li>
       </ul>
 
       <h2>Apply the migrations</h2>
       <p>
-        Three SQL files in <code>supabase/migrations/</code> must be
-        applied in order:
+        The reviewed SQL lives in <code>migrations/</code> and is applied in
+        order:
       </p>
       <ol>
         <li>
-          <code>001_initial_schema.sql</code> &mdash; tables, enums,
-          indexes, and the <code>sync_user_subscription_status()</code>{" "}
-          trigger that flips <code>users.isSubscribed</code> based on
-          subscription status.
+          <code>001_initial_schema.sql</code> — Better Auth tables, app
+          tables, enums, indexes, and the{" "}
+          <code>sync_user_subscription_status()</code> trigger that flips{" "}
+          <code>user.isSubscribed</code> based on subscription status.
         </li>
         <li>
-          <code>002_row_level_security.sql</code> &mdash; RLS policies
-          restricting each table to its own user (plus service-role
-          bypass for webhooks).
+          <code>002_waitlist.sql</code> — optional pre-launch email capture
+          table.
         </li>
         <li>
-          <code>003_rls_optimization.sql</code> &mdash; rewrites the
-          policies to wrap <code>auth.uid()</code> and{" "}
-          <code>auth.jwt()</code> in subselects, so the Postgres planner
-          hoists them out of the per-row evaluation.
+          <code>003_email_log.sql</code> — optional delivery-audit table.
         </li>
       </ol>
-      <p>Apply them via the Supabase CLI:</p>
+      <p>Either apply them directly:</p>
       <pre className="not-prose bg-secondary p-4 rounded-md text-sm overflow-x-auto">
-{`supabase link --project-ref your-project-ref
-supabase db push`}
+{`psql $DATABASE_URL -f migrations/001_initial_schema.sql
+psql $DATABASE_URL -f migrations/002_waitlist.sql
+psql $DATABASE_URL -f migrations/003_email_log.sql`}
       </pre>
-      <p>Or paste each file into the SQL editor in the Supabase dashboard.</p>
-
-      <h2>Row-level security model</h2>
       <p>
-        Every table has RLS enabled. A user can read or update only
-        their own row(s). Webhooks run with the service role and bypass
-        RLS to write subscription and payment records.
+        …or let Drizzle generate and push the schema from{" "}
+        <code>src/db/schema.ts</code>:
+      </p>
+      <pre className="not-prose bg-secondary p-4 rounded-md text-sm overflow-x-auto">
+{`npx drizzle-kit push`}
+      </pre>
+
+      <h2>Authorization model</h2>
+      <p>
+        There is no row-level security by design: the app connects with a
+        single Postgres role and every query is scoped in application code —
+        all database access goes through server-side code
+        (<code>src/db/queries.ts</code> and route handlers); nothing queries
+        the database from the browser.
       </p>
       <p>
-        If you need to query another user&apos;s data (for an admin
-        dashboard, for example), create a separate Supabase client with
-        the service role key in a server-only route handler. Never
-        expose the service role key to the browser.
+        If you add admin features, scope them explicitly in the query layer
+        (a role column on <code>user</code> plus server-side checks), and keep
+        every table&apos;s <code>userId</code> foreign key — user deletion
+        cascades across session, account, subscription, order, and payment
+        rows.
       </p>
 
       <h2>Querying with Drizzle</h2>
@@ -107,13 +124,13 @@ if (subscription) {
       </p>
       <pre className="not-prose bg-secondary p-4 rounded-md text-sm overflow-x-auto">
 {`import { db } from "@/db";
-import { users } from "@/db/schema";
+import { user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-const [user] = await db
+const [row] = await db
   .select()
-  .from(users)
-  .where(eq(users.id, userId));`}
+  .from(user)
+  .where(eq(user.id, userId));`}
       </pre>
 
       <h2>Local development</h2>

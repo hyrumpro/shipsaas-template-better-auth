@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 import { stripe } from "@/utils/stripe";
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "@/lib/auth";
 import { getUserById } from "@/db/queries";
 import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -21,11 +20,8 @@ export async function POST(request: Request) {
   if (!limit.allowed) return rateLimitResponse(limit);
 
   try {
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const authSession = await getServerSession();
+    const user = authSession?.user;
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

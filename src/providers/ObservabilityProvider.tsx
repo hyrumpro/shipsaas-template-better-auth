@@ -37,13 +37,12 @@ export function ObservabilityProvider({
     if (user?.id) {
       identifyUserClient(user.id, {
         email: user.email,
-        name:
-          (user.user_metadata?.name as string | undefined) ?? undefined,
+        name: user.name || undefined,
       });
     } else {
       resetClient();
     }
-  }, [enabled, user?.id, user?.email, user?.user_metadata?.name]);
+  }, [enabled, user?.id, user?.email, user?.name]);
 
   return (
     <>

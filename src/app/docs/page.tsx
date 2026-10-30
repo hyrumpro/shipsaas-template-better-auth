@@ -37,7 +37,7 @@ const guides = [
     title: "Authentication",
     time: "20 min",
     icon: KeyRound,
-    desc: "Set up Supabase Auth with magic links and Google OAuth, plus the webhook that syncs new users into your database.",
+    desc: "Set up Better Auth with email verification, magic links, and Google OAuth — all backed by your own Postgres database.",
   },
   {
     href: "/docs/database",

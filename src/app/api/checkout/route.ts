@@ -6,8 +6,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { handleApiError, Errors } from "@/lib/error-handler";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "@/lib/auth";
 import { createCheckoutSession } from "@/lib/checkout";
 import { getPlanById } from "@/config/payments";
 import type { CheckoutProvider } from "@/config/payments";
@@ -26,14 +25,10 @@ export async function POST(req: Request) {
     if (!limit.allowed) return rateLimitResponse(limit);
 
     // Get authenticated user
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
-    if (authError || !user) {
+    if (!user) {
       throw Errors.authentication("You must be logged in to checkout");
     }
 

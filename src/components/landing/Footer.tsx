@@ -73,7 +73,7 @@ export const Footer = () => {
             © {new Date().getFullYear()} ShipSaaS. All rights reserved.
           </p>
           <p className="text-muted-foreground">
-            Built with Next.js, Supabase, and Stripe.
+            Built with Next.js, Better Auth, and Stripe.
           </p>
         </div>
       </div>

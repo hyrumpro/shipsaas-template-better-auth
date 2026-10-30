@@ -12,9 +12,8 @@ export function validateRequiredEnvVars() {
   
   // Required for all deployments
   const required = {
-    'NEXT_PUBLIC_SUPABASE_URL': process.env.NEXT_PUBLIC_SUPABASE_URL,
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    'SUPABASE_SERVICE_ROLE_KEY': process.env.SUPABASE_SERVICE_ROLE_KEY,
+    'BETTER_AUTH_SECRET': process.env.BETTER_AUTH_SECRET,
+    'BETTER_AUTH_URL': process.env.BETTER_AUTH_URL,
     'DATABASE_URL': process.env.DATABASE_URL,
     'NEXT_PUBLIC_SITE_URL': process.env.NEXT_PUBLIC_SITE_URL,
   };
@@ -53,7 +52,4 @@ export function validateRequiredEnvVars() {
   return { valid: errors.length === 0, errors };
 }
 
-// Auto-validate on import in production
-if (process.env.NODE_ENV === 'production') {
-  validateRequiredEnvVars();
-}
+// Validation is invoked from src/instrumentation.ts at server startup.

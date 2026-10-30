@@ -234,10 +234,10 @@ export default function Dashboard() {
 
 ## 🗄️ Database Architecture
 
-### Drizzle + Supabase Integration
+### Drizzle + Better Auth Integration
 
 This project uses a dual-layer architecture:
-- **Supabase** for authentication
+- **Better Auth** for authentication (its tables live in the same Drizzle schema)
 - **Drizzle ORM** for type-safe database operations
 
 ### Architecture Diagram
@@ -246,7 +246,7 @@ This project uses a dual-layer architecture:
 ┌─────────────────────────────────────┐
 │        Your Application             │
 ├─────────────────────────────────────┤
-│  Supabase Auth  │   Drizzle ORM    │
+│  Better Auth    │   Drizzle ORM    │
 │  (Client-side)  │  (Server-side)   │
 │  • Login        │  • Type-safe     │
 │  • Sessions     │  • Queries       │
@@ -256,8 +256,8 @@ This project uses a dual-layer architecture:
                   │
          ┌────────▼────────┐
          │  PostgreSQL     │
-         │  • auth.users   │
-         │  • public.*     │
+         │  • user/session │
+         │  • app tables   │
          └─────────────────┘
 ```
 
@@ -265,12 +265,13 @@ This project uses a dual-layer architecture:
 
 ```typescript
 // src/db/schema.ts
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey(),
+export const user = pgTable("user", {
+  id: text("id").primaryKey(), // Better Auth generated
+  name: text("name").notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
-  fullName: varchar("full_name", { length: 255 }),
-  isSubscribed: boolean("is_subscribed").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  isSubscribed: boolean("is_subscribed").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 ```
 
@@ -278,16 +279,15 @@ export const users = pgTable("users", {
 
 ```typescript
 // ❌ Without Drizzle
-const { data } = await supabase
-  .from('users')
-  .select('*')
-  .eq('email', email); // No type checking!
+const result = await pool.query(
+  'SELECT * FROM "user" WHERE email = $1', [email]
+); // Untyped strings!
 
 // ✅ With Drizzle
-const [user] = await db
+const [row] = await db
   .select()
-  .from(users)
-  .where(eq(users.email, email)); // Fully typed!
+  .from(user)
+  .where(eq(user.email, email)); // Fully typed!
 ```
 
 ### Query Examples
@@ -505,7 +505,7 @@ Bing Webmaster Tools
 
 ### External Resources
 - [Next.js Docs](https://nextjs.org/docs)
-- [Supabase Docs](https://supabase.com/docs)
+- [Better Auth Docs](https://better-auth.com/docs)
 - [Stripe Docs](https://stripe.com/docs)
 - [Drizzle ORM Docs](https://orm.drizzle.team/)
 

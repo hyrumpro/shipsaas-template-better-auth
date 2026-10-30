@@ -12,7 +12,7 @@ const milestones = [
   },
   {
     title: "Authentication Setup",
-    description: "Supabase auth integrated with protected routes",
+    description: "Better Auth integrated with protected routes",
     date: "Day 2",
     status: "completed",
   },

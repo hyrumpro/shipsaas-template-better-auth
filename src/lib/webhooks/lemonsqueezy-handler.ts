@@ -695,7 +695,7 @@ async function sendLsPaymentReceipt(
     if (!user?.email) return;
     await sendPaymentSuccessEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       formatMoneyLs(amountCents, currency),
       planName,
       receiptUrl
@@ -720,7 +720,7 @@ async function sendLsPaymentFailure(
       "http://localhost:3000";
     await sendPaymentFailedEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       planName,
       formatMoneyLs(amountCents, currency),
       reason,
@@ -746,7 +746,7 @@ async function sendLsRefund(
     if (!user?.email) return;
     await sendRefundIssuedEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       formatMoneyLs(amountCents, currency),
       productName,
       orderId

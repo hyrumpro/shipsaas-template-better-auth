@@ -1,6 +1,5 @@
 import * as React from "react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import {
   CreditCard,
   ExternalLink,
@@ -9,7 +8,7 @@ import {
   Calendar,
 } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "@/lib/auth";
 import {
   getActiveSubscription,
   getUserSubscriptions,
@@ -68,11 +67,8 @@ function paymentTone(status: string) {
 }
 
 export default async function BillingPage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
   if (!user) return null;
 

@@ -32,9 +32,7 @@ export function ProfileForm({
     setError(null);
     setSaved(false);
     try {
-      await updateProfile.mutateAsync({
-        data: { full_name: name },
-      });
+      await updateProfile.mutateAsync({ name });
       setSaved(true);
     } catch (err) {
       logger.error("Profile update failed", err);

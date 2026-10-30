@@ -10,7 +10,7 @@ const guides = [
   { href: "/docs/email", title: "Email", desc: "Mailgun + DNS" },
   { href: "/docs/payments", title: "Payments", desc: "Stripe / Lemon Squeezy" },
   { href: "/docs/auth", title: "Authentication", desc: "Magic links + Google" },
-  { href: "/docs/database", title: "Database", desc: "Supabase + Drizzle" },
+  { href: "/docs/database", title: "Database", desc: "Postgres + Drizzle" },
   { href: "/docs/seo", title: "SEO", desc: "Sitemap, robots, JSON-LD" },
   { href: "/docs/styling", title: "Styling", desc: "Themes + dark mode" },
   {

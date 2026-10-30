@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +12,7 @@ import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 export function RegisterForm() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,9 +20,6 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
-  const router = useRouter();
-  const supabase = createClient();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +38,10 @@ export function RegisterForm() {
       validationErrors.confirmPassword = "Passwords do not match";
     }
 
+    if (name.trim().length < 2) {
+      validationErrors.name = "Please enter your name";
+    }
+
     if (hasErrors(validationErrors)) {
       setErrors(validationErrors);
       return;
@@ -52,43 +53,45 @@ export function RegisterForm() {
     try {
       logger.info("Registration attempt", { email });
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+      // Better Auth sends the verification email automatically
+      // (emailVerification.sendOnSignUp in src/lib/auth.ts). The user is
+      // signed in after they click the verification link.
+      const { error } = await authClient.signUp.email(
+        {
+          email,
+          password,
+          name: name.trim(),
+          callbackURL: "/dashboard",
         },
-      });
+        {
+          onSuccess: (ctx) => {
+            logger.auth("register", ctx.data?.user?.id, true);
+          },
+        }
+      );
 
       if (error) {
         logger.error("Registration failed", error, { email });
 
-        if (error.message.includes("already registered")) {
+        if (/already (registered|exists)/i.test(error.message ?? "")) {
           setErrorMessage(
             "This email is already registered. Please sign in instead."
           );
-        } else if (error.message.includes("weak password")) {
+        } else if (/weak password/i.test(error.message ?? "")) {
           setErrors({
             password: "Password is too weak. Please choose a stronger one.",
           });
         } else {
-          setErrorMessage(error.message || "Registration failed. Please try again.");
+          setErrorMessage(
+            error.message || "Registration failed. Please try again."
+          );
         }
         return;
       }
 
-      logger.auth("register", data.user?.id, true);
-
-      if (data.user && !data.session) {
-        setSuccessMessage(
-          "Account created! Check your email to verify your account."
-        );
-      } else {
-        setSuccessMessage("Account created successfully!");
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1500);
-      }
+      setSuccessMessage(
+        "Account created! Check your inbox — click the verification link to activate your account."
+      );
     } catch (err) {
       logger.error("Unexpected registration error", err);
       setErrorMessage("An unexpected error occurred. Please try again.");
@@ -126,6 +129,35 @@ export function RegisterForm() {
       )}
 
       <form onSubmit={handleRegister} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="name">Full name</Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) {
+                setErrors((prev) => ({ ...prev, name: "" }));
+              }
+            }}
+            disabled={isLoading}
+            className={cn(errors.name && "border-destructive")}
+            required
+            minLength={2}
+            maxLength={100}
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-error" : undefined}
+            autoComplete="name"
+            placeholder="Ada Lovelace"
+          />
+          {errors.name && (
+            <p id="name-error" className="text-destructive text-xs">
+              {errors.name}
+            </p>
+          )}
+        </div>
+
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input

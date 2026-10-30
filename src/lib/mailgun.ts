@@ -75,6 +75,12 @@ export const sendEmail = async ({
       template: templateName,
     });
     console.log(`[EMAIL SKIPPED] to=${to} subject=${subject} template=${templateName}`);
+    // Surface the action links (verification, magic link, password reset)
+    // so local flows are clickable without a Mailgun account.
+    const links = (text ?? "").match(/https?:\/\/\S+/g) ?? [];
+    for (const link of links) {
+      console.log(`[EMAIL SKIPPED] link: ${link}`);
+    }
     return null;
   }
 
@@ -205,6 +211,29 @@ export const sendEmailVerification = async (
     text: template.text,
     tags: ["verification", "auth"],
     template: "emailVerification",
+    userId,
+  });
+  return providerMessageId !== null;
+};
+
+/**
+ * Send magic link email (passwordless sign-in)
+ */
+export const sendMagicLinkEmail = async (
+  email: string,
+  name: string,
+  magicLinkUrl: string,
+  userId?: string
+): Promise<boolean> => {
+  const template = EmailTemplates.magicLink(name, magicLinkUrl);
+
+  const providerMessageId = await sendEmail({
+    to: email,
+    subject: template.subject,
+    html: template.html,
+    text: template.text,
+    tags: ["magic-link", "auth"],
+    template: "magicLink",
     userId,
   });
   return providerMessageId !== null;

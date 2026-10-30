@@ -4,7 +4,7 @@
  * Edit this file to change the public /waitlist page.
  *
  * To enable the page, set NEXT_PUBLIC_WAITLIST_ENABLED=true in .env.local
- * (and run the supabase/migrations/004_waitlist.sql migration).
+ * (and run the migrations/002_waitlist.sql migration).
  *
  * When disabled, the route returns 404 and the page is unreachable.
  */

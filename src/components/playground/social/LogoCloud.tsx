@@ -6,7 +6,7 @@ const logos = [
   { name: "Vercel", width: "w-24" },
   { name: "Next.js", width: "w-28" },
   { name: "Stripe", width: "w-20" },
-  { name: "Supabase", width: "w-32" },
+  { name: "Better Auth", width: "w-32" },
   { name: "Tailwind", width: "w-28" },
   { name: "TypeScript", width: "w-32" },
 ];

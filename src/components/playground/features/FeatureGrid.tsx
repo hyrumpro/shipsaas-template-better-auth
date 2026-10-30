@@ -41,7 +41,7 @@ const features = [
   {
     icon: Lock,
     title: "Auth Ready",
-    description: "Supabase authentication with protected routes",
+    description: "Better Auth authentication with protected routes",
     color: "from-red-500 to-rose-500",
   },
   {

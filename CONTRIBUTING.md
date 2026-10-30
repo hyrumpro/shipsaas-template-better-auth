@@ -20,7 +20,7 @@ The CI workflow runs the same three commands plus a Postgres service. It must pa
 
 - TypeScript strict mode, no `any` outside clearly justified spots
 - Functional React with Server Components by default; `"use client"` only when you need state, effects, or browser APIs
-- Drizzle queries live in `src/db/queries.ts`; raw SQL lives in `supabase/migrations/`
+- Drizzle queries live in `src/db/queries.ts`; raw SQL lives in `migrations/`
 - Environment variables go in `.env.example` (committed) — never commit `.env.local`
 - The Playbook:
   - Add tests for any new business logic
@@ -35,7 +35,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 feat(checkout): add LemonSqueezy subscription pause support
 fix(webhooks): realign Stripe invoice id with subscription id
-docs(readme): document SUPABASE_WEBHOOK_SECRET rotation
+docs(readme): document BETTER_AUTH_SECRET rotation
 chore(deps): bump drizzle-orm to 0.39.3
 ```
 

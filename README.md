@@ -2,6 +2,10 @@
 
 > Production-minded Next.js 16 SaaS foundation. **The plumbing, the design, the
 > boring stuff — done. You ship the product.**
+>
+> **Better Auth edition** - authentication runs on your own Postgres via
+> [Better Auth](https://better-auth.com). A Supabase Auth edition of the same
+> template is also available.
 
 Most templates sell you a fresh `create-next-app` with a landing page and
 wish you luck. ShipSaaS is the template you wish you'd had on your last
@@ -16,9 +20,10 @@ Built for solo indie SaaS developers who want to ship, not configure.
 ## What's in the box
 
 - **Next.js 16** App Router, Turbopack, React 19, TypeScript strict
-- **Supabase Auth** — email/password, magic link, Google OAuth, password
-  reset, account deletion
-- **Supabase Postgres** + Drizzle ORM + row-level security + 4 migrations
+- **Better Auth** — email/password + email verification, magic link,
+  Google OAuth, password reset, account deletion
+- **Postgres** (any provider: Neon, Railway, Supabase, RDS) + Drizzle ORM
+  + reviewed SQL migrations
 - **Stripe + LemonSqueezy** behind a single `resolveCheckout()` switch —
   flip `NEXT_PUBLIC_PAYMENT_PROVIDER` and you're on the other one
 - **10 transactional email templates** (welcome, receipts, payment-failed,
@@ -49,7 +54,7 @@ Built for solo indie SaaS developers who want to ship, not configure.
   overflow guard, ARIA labels
 - **CI** — GitHub Actions runs lint + typecheck + build on every PR
 - **Docker** — dev and prod compose files, Next.js `standalone` output
-- **Lazy clients** — Stripe, Drizzle, Supabase admin are `Proxy`-wrapped
+- **Lazy clients** — Stripe and Drizzle are `Proxy`-wrapped
   so the build doesn't need env vars
 - **AI-agent rules** — `AGENTS.md`, `CLAUDE.md`, `.cursorrules` (so Cursor,
   Claude Code, and other agents all play nice)
@@ -69,7 +74,8 @@ recommended next steps for each.
 ### Prerequisites
 
 - Node.js 20+ and npm 10+ (the committed `package-lock.json` is the source of truth)
-- A [Supabase](https://supabase.com) project — free tier is fine
+- A Postgres database — [Neon](https://neon.tech), [Railway](https://railway.app),
+  Supabase Postgres, or self-hosted — free tiers are fine
 - A payment account — [Stripe](https://stripe.com) or [LemonSqueezy](https://lemonsqueezy.com)
 - A [Mailgun](https://mailgun.com) account — optional in dev, required in production
 - (Recommended) A [Vercel](https://vercel.com) account for deployment
@@ -81,7 +87,7 @@ git clone <this-repo> my-saas
 cd my-saas
 npm install
 cp .env.example .env.local       # then fill in the values
-npm run db:push                  # apply schema to your Supabase Postgres
+npm run db:push                  # apply schema to your Postgres database
 npm run dev                      # http://localhost:3000
 ```
 
@@ -94,7 +100,7 @@ and email actually hit third-party APIs.
 1. Push the repo to GitHub.
 2. Import on Vercel.
 3. Add the env vars from `.env.example` in the Vercel dashboard.
-4. Apply `supabase/migrations/*.sql` to your Supabase project, including `006_webhook_processing.sql`.
+4. Apply the SQL in `migrations/*.sql` (or run `npx drizzle-kit push`).
 5. Configure Stripe (or LemonSqueezy) and Mailgun webhooks — URLs are
    documented in `src/app/docs/payments` and `src/app/docs/email`.
 6. Ship.
@@ -137,23 +143,21 @@ runnable dev server:
 
 | Variable                                      | Required   | Purpose                                           |
 | --------------------------------------------- | ---------- | ------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`                    | yes        | Supabase project URL                              |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`               | yes        | Public anon key (safe in browser)                 |
-| `SUPABASE_SERVICE_ROLE_KEY`                   | yes        | Admin client for webhooks                         |
+| `BETTER_AUTH_SECRET`                          | yes        | Session signing secret (`openssl rand -base64 32`)|
+| `BETTER_AUTH_URL`                             | yes        | App base URL (callbacks, verification links)      |
 | `DATABASE_URL`                                | yes        | Postgres connection string                        |
 | `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` | for Stripe | Server-side checkout + webhook verify             |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`          | for Stripe | Browser-side redirect                             |
 | `LEMONSQUEEZY_API_KEY` + store/variant ids    | for LS     | Alternative to Stripe                             |
 | `MAILGUN_API_KEY` + `MAILGUN_DOMAIN`          | for email  | Transactional + inbound                           |
 | `MAILGUN_WEBHOOK_SIGNING_KEY`                 | for email  | Verifies delivery event callbacks                 |
-| `SUPABASE_WEBHOOK_SECRET`                     | production | HMAC for the auth sync webhook                    |
 | `NEXT_PUBLIC_SITE_URL`                        | yes        | Used for absolute URLs in metadata, OAuth, emails |
 | `NEXT_PUBLIC_PAYMENT_PROVIDER`                | yes        | `stripe` or `lemonsqueezy`                        |
 | `EMAIL_BRAND_NAME` … `EMAIL_BACKGROUND_COLOR` | optional   | Brand customization (defaults supplied)           |
 | `NEXT_PUBLIC_WAITLIST_ENABLED`                | optional   | Set to `true` to enable `/waitlist`               |
 
-Generate the Supabase webhook secret with `openssl rand -hex 32` and paste
-it into both `.env.local` and the Supabase dashboard.
+Generate the auth secret with `openssl rand -base64 32` and paste it into
+`.env.local` (and your hosting provider's env settings for production).
 
 ---
 
@@ -162,7 +166,7 @@ it into both `.env.local` and the Supabase dashboard.
 The full guides live inside the app at `/docs` so they always match the
 deployed code:
 
-- `/docs/auth` — Supabase auth, magic links, OAuth, webhook sync
+- `/docs/auth` — Better Auth, email verification, magic links, OAuth
 - `/docs/database` — Drizzle schema, migrations, row-level security
 - `/docs/email` — Mailgun setup, DNS (SPF/DKIM/DMARC), templates, dev preview
 - `/docs/payments` — Stripe and LemonSqueezy setup, webhooks, idempotency
@@ -205,19 +209,20 @@ src/
   lib/
     checkout.ts         # unified Stripe + LemonSqueezy switch
   webhooks/           # signed, retry-safe webhook handlers
-    supabase/           # client / server / admin tiers
+    auth.ts             # Better Auth server config (Drizzle adapter)
+    auth-client.ts      # Better Auth browser client
     mailgun.ts          # lazy Mailgun client + send helpers (logs to email_log)
     email-templates.ts  # 10 Hallmark modern-minimal templates
     rate-limit.ts       # in-memory token bucket (see SUGGESTIONS.md for Redis swap)
     logger.ts           # PII-redacting logger
     observability.ts    # opt-in PostHog + Sentry shim
-  hooks/                # React Query hooks (useAuth uses lazy Supabase client)
+  hooks/                # React Query hooks (useAuth wraps Better Auth)
   providers/            # QueryProvider, ObservabilityProvider (PageviewTracker in Suspense)
   config/
     email.ts            # brand config (env-driven) used by every template
 content/blog/           # markdown posts (drop a .md file, get a page)
-supabase/migrations/    # 001 schema, 002 RLS, 003 RLS optim, 004 waitlist, 005 email_log
-proxy.ts                # Next.js middleware (public paths, webhook allowlist)
+migrations/             # 001 schema (Better Auth + app), 002 waitlist, 003 email_log
+src/proxy.ts           # Next.js proxy/middleware (public paths, webhook allowlist)
 scripts/
   init-db.ts            # db:init script (seed roles, etc.)
   test-email.ts         # npm run email:test -- <template> <email>
@@ -260,8 +265,8 @@ Browse the live catalog at <http://localhost:3000/playground>.
 | Styling       | Tailwind CSS 3 + CSS variables     | Theming without runtime cost                |
 | UI primitives | Radix UI + custom shadcn-style     | Accessible, unstyled                        |
 | Animation     | Framer Motion 12                   | Production-tested, tree-shaken              |
-| Auth          | Supabase Auth                      | Email, OAuth, magic links, sessions, RLS    |
-| Database      | PostgreSQL (Supabase)              | RLS, branching, backups                     |
+| Auth          | Better Auth                        | Email, OAuth, magic links, sessions         |
+| Database      | PostgreSQL (any provider)          | Drizzle ORM, plain SQL migrations           |
 | ORM           | Drizzle 0.45                       | Type-safe SQL, no runtime overhead          |
 | Payments      | Stripe + LemonSqueezy              | Two providers, one checkout API             |
 | Email         | Mailgun                            | Transactional + inbound + delivery webhooks |
@@ -298,18 +303,15 @@ Run through this once before going live:
 
 ### Auth & data
 
-- [ ] Set `SUPABASE_WEBHOOK_SECRET` (`openssl rand -hex 32`) and configure
-      the Supabase auth webhook to your production endpoint
-- [ ] Apply every migration in `supabase/migrations/` to your Supabase
-      project
-- [ ] Enable **Point-in-Time Recovery** in the Supabase dashboard
-      (ships off by default)
-- [ ] Confirm RLS is on:
-      `select * from pg_tables where schemaname='public';` should show
-      `rowsecurity = true` on every table
-- [ ] Verify RLS policies:
-      `select * from pg_policies where schemaname='public';` should show
-      policies on `users`, `subscriptions`, `orders`, `payments`
+- [ ] Set `BETTER_AUTH_SECRET` (`openssl rand -base64 32`) in your hosting
+      provider's environment
+- [ ] Apply every migration in `migrations/` to your Postgres database
+- [ ] Enable your database provider's backups / Point-in-Time Recovery
+      (many managed Postgres providers ship it off by default)
+- [ ] Verify the auth + app tables exist:
+      `select table_name from information_schema.tables
+       where table_schema = 'public';` should list `user`, `session`,
+      `account`, `verification`, `subscriptions`, `orders`, `payments`
 
 ### Payments
 
@@ -348,14 +350,10 @@ Run through this once before going live:
 
 ### What was already done (so you don't redo it)
 
-- **Webhook processing.** Stripe uses its real event id. Lemon Squeezy,
-  Supabase, and Mailgun use an internal body dedupe key because those webhook
-  shapes do not consistently expose a delivery id. Failed claims remain
-  retryable and stale claims expire.
-- **RLS performance.** All policies in
-  `supabase/migrations/003_rls_optimization.sql` wrap auth lookups in
-  `(SELECT auth.uid())` and `(SELECT auth.jwt()->>'role')` so the planner
-  can hoist the subselect out of per-row evaluation.
+- **Webhook processing.** Stripe uses its real event id. Lemon Squeezy
+  and Mailgun use an internal body dedupe key because those webhook shapes
+  do not consistently expose a delivery id. Failed claims remain retryable
+  and stale claims expire.
 - **Lazy server clients.** `src/db/index.ts` and `src/utils/stripe.ts` use
   a `Proxy` so the build doesn't require `DATABASE_URL` or
   `STRIPE_SECRET_KEY` to be set in CI. They're initialised on first use,
@@ -365,8 +363,8 @@ Run through this once before going live:
   `/api/account/delete`, `/api/waitlist`.
 - **Health probe.** `/api/health` pings the database and is marked
   `force-dynamic` so it isn't evaluated at build time.
-- **Webhook allowlist.** `proxy.ts` short-circuits webhook paths so the
-  Supabase middleware never sees Stripe / LemonSqueezy / Mailgun traffic.
+- **Webhook allowlist.** `src/proxy.ts` short-circuits webhook paths so
+  middleware never delays Stripe / LemonSqueezy / Mailgun traffic.
 - **PII redaction.** `src/lib/logger.ts` walks objects and replaces any key
   in the `PII_KEYS` set with `[REDACTED]` before logging.
 - **Email log + delivery tracking.** `email_log` table written on every
@@ -495,7 +493,7 @@ After you buy and deploy, you'll want to:
 3. **Add a background job queue** when you need scheduled work
    (renewal reminders, abandoned cart, trial expiry cleanup).
 4. **Add file storage** when you need avatars or uploads
-   (Supabase Storage is the path of least resistance).
+   (Supabase Storage or Cloudflare R2 are the path of least resistance).
 5. **Add a blog with scheduling** when you outgrow markdown files
    (Keystatic, Sanity, Contentful).
 

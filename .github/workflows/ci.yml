@@ -28,9 +28,8 @@ jobs:
 
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/shipsaas_test
-      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
-      SUPABASE_SERVICE_ROLE_KEY: ci-service-key
+      BETTER_AUTH_SECRET: ci-better-auth-secret-placeholder-min-32-chars
+      BETTER_AUTH_URL: http://localhost:3000
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       STRIPE_SECRET_KEY: sk_test_ci_placeholder
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
@@ -41,7 +40,6 @@ jobs:
       NEXT_PUBLIC_PAYMENT_PROVIDER: stripe
       MAILGUN_API_KEY: ci_placeholder
       MAILGUN_DOMAIN: example.com
-      SUPABASE_WEBHOOK_SECRET: ci_webhook_secret
 
     steps:
       - uses: actions/checkout@v4

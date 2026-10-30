@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Activity, RefreshCw, User, Receipt } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getServerSession } from "@/lib/auth";
 import {
   getUserPayments,
   getUserSubscriptions,
@@ -68,11 +67,8 @@ function paymentTitle(reason: string | null | undefined) {
 }
 
 export default async function ActivityPage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
   if (!user) return null;
 
@@ -104,23 +100,23 @@ export default async function ActivityPage() {
     })),
   ];
 
-  if (user.last_sign_in_at) {
+  if (session?.session) {
     items.push({
       id: `signin-${user.id}`,
       kind: "signin",
       title: "Signed in",
-      description: "Latest authentication event from Supabase",
-      timestamp: new Date(user.last_sign_in_at),
+      description: "Latest authentication event",
+      timestamp: new Date(session.session.createdAt),
     });
   }
 
-  if (user.created_at) {
+  if (user.createdAt) {
     items.push({
       id: `created-${user.id}`,
       kind: "signin",
       title: "Account created",
       description: "Your ShipSaaS account was created",
-      timestamp: new Date(user.created_at),
+      timestamp: new Date(user.createdAt),
     });
   }
 

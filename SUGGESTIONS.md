@@ -26,7 +26,9 @@ real users it's a footgun.
 generous, serverless-friendly, no connection pool to manage). The
 `rateLimit()` signature in `src/lib/rate-limit.ts` is the only place that
 needs to change — drop in a Redis-backed implementation, callers stay
-identical.
+identical. Better Auth's own limiter has the same serverless caveat: set
+`rateLimit.storage: "secondary-storage"` in `src/lib/auth.ts` and provide
+a `secondaryStorage` implementation to share limits across instances.
 
 ```ts
 // Replace getRateLimitStorage() in src/lib/rate-limit.ts with:
@@ -38,12 +40,13 @@ const redis = new Redis({ url: process.env.UPSTASH_REDIS_URL!, token: process.en
 ### 2. Database read replicas
 
 **What the template does:** all reads + writes go through the primary
-Supabase Postgres connection.
+Postgres connection.
 
 **Why not by default:** adds an env var, doubles the connection-pool cost,
 and most Customer Projects don't need it until they hit real scale.
 
-**Recommended:** enable Supabase's [Read Replicas](https://supabase.com/docs/guides/database/read-replicas)
+**Recommended:** enable your provider's read replicas (Neon, Supabase,
+Crunchy) — see [Supabase Read Replicas](https://supabase.com/docs/guides/database/read-replicas)
 when your dashboard reports connection-pool saturation. Add a second
 Drizzle client pointing at the replica URL; route `SELECT`s to it.
 
@@ -52,19 +55,18 @@ Drizzle client pointing at the replica URL; route `SELECT`s to it.
 **What the template does:** `DATABASE_URL` connects directly. Fine on Vercel
 when the DB has PgBouncer in transaction mode; bad on long-lived servers.
 
-**Recommended:** if you outgrow Supabase's pooler, switch to [Supavisor](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)
-(session mode) or a dedicated pooler like PgBouncer. Add a second env var
+**Recommended:** use your provider's pooler (Neon pooler, Supavisor,
+PgBouncer) in transaction mode for serverless deployments. Add a second env var
 `DATABASE_POOL_URL` and read it in `src/db/index.ts` if it exists.
 
 ### 4. Backups and PITR
 
-**What the template does:** nothing — Supabase handles this for you, but it
-ships **off by default** on free and pro plans.
+**What the template does:** nothing — most managed Postgres providers offer
+automated backups, but the good ones are paid add-ons.
 
-**Recommended:** in the Supabase dashboard, enable
-[Point-in-Time Recovery](https://supabase.com/docs/guides/platform/backups#point-in-time-recovery)
-(PITR) on production projects. ~$100/mo on the pro plan, but it lets you
-restore to any second in the last 7 days.
+**Recommended:** enable your provider's Point-in-Time Recovery on production
+projects. It restores to any second within the retention window instead of
+picking a nightly snapshot.
 
 ---
 
@@ -135,14 +137,14 @@ avatars, attachments, exports, or uploads have to add it.
 
 | Provider | Why |
 | --- | --- |
-| [Supabase Storage](https://supabase.com/docs/guides/storage) | Same project as your DB, RLS-aware, cheapest. |
+| [Supabase Storage](https://supabase.com/docs/guides/storage) | Managed S3-compatible storage, generous free tier. |
 | [Cloudflare R2](https://cloudflare.com/products/r2) | No egress fees, S3-compatible, free tier 10GB. |
 | [AWS S3](https://aws.amazon.com/s3) | The default, mature ecosystem, more setup. |
 | [UploadThing](https://uploadthing.com) | Purpose-built for Next.js, file uploads in ~10 lines. |
 | [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) | Tight Vercel integration, paid from day 1. |
 
-**For avatars on the profile page:** Supabase Storage + a `avatars` bucket
-with RLS is the path of least resistance.
+**For avatars on the profile page:** any S3-compatible store (Supabase
+Storage, Cloudflare R2) + an `avatars` bucket is the path of least resistance.
 
 ---
 
@@ -179,16 +181,17 @@ toggle on". Recommended:
 
 ## Auth enhancements
 
-The template ships Supabase Auth with email/password + magic link + Google
-OAuth. Common adds:
+The template ships Better Auth with email/password + email verification +
+magic link + Google OAuth. Common adds:
 
 | Feature | How |
 | --- | --- |
-| More OAuth providers (GitHub, Apple, Microsoft) | Supabase dashboard → Auth → Providers. ~5 min each. |
-| 2FA / TOTP | Supabase has MFA support in the dashboard; needs UI work in `src/app/dashboard/profile`. |
-| Passkeys | Supabase supports WebAuthn; same caveat. |
-| Team / org accounts | Out of scope for a solo template. See [Clerk Organizations](https://clerk.com/docs/organizations/overview) or [WorkOS](https://workos.com). |
-| Session management | Supabase handles; expose "sign out other sessions" via `supabase.auth.signOut({ scope: 'others' })`. |
+| More OAuth providers (GitHub, Apple, Microsoft) | `socialProviders` in `src/lib/auth.ts` + client ID/secret. ~5 min each. |
+| 2FA / TOTP | Better Auth's `twoFactor` plugin + `twoFactorClient`; add UI in `src/app/dashboard/profile`. |
+| Passkeys | Better Auth has a `passkey` plugin; add the client plugin and UI. |
+| Admin features (roles, ban, impersonate) | Better Auth's `admin` plugin + `adminClient`; re-run `npx @better-auth/cli generate` for the schema, then add UI. |
+| Team / org accounts | Out of scope for a solo template. Better Auth's `organization` plugin, or [Clerk Organizations](https://clerk.com/docs/organizations/overview) / [WorkOS](https://workos.com). |
+| Session management | Sessions live in the `session` table; add a "sign out everywhere" button with `authClient.revokeSessions()`. |
 
 ---
 
@@ -241,7 +244,7 @@ indie buyer. For your Customer Project you'll want at least:
 
 **Minimum bar before going to production:**
 
-- Webhook signature rejection (Stripe, LemonSqueezy, Mailgun, Supabase)
+- Webhook signature rejection (Stripe, LemonSqueezy, Mailgun)
 - Webhook idempotency (duplicate `event_id` returns 200)
 - Rate limiter (10 in a row → 429)
 - RLS policy smoke (anon can't read other users' rows)

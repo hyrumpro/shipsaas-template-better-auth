@@ -6,13 +6,12 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { logger } from "@/lib/logger";
 
 type FormState = "idle" | "saving" | "saved" | "error";
 
 export function PasswordForm() {
-  const supabase = createClient();
   const [current, setCurrent] = React.useState("");
   const [next, setNext] = React.useState("");
   const [confirm, setConfirm] = React.useState("");
@@ -42,20 +41,21 @@ export function PasswordForm() {
     setState("saving");
     setMessage(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: (await supabase.auth.getUser()).data.user?.email ?? "",
-      password: current,
+    const { error } = await authClient.changePassword({
+      currentPassword: current,
+      newPassword: next,
+      // Signing out other devices after a password change is good hygiene.
+      revokeOtherSessions: true,
     });
-    if (signInError) {
-      setState("error");
-      setMessage("Current password is incorrect.");
-      return;
-    }
 
-    const { error } = await supabase.auth.updateUser({ password: next });
     if (error) {
       setState("error");
-      setMessage(error.message);
+      setMessage(
+        /password/i.test(error.message ?? "") &&
+        /invalid|incorrect/i.test(error.message ?? "")
+          ? "Current password is incorrect."
+          : error.message || "Failed to update password."
+      );
       logger.error("Password update failed", error);
       return;
     }

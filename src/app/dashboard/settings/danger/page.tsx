@@ -1,8 +1,7 @@
 import * as React from "react";
-import { cookies } from "next/headers";
 import { AlertTriangle } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "@/lib/auth";
 import { getActiveSubscription, getUserByEmail } from "@/db/queries";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +10,8 @@ import { DeleteAccountDialog } from "@/components/dashboard/DeleteAccountDialog"
 import { formatDate, subscriptionStatusLabel, type SubscriptionStatus } from "@/lib/format";
 
 export default async function DangerZonePage() {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getServerSession();
+  const user = session?.user;
 
   if (!user) return null;
 

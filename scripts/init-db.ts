@@ -1,11 +1,11 @@
 /**
  * Database Initialization Script
- * Run this after setting up Supabase to create initial data
+ * Verifies the DATABASE_URL connection and prints the setup checklist.
+ * Run this after configuring your Postgres database.
  */
 
 import { db } from "../src/db";
-import { users } from "../src/db/schema";
-import { createClient } from "@supabase/supabase-js";
+import { user } from "../src/db/schema";
 
 async function initializeDatabase() {
   console.log("🚀 Initializing database...");
@@ -13,44 +13,19 @@ async function initializeDatabase() {
   try {
     // Test database connection
     console.log("📡 Testing database connection...");
-    const result = await db.select().from(users).limit(1);
+    const result = await db.select().from(user).limit(1);
     console.log(
-      `✅ Database connection successful (${result.length} users checked)!`
+      `✅ Database connection successful (${result.length} user rows checked)!`
     );
-
-    // Check if Supabase is configured
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn(
-        "⚠️  Supabase credentials not found. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY"
-      );
-      return;
-    }
-
-    console.log("✅ Supabase credentials configured");
-
-    // Test Supabase connection
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data: authData, error: authError } =
-      await supabase.auth.getSession();
-
-    if (authError) {
-      console.warn("⚠️  Supabase auth check failed:", authError.message);
-    } else {
-      console.log(
-        `✅ Supabase connection successful (session: ${Boolean(authData?.session)})!`
-      );
-    }
 
     console.log("\n📋 Database Setup Checklist:");
     console.log("1. ✅ Database connection working");
-    console.log("2. ⏳ Run migrations in Supabase dashboard:");
-    console.log("   - supabase/migrations/001_initial_schema.sql");
-    console.log("   - supabase/migrations/002_row_level_security.sql");
-    console.log("3. ⏳ Verify tables in Supabase Table Editor");
-    console.log("4. ⏳ Test RLS policies");
+    console.log("2. ⏳ Apply the schema — pick one:");
+    console.log("   - npx drizzle-kit push          (fast, dev-friendly)");
+    console.log("   - psql $DATABASE_URL -f migrations/001_initial_schema.sql");
+    console.log("   - then the remaining migrations/00*.sql files in order");
+    console.log("3. ⏳ Verify tables (npm run db:studio)");
+    console.log("4. ⏳ Start the app and test sign-up → verification → dashboard");
     console.log("\n✨ Database initialization complete!");
   } catch (error) {
     console.error("❌ Database initialization failed:", error);
@@ -58,9 +33,4 @@ async function initializeDatabase() {
   }
 }
 
-// Run if called directly
-if (require.main === module) {
-  initializeDatabase();
-}
-
-export { initializeDatabase };
+initializeDatabase();

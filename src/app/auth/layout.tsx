@@ -1,20 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { getServerSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const supabase = await createClient(cookieStore);
+  const session = await getServerSession();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
+  if (session) {
     redirect("/dashboard");
   }
 

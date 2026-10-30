@@ -1,26 +1,30 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { isAuthSessionMissingError } from "@supabase/auth-js";
+import { authClient } from "@/lib/auth-client";
 import { logger } from "@/lib/logger";
 
+/**
+ * Client-side session hook. Returns the Better Auth user (or null) and is
+ * backed by TanStack Query, so `useAuth()` keeps the same consumer shape
+ * as before: `const { data: user, isLoading } = useAuth()`.
+ *
+ * For server-side checks use `getServerSession()` from "@/lib/auth".
+ */
 export function useAuth(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["auth", "user"],
     queryFn: async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+      const { data, error } = await authClient.getSession();
 
-      if (error && !isAuthSessionMissingError(error)) {
-        logger.error("Failed to get user", error);
+      // 401 simply means "not signed in" — not an error worth logging.
+      if (error) {
+        if (error.status === 401) return null;
+        logger.error("Failed to get session", error);
         throw error;
       }
 
-      return user;
+      return data?.user ?? null;
     },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
@@ -31,15 +35,14 @@ export function useAuth(options?: { enabled?: boolean }) {
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
-    mutationFn: async (updates: { data: Record<string, any> }) => {
-      const { data, error } = await supabase.auth.updateUser(updates);
+    mutationFn: async (updates: { name?: string; image?: string | null }) => {
+      const { data, error } = await authClient.updateUser(updates);
 
       if (error) {
         logger.error("Failed to update profile", error);
-        throw error;
+        throw new Error(error.message || "Failed to update profile");
       }
 
       return data;
@@ -56,15 +59,14 @@ export function useUpdateProfile() {
 
 export function useSignOut() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await authClient.signOut();
 
       if (error) {
         logger.error("Failed to sign out", error);
-        throw error;
+        throw new Error(error.message || "Failed to sign out");
       }
     },
     onSuccess: () => {

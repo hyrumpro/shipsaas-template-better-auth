@@ -18,7 +18,7 @@ const groups: { category: string; items: Item[] }[] = [
   {
     category: "Backend",
     items: [
-      { name: "Supabase", note: "Auth, Postgres, RLS, and session management" },
+      { name: "Better Auth", note: "Email/password, magic links, OAuth, sessions" },
       { name: "Drizzle ORM", note: "Schema → types → queries" },
       { name: "Next.js Route Handlers", note: "Typed, rate-limited, signed" },
     ],

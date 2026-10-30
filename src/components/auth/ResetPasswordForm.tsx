@@ -1,35 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { logger } from "@/lib/logger";
 
+/**
+ * Uses useSearchParams (for the reset token), so this component must be
+ * rendered inside a <Suspense> boundary — /auth/reset-password does this.
+ */
 export function ResetPasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [hasSession, setHasSession] = useState<boolean | null>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (active) setHasSession(Boolean(data.session));
-    })();
-    return () => {
-      active = false;
-    };
-  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +38,23 @@ export function ResetPasswordForm() {
       setErrorMessage("Passwords do not match.");
       return;
     }
+    if (!token) {
+      setErrorMessage("Missing reset token. Request a new reset link.");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await authClient.resetPassword({
+        newPassword: password,
+        token,
+      });
       if (error) {
         logger.error("Password update failed", error);
-        setErrorMessage(error.message || "Failed to update password.");
+        setErrorMessage(
+          error.message ||
+            "This reset link is invalid or has expired. Request a new one.",
+        );
       } else {
         logger.auth("password_reset_completed", undefined, true);
         setSuccessMessage("Password updated. Redirecting to your dashboard...");
@@ -67,30 +71,11 @@ export function ResetPasswordForm() {
     }
   };
 
-  if (hasSession === null) {
-    return (
-      <AuthShell
-        title="Set a new password"
-        subtitle="Loading…"
-        footer={
-          <Link
-            href="/auth/login"
-            className="text-foreground font-medium underline-offset-4 hover:underline"
-          >
-            Back to sign in
-          </Link>
-        }
-      >
-        <div className="h-24" />
-      </AuthShell>
-    );
-  }
-
-  if (!hasSession) {
+  if (!token) {
     return (
       <AuthShell
         title="Reset link expired"
-        subtitle="This reset link is no longer valid. Request a new one and try again."
+        subtitle="This reset link is missing its token or is no longer valid. Request a new one and try again."
         footer={
           <Link
             href="/auth/forgot-password"

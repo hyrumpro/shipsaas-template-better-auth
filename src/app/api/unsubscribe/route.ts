@@ -54,22 +54,22 @@ async function unsubscribeByEmail(email: string) {
   try {
     // We don't have a direct "by email" lookup helper; do it inline.
     const { db } = await import("@/db");
-    const { users } = await import("@/db/schema");
+    const { user } = await import("@/db/schema");
     const { eq } = await import("drizzle-orm");
-    const [user] = await db
+    const [row] = await db
       .select()
-      .from(users)
-      .where(eq(users.email, lower));
+      .from(user)
+      .where(eq(user.email, lower));
 
-    if (user) {
-      await updateUser(user.id, {
+    if (row) {
+      await updateUser(row.id, {
         metadata: {
-          ...((user.metadata as Record<string, any>) ?? {}),
+          ...((row.metadata as Record<string, any>) ?? {}),
           unsubscribedFromMarketing: true,
           unsubscribedAt: new Date().toISOString(),
         },
       });
-      logger.info("User unsubscribed from marketing", { userId: user.id, email: lower });
+      logger.info("User unsubscribed from marketing", { userId: row.id, email: lower });
     } else {
       logger.info("Unsubscribe request for unknown email", { email: lower });
     }

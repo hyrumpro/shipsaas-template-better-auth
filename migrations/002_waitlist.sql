@@ -16,15 +16,3 @@ CREATE TABLE IF NOT EXISTS waitlist (
 
 CREATE INDEX IF NOT EXISTS waitlist_email_idx ON waitlist (email);
 CREATE INDEX IF NOT EXISTS waitlist_created_at_idx ON waitlist (created_at);
-
--- ============================================================================
--- RLS — waitlist is server-only, no public reads
--- Service role (used by /api/waitlist) bypasses RLS, but we lock the table
--- down for the anon and authenticated roles in case anyone hits the public
--- schema directly.
--- ============================================================================
-
-ALTER TABLE waitlist ENABLE ROW LEVEL SECURITY;
-
--- No policies: anon and authenticated get zero access. The API route uses the
--- service-role Drizzle client at src/db/index.ts, which bypasses RLS.

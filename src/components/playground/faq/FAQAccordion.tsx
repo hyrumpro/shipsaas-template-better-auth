@@ -32,7 +32,7 @@ const faqs = [
   {
     question: "Is authentication included?",
     answer:
-      "Yes! Supabase authentication is fully integrated with email/password, OAuth providers (Google, GitHub, etc.), protected routes, and automatic session management. All webhook handlers are configured.",
+      "Yes! Better Auth is fully integrated with email/password, magic links, OAuth providers (Google, etc.), protected routes, and automatic session management. All webhook handlers are configured.",
   },
   {
     question: "What about email sending?",

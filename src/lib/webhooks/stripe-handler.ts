@@ -528,7 +528,7 @@ async function sendPaymentReceipt(
     if (!user?.email) return;
     await sendPaymentSuccessEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       formatMoney(amountCents, currency),
       planName,
       invoiceUrl
@@ -553,7 +553,7 @@ async function sendPaymentFailure(
       "http://localhost:3000";
     await sendPaymentFailedEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       planName,
       formatMoney(amountCents, currency),
       reason,
@@ -574,7 +574,7 @@ async function sendCancellation(
     if (!user?.email) return;
     await sendSubscriptionCancelledEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       endDate
     );
     logger.info("Subscription cancellation email queued", {
@@ -675,7 +675,7 @@ async function sendRenewalReminder(
       "http://localhost:3000";
     await sendSubscriptionRenewalUpcomingEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       planName,
       formatMoney(amountCents, currency),
       renewalDate,
@@ -701,7 +701,7 @@ async function sendTrialEndReminder(
       "http://localhost:3000";
     await sendTrialEndingEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       planName,
       trialEndDate,
       formatMoney(amountCents, currency),
@@ -723,7 +723,7 @@ async function sendRefund(
     if (!user?.email) return;
     await sendRefundIssuedEmail(
       user.email,
-      user.fullName ?? user.email.split("@")[0] ?? "there",
+      user.name ?? user.email.split("@")[0] ?? "there",
       amount,
       productName,
       refundId

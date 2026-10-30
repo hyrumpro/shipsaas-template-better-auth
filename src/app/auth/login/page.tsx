@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { LoginForm } from "@/components/LoginForm/LoginForm";
 import { Metadata } from "next";
 
@@ -10,6 +11,12 @@ export const metadata: Metadata = {
   },
 };
 
+// LoginForm reads ?redirectTo= via useSearchParams and needs a Suspense
+// boundary so the page can be statically prerendered.
 export default function Login() {
-  return <LoginForm />;
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
 }

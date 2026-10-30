@@ -24,7 +24,7 @@ const formatPrice = (cents: number, currency: string) => {
 };
 
 const everyPlanIncludes = [
-  "Supabase auth — email, magic links, Google",
+  "Better Auth — email, magic links, Google",
   "Stripe + LemonSqueezy checkout behind one switch",
   "10 branded transactional email templates",
   "Dashboard, blog, docs, and 55+ components",

@@ -33,7 +33,7 @@ export function verifyHmacSha256(
  * provider id. A changed payload produces a different key.
  */
 export function createWebhookBodyDedupeKey(
-  provider: "lemonsqueezy" | "mailgun" | "supabase",
+  provider: "lemonsqueezy" | "mailgun",
   rawBody: string
 ): string {
   return `${provider}:body:${crypto.createHash("sha256").update(rawBody).digest("hex")}`;
