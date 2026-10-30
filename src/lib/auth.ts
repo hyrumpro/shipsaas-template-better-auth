@@ -17,7 +17,10 @@ import { nextCookies } from "better-auth/next-js";
 import { magicLink } from "better-auth/plugins/magic-link";
 import { headers } from "next/headers";
 
+import { randomBytes } from "node:crypto";
+
 import { db } from "@/db";
+import { isShowcaseMode } from "@/lib/env-validation";
 import * as schema from "@/db/schema";
 import {
   sendEmailVerification,
@@ -36,6 +39,13 @@ const displayName = (email: string, name?: string | null) =>
   name?.trim() || email.split("@")[0];
 
 export const auth = betterAuth({
+  // Better Auth refuses to construct without a secret. In showcase mode
+  // (frontend-only demo, no environment configured) use an ephemeral
+  // per-process one so pages render; real deployments must set
+  // BETTER_AUTH_SECRET.
+  secret:
+    process.env.BETTER_AUTH_SECRET ??
+    (isShowcaseMode() ? randomBytes(32).toString("hex") : undefined),
   appName: process.env.NEXT_PUBLIC_APP_NAME || "ShipSaaS",
 
   database: drizzleAdapter(db, {
