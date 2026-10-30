@@ -26,7 +26,7 @@ export const Hero = () => {
         <div className="max-w-3xl">
           <Badge variant="outline" className="mb-6 rounded-full px-3 py-1">
             <span className="text-muted-foreground text-xs font-medium">
-              Next.js 16 SaaS template
+              Next.js 16 · Better Auth · Your own Postgres
             </span>
           </Badge>
 
@@ -35,9 +35,10 @@ export const Hero = () => {
           </h1>
 
           <p className="text-foreground/70 mt-6 max-w-2xl text-lg leading-relaxed md:text-xl">
-            Auth, payments, email, and a real dashboard. Production-ready code,
-            end-to-end types, and the architecture we wish every template
-            shipped with.
+            Better Auth on your own Postgres, Stripe and LemonSqueezy
+            payments, Mailgun email, and a real dashboard. Production-ready
+            code, end-to-end types, and the architecture most templates make
+            you build yourself.
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -57,7 +58,7 @@ export const Hero = () => {
           </p>
 
           <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
-            {["Auth, payments & email", "Real dashboard", "55+ components"].map(
+            {["Better Auth + magic links", "Stripe & LemonSqueezy", "55+ components"].map(
               (item) => (
                 <li
                   key={item}
