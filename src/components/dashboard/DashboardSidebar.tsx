@@ -245,7 +245,7 @@ export function DashboardMobileHeader({
   onOpen: () => void;
 }) {
   return (
-    <div className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-xl lg:hidden">
+    <div className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background px-4 lg:hidden">
       <Button
         variant="ghost"
         size="icon"

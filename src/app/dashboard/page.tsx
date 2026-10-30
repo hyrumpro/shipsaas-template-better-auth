@@ -108,7 +108,7 @@ export default async function DashboardOverviewPage() {
               <CardDescription>Current plan</CardDescription>
               <Sparkles className="h-4 w-4 text-primary" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl tabular-nums">
               {subscription ? subscription.planName : "Free"}
             </CardTitle>
           </CardHeader>
@@ -160,7 +160,7 @@ export default async function DashboardOverviewPage() {
               <CardDescription>Total spent</CardDescription>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl tabular-nums">
               {formatMoney(totalSpentCents)}
             </CardTitle>
           </CardHeader>
@@ -183,7 +183,7 @@ export default async function DashboardOverviewPage() {
               <CardDescription>Last payment</CardDescription>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
             </div>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl tabular-nums">
               {lastPayment ? formatMoney(lastPayment.amount, lastPayment.currency) : "—"}
             </CardTitle>
           </CardHeader>
