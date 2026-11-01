@@ -41,6 +41,29 @@ export interface Dictionary {
     builtWith: string;
     rights: string;
   };
+  pricing: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    free: {
+      name: string;
+      description: string;
+      period: string;
+      features: string[];
+      cta: string;
+    };
+    popularBadge: string;
+    choosePrefix: string;
+    includes: {
+      title: string;
+      subtitle: string;
+      items: string[];
+    };
+    contact: {
+      text: string;
+      link: string;
+    };
+  };
   sections: {
     features: {
       eyebrow: string;
@@ -107,6 +130,43 @@ const dictionaries: Record<Locale, Dictionary> = {
     footer: {
       builtWith: "Built with Next.js, Better Auth, and Stripe.",
       rights: "All rights reserved.",
+    },
+    pricing: {
+      eyebrow: "Pricing",
+      title: "Simple pricing. No surprises.",
+      subtitle:
+        "One plan with everything you need to ship a real SaaS. Free to start — upgrade when you outgrow the free tier.",
+      free: {
+        name: "Free",
+        description: "Try the template and build your first project.",
+        period: "/forever",
+        features: [
+          "Full source code",
+          "Local development setup",
+          "Documentation and examples",
+          "Community support",
+        ],
+        cta: "Get started",
+      },
+      popularBadge: "Most popular",
+      choosePrefix: "Choose",
+      includes: {
+        title: "Every plan includes",
+        subtitle:
+          "One source of truth — every plan unlocks the full template and the complete component library. The only difference is how much you pay for it.",
+        items: [
+          "Better Auth — email, magic links, Google",
+          "Stripe + LemonSqueezy checkout behind one switch",
+          "10 branded transactional email templates",
+          "Dashboard, blog, docs, and 55+ components",
+          "Rate limiting, retry-safe webhooks, and fail-fast env validation",
+          "SEO: metadata, sitemap, robots, JSON-LD",
+        ],
+      },
+      contact: {
+        text: "Need a custom plan or have questions?",
+        link: "Get in touch",
+      },
     },
     sections: {
       features: {
@@ -319,6 +379,43 @@ const dictionaries: Record<Locale, Dictionary> = {
     footer: {
       builtWith: "Construido con Next.js, Better Auth y Stripe.",
       rights: "Todos los derechos reservados.",
+    },
+    pricing: {
+      eyebrow: "Precios",
+      title: "Precios simples. Sin sorpresas.",
+      subtitle:
+        "Un plan con todo lo que necesitas para lanzar un SaaS real. Gratis para empezar — mejora cuando superes el nivel gratuito.",
+      free: {
+        name: "Gratis",
+        description: "Prueba la plantilla y construye tu primer proyecto.",
+        period: "/para siempre",
+        features: [
+          "Código fuente completo",
+          "Configuración de desarrollo local",
+          "Documentación y ejemplos",
+          "Soporte de la comunidad",
+        ],
+        cta: "Comenzar",
+      },
+      popularBadge: "El más popular",
+      choosePrefix: "Elegir",
+      includes: {
+        title: "Cada plan incluye",
+        subtitle:
+          "Una única fuente de verdad — cada plan desbloquea la plantilla completa y la librería de componentes entera. La única diferencia es cuánto pagas por ella.",
+        items: [
+          "Better Auth: email, enlaces mágicos y Google",
+          "Checkout con Stripe + LemonSqueezy tras un solo interruptor",
+          "10 plantillas de email con tu marca",
+          "Dashboard, blog, documentación y más de 55 componentes",
+          "Rate limiting, webhooks con reintentos seguros y validación de entorno",
+          "SEO: metadatos, sitemap, robots, JSON-LD",
+        ],
+      },
+      contact: {
+        text: "¿Necesitas un plan personalizado o tienes dudas?",
+        link: "Escríbenos",
+      },
     },
     sections: {
       features: {
