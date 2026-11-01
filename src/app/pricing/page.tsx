@@ -28,7 +28,7 @@ const everyPlanIncludes = [
   "Stripe + LemonSqueezy checkout behind one switch",
   "10 branded transactional email templates",
   "Dashboard, blog, docs, and 55+ components",
-  "RLS, rate limiting, and retry-safe webhooks",
+  "Rate limiting, retry-safe webhooks, and fail-fast env validation",
   "SEO: metadata, sitemap, robots, JSON-LD",
 ];
 

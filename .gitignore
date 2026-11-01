@@ -66,6 +66,9 @@ pnpm-lock.yaml
 .env.docker
 .env.production
 
+# local ops runbook (contains live database credentials)
+DB-SETUP-RUNBOOK.md
+
 # vercel
 .vercel
 
