@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Terms of service",
@@ -12,10 +13,11 @@ const TOS = () => {
   return (
     <div className="min-h-screen">
       <header className="border-border border-b">
-        <div className="mx-auto flex h-14 w-full max-w-3xl items-center px-6">
+        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-6">
           <Link href="/" aria-label="ShipSaaS home">
             <Logo />
           </Link>
+          <LanguageSwitcher />
         </div>
       </header>
 

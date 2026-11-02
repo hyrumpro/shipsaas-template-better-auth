@@ -64,6 +64,92 @@ export interface Dictionary {
       link: string;
     };
   };
+  auth: {
+    login: {
+      title: string;
+      subtitle: string;
+      footerText: string;
+      footerLink: string;
+      modePassword: string;
+      modeMagic: string;
+      emailLabel: string;
+      passwordLabel: string;
+      magicNote: string;
+      submit: string;
+      submitting: string;
+      magicSubmit: string;
+      magicSending: string;
+      forgot: string;
+      or: string;
+      google: string;
+      success: string;
+      magicSent: string;
+      notVerified: string;
+      resend: string;
+      verificationSent: string;
+      invalidCredentials: string;
+      magicError: string;
+      googleError: string;
+      unexpected: string;
+      resendError: string;
+    };
+    register: {
+      title: string;
+      subtitle: string;
+      nameLabel: string;
+      emailLabel: string;
+      passwordLabel: string;
+      confirmLabel: string;
+      passwordHelper: string;
+      submit: string;
+      submitting: string;
+      footerText: string;
+      footerLink: string;
+      success: string;
+      alreadyRegistered: string;
+      weakPassword: string;
+      unexpected: string;
+    };
+    forgot: {
+      title: string;
+      subtitle: string;
+      emailLabel: string;
+      submit: string;
+      sending: string;
+      success: string;
+      footerText: string;
+      footerLink: string;
+      unexpected: string;
+    };
+    reset: {
+      title: string;
+      subtitle: string;
+      newLabel: string;
+      confirmLabel: string;
+      submit: string;
+      submitting: string;
+      success: string;
+      expiredTitle: string;
+      expiredSubtitle: string;
+      expiredCta: string;
+      footerLink: string;
+      minLength: string;
+      mismatch: string;
+      missingToken: string;
+      invalidLink: string;
+      unexpected: string;
+    };
+  };
+  blog: {
+    navBlog: string;
+    navComponents: string;
+    navDocs: string;
+    getStarted: string;
+  };
+  docs: {
+    backHome: string;
+    eyebrow: string;
+  };
   sections: {
     features: {
       eyebrow: string;
@@ -163,10 +249,103 @@ const dictionaries: Record<Locale, Dictionary> = {
           "SEO: metadata, sitemap, robots, JSON-LD",
         ],
       },
-      contact: {
-        text: "Need a custom plan or have questions?",
-        link: "Get in touch",
+    contact: {
+      text: "Need a custom plan or have questions?",
+      link: "Get in touch",
+    },
+    },
+    auth: {
+      login: {
+        title: "Sign in",
+        subtitle:
+          "Use your email and password, or get a magic link sent to your inbox.",
+        footerText: "Don't have an account?",
+        footerLink: "Create one",
+        modePassword: "Password",
+        modeMagic: "Magic link",
+        emailLabel: "Email",
+        passwordLabel: "Password",
+        magicNote: "We'll email you a one-time sign-in link.",
+        submit: "Sign in",
+        submitting: "Signing in...",
+        magicSubmit: "Send magic link",
+        magicSending: "Sending...",
+        forgot: "Forgot your password?",
+        or: "Or",
+        google: "Continue with Google",
+        success: "Login successful! Redirecting...",
+        magicSent: "Magic link sent! Check your email to complete the login.",
+        notVerified:
+          "Your email hasn't been verified yet. Check your inbox for the verification link, or resend it below.",
+        resend: "Resend verification email",
+        verificationSent: "Verification email sent! Check your inbox.",
+        invalidCredentials: "Failed to login. Please check your credentials.",
+        magicError: "Failed to send magic link. Please try again.",
+        googleError: "Failed to login with Google.",
+        unexpected: "An unexpected error occurred. Please try again.",
+        resendError: "Failed to resend the email.",
       },
+      register: {
+        title: "Create your account",
+        subtitle: "Free to start. No credit card required.",
+        nameLabel: "Full name",
+        emailLabel: "Email",
+        passwordLabel: "Password",
+        confirmLabel: "Confirm password",
+        passwordHelper: "At least 8 characters with uppercase, lowercase, and a number.",
+        submit: "Create account",
+        submitting: "Creating account...",
+        footerText: "Already have an account?",
+        footerLink: "Sign in",
+        success:
+          "Account created! Check your inbox — click the verification link to activate your account.",
+        alreadyRegistered: "This email is already registered. Please sign in instead.",
+        weakPassword: "Password is too weak. Please choose a stronger one.",
+        unexpected: "Registration failed. Please try again.",
+      },
+      forgot: {
+        title: "Forgot your password?",
+        subtitle:
+          "Enter your email and we'll send you a link to choose a new password.",
+        emailLabel: "Email",
+        submit: "Send reset link",
+        sending: "Sending...",
+        success:
+          "If an account exists for that email, a reset link is on its way. Check your inbox.",
+        footerText: "Remembered it?",
+        footerLink: "Back to sign in",
+        unexpected: "An unexpected error occurred. Please try again.",
+      },
+      reset: {
+        title: "Set a new password",
+        subtitle:
+          "Choose a new password for your account. Use at least 8 characters.",
+        newLabel: "New password",
+        confirmLabel: "Confirm new password",
+        submit: "Update password",
+        submitting: "Updating...",
+        success: "Password updated. Redirecting to your dashboard...",
+        expiredTitle: "Reset link expired",
+        expiredSubtitle:
+          "This reset link is missing its token or is no longer valid. Request a new one and try again.",
+        expiredCta: "Send another reset link",
+        footerLink: "Back to sign in",
+        minLength: "Password must be at least 8 characters.",
+        mismatch: "Passwords do not match.",
+        missingToken: "Missing reset token. Request a new reset link.",
+        invalidLink: "This reset link is invalid or has expired. Request a new one.",
+        unexpected: "An unexpected error occurred. Please try again.",
+      },
+    },
+    blog: {
+      navBlog: "Blog",
+      navComponents: "Components",
+      navDocs: "Docs",
+      getStarted: "Get started",
+    },
+    docs: {
+      backHome: "Back to home",
+      eyebrow: "Documentation",
     },
     sections: {
       features: {
@@ -416,6 +595,101 @@ const dictionaries: Record<Locale, Dictionary> = {
         text: "¿Necesitas un plan personalizado o tienes dudas?",
         link: "Escríbenos",
       },
+    },
+    auth: {
+      login: {
+        title: "Iniciar sesión",
+        subtitle:
+          "Usa tu email y contraseña, o recibe un enlace mágico en tu bandeja.",
+        footerText: "¿No tienes cuenta?",
+        footerLink: "Crea una",
+        modePassword: "Contraseña",
+        modeMagic: "Enlace mágico",
+        emailLabel: "Email",
+        passwordLabel: "Contraseña",
+        magicNote: "Te enviaremos un enlace de un solo uso por email.",
+        submit: "Iniciar sesión",
+        submitting: "Iniciando...",
+        magicSubmit: "Enviar enlace mágico",
+        magicSending: "Enviando...",
+        forgot: "¿Olvidaste tu contraseña?",
+        or: "O",
+        google: "Continuar con Google",
+        success: "¡Sesión iniciada! Redirigiendo...",
+        magicSent: "¡Enlace mágico enviado! Revisa tu email para completar el acceso.",
+        notVerified:
+          "Tu email aún no está verificado. Revisa tu bandeja para el enlace de verificación, o reenvíalo abajo.",
+        resend: "Reenviar email de verificación",
+        verificationSent: "¡Email de verificación enviado! Revisa tu bandeja.",
+        invalidCredentials: "No se pudo iniciar sesión. Revisa tus credenciales.",
+        magicError: "No se pudo enviar el enlace mágico. Inténtalo de nuevo.",
+        googleError: "No se pudo iniciar sesión con Google.",
+        unexpected: "Ocurrió un error inesperado. Inténtalo de nuevo.",
+        resendError: "No se pudo reenviar el email.",
+      },
+      register: {
+        title: "Crea tu cuenta",
+        subtitle: "Gratis para empezar. Sin tarjeta de crédito.",
+        nameLabel: "Nombre completo",
+        emailLabel: "Email",
+        passwordLabel: "Contraseña",
+        confirmLabel: "Confirma la contraseña",
+        passwordHelper:
+          "Al menos 8 caracteres con mayúsculas, minúsculas y un número.",
+        submit: "Crear cuenta",
+        submitting: "Creando cuenta...",
+        footerText: "¿Ya tienes cuenta?",
+        footerLink: "Inicia sesión",
+        success:
+          "¡Cuenta creada! Revisa tu bandeja: haz clic en el enlace de verificación para activarla.",
+        alreadyRegistered:
+          "Este email ya está registrado. Inicia sesión en su lugar.",
+        weakPassword: "La contraseña es demasiado débil. Elige una más fuerte.",
+        unexpected: "No se pudo registrar. Inténtalo de nuevo.",
+      },
+      forgot: {
+        title: "¿Olvidaste tu contraseña?",
+        subtitle:
+          "Introduce tu email y te enviaremos un enlace para elegir una nueva contraseña.",
+        emailLabel: "Email",
+        submit: "Enviar enlace",
+        sending: "Enviando...",
+        success:
+          "Si existe una cuenta con ese email, el enlace está en camino. Revisa tu bandeja.",
+        footerText: "¿La recordaste?",
+        footerLink: "Volver a iniciar sesión",
+        unexpected: "Ocurrió un error inesperado. Inténtalo de nuevo.",
+      },
+      reset: {
+        title: "Elige una nueva contraseña",
+        subtitle:
+          "Elige una nueva contraseña para tu cuenta. Usa al menos 8 caracteres.",
+        newLabel: "Nueva contraseña",
+        confirmLabel: "Confirma la nueva contraseña",
+        submit: "Actualizar contraseña",
+        submitting: "Actualizando...",
+        success: "Contraseña actualizada. Redirigiendo a tu dashboard...",
+        expiredTitle: "Enlace caducado",
+        expiredSubtitle:
+          "A este enlace le falta el token o ya no es válido. Solicita uno nuevo e inténtalo de nuevo.",
+        expiredCta: "Enviar otro enlace",
+        footerLink: "Volver a iniciar sesión",
+        minLength: "La contraseña debe tener al menos 8 caracteres.",
+        mismatch: "Las contraseñas no coinciden.",
+        missingToken: "Falta el token. Solicita un nuevo enlace.",
+        invalidLink: "Este enlace no es válido o ha caducado. Solicita uno nuevo.",
+        unexpected: "Ocurrió un error inesperado. Inténtalo de nuevo.",
+      },
+    },
+    blog: {
+      navBlog: "Blog",
+      navComponents: "Componentes",
+      navDocs: "Documentación",
+      getStarted: "Comenzar",
+    },
+    docs: {
+      backHome: "Volver al inicio",
+      eyebrow: "Documentación",
     },
     sections: {
       features: {

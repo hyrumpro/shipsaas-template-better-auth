@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
 
 /**
  * Auth shell — single-column, centered, hairline card.
- * Used by /auth/login, /auth/register, /auth/confirm.
+ * Used by /auth/login, /auth/register, /auth/forgot-password and
+ * /auth/reset-password. The header carries the language switcher so the
+ * whole sign-up flow follows the selected locale.
  */
 export function AuthShell({
   title,
@@ -22,10 +25,11 @@ export function AuthShell({
   return (
     <div className="bg-background min-h-screen">
       <header className="border-border border-b">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center px-6">
+        <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-6">
           <Link href="/" aria-label="ShipSaaS home">
             <Logo />
           </Link>
+          <LanguageSwitcher />
         </div>
       </header>
 

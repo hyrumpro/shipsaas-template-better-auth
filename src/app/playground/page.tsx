@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSwitcher } from "@/components/playground/ui/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import {
@@ -125,6 +126,7 @@ export default function PlaygroundPage() {
               </Link>
             </Button>
             <ThemeSwitcher />
+            <LanguageSwitcher />
             <Button asChild size="sm">
               <Link href="/docs">
                 <Code2 className="h-3.5 w-3.5" />

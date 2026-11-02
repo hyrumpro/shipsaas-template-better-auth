@@ -27,6 +27,8 @@ export function LoginForm() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
+  const copy = t.auth.login;
   const redirectTo = searchParams.get("redirectTo") || "/dashboard";
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -42,7 +44,7 @@ export function LoginForm() {
         {
           onSuccess: () => {
             logger.auth("login_password", email, true);
-            setSuccessMessage("Login successful! Redirecting...");
+            setSuccessMessage(copy.success);
             router.push(redirectTo);
             router.refresh();
           },
@@ -56,20 +58,15 @@ export function LoginForm() {
           /not verified|verify your email/i.test(error.message ?? "")
         ) {
           setNeedsVerification(true);
-          setErrorMessage(
-            "Your email hasn't been verified yet. Check your inbox for the verification link, or resend it below."
-          );
+          setErrorMessage(copy.notVerified);
         } else {
-          setErrorMessage(
-            error.message ||
-              "Failed to login. Please check your credentials."
-          );
+          setErrorMessage(error.message || copy.invalidCredentials);
         }
         setIsLoading(false);
       }
     } catch (error) {
       logger.error("Unexpected login error", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      setErrorMessage(copy.unexpected);
       setIsLoading(false);
     }
   };
@@ -82,14 +79,14 @@ export function LoginForm() {
         callbackURL: redirectTo,
       });
       if (error) {
-        setErrorMessage(error.message || "Failed to resend the email.");
+        setErrorMessage(error.message || copy.resendError);
       } else {
-        setSuccessMessage("Verification email sent! Check your inbox.");
+        setSuccessMessage(copy.verificationSent);
         setErrorMessage("");
       }
     } catch (error) {
       logger.error("Failed to resend verification email", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      setErrorMessage(copy.unexpected);
     } finally {
       setIsLoading(false);
     }
@@ -113,17 +110,13 @@ export function LoginForm() {
 
       if (error) {
         logger.error("Magic link login failed", error);
-        setErrorMessage(
-          error.message || "Failed to send magic link. Please try again."
-        );
+        setErrorMessage(error.message || copy.magicError);
       } else {
-        setSuccessMessage(
-          "Magic link sent! Check your email to complete the login."
-        );
+        setSuccessMessage(copy.magicSent);
       }
     } catch (error) {
       logger.error("Unexpected magic link error", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      setErrorMessage(copy.unexpected);
     } finally {
       setIsLoading(false);
     }
@@ -141,29 +134,29 @@ export function LoginForm() {
 
       if (error) {
         logger.error("Google login failed", error);
-        setErrorMessage(error.message || "Failed to login with Google.");
+        setErrorMessage(error.message || copy.googleError);
         setIsLoading(false);
       }
       // On success the browser is redirected to Google, so nothing to do.
     } catch (error) {
       logger.error("Unexpected Google login error", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      setErrorMessage(copy.unexpected);
       setIsLoading(false);
     }
   };
 
   return (
     <AuthShell
-      title="Sign in"
-      subtitle="Use your email and password, or get a magic link sent to your inbox."
+      title={copy.title}
+      subtitle={copy.subtitle}
       footer={
         <p className="text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          {copy.footerText}{" "}
           <Link
             href="/auth/register"
             className="text-foreground font-medium underline-offset-4 hover:underline"
           >
-            Create one
+            {copy.footerLink}
           </Link>
         </p>
       }
@@ -184,7 +177,7 @@ export function LoginForm() {
               disabled={isLoading}
               className="text-foreground mt-2 block font-medium underline-offset-4 hover:underline disabled:opacity-50"
             >
-              Resend verification email
+              {copy.resend}
             </button>
           )}
         </div>
@@ -203,7 +196,7 @@ export function LoginForm() {
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            Password
+            {copy.modePassword}
           </button>
           <button
             type="button"
@@ -216,7 +209,7 @@ export function LoginForm() {
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            Magic link
+            {copy.modeMagic}
           </button>
         </div>
       </div>
@@ -224,7 +217,7 @@ export function LoginForm() {
       {loginMode === "password" ? (
         <form onSubmit={handlePasswordLogin} className="mt-6 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{copy.emailLabel}</Label>
             <Input
               id="email"
               type="email"
@@ -236,7 +229,7 @@ export function LoginForm() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{copy.passwordLabel}</Label>
             <Input
               id="password"
               type="password"
@@ -248,13 +241,13 @@ export function LoginForm() {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? copy.submitting : copy.submit}
           </Button>
         </form>
       ) : (
         <form onSubmit={handleMagicLinkLogin} className="mt-6 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email-magic">Email</Label>
+            <Label htmlFor="email-magic">{copy.emailLabel}</Label>
             <Input
               id="email-magic"
               type="email"
@@ -264,12 +257,10 @@ export function LoginForm() {
               required
               autoComplete="email"
             />
-            <p className="text-muted-foreground text-xs">
-              We&apos;ll email you a one-time sign-in link.
-            </p>
+            <p className="text-muted-foreground text-xs">{copy.magicNote}</p>
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Sending..." : "Send magic link"}
+            {isLoading ? copy.magicSending : copy.magicSubmit}
           </Button>
         </form>
       )}
@@ -279,7 +270,7 @@ export function LoginForm() {
           href="/auth/forgot-password"
           className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
         >
-          Forgot your password?
+          {copy.forgot}
         </Link>
       </div>
 
@@ -289,7 +280,7 @@ export function LoginForm() {
         </div>
         <div className="relative flex justify-center text-xs">
           <span className="bg-background text-muted-foreground px-2 uppercase tracking-wider">
-            Or
+            {copy.or}
           </span>
         </div>
       </div>
@@ -323,7 +314,7 @@ export function LoginForm() {
             fill="#EA4335"
           />
         </svg>
-        Continue with Google
+        {copy.google}
       </Button>
     </AuthShell>
   );
