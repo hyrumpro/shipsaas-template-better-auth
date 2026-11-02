@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 type LoginMode = "password" | "magic-link";
 
